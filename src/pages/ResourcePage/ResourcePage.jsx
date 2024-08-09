@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import NavBar from "../../components/NavBar/NavBar";
 import ResourceDetailCard from "../../components/ResourceDetailCard/ResourceDetailCard";
 import ResourceList from "../../components/ResourceList/ResourceList";
@@ -128,7 +128,8 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
       category === "All" || resource.discipline === category;
     const matchesType = type.length === 0 || type.includes(resource.type);
     const matchesSkill = skill.length === 0 || skill.includes(resource.level);
-    const matchesDuration = duration.length === 0 || duration.includes(resource.duration);
+    const matchesDuration =
+      duration.length === 0 || duration.includes(resource.duration);
 
     return currentCategory && matchesType && matchesSkill && matchesDuration;
   });
@@ -150,7 +151,9 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   };
 
   const handleSelectResource = (clickedId) => {
-    const foundResource = resources.find((resource) => resource.id === clickedId);
+    const foundResource = resources.find(
+      (resource) => resource.id === clickedId
+    );
     if (foundResource) {
       console.log("Setting selected resource:", foundResource);
       setSelectedResource(foundResource);
@@ -172,17 +175,19 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   };
 
   const handleResourceUpdate = useCallback((updatedResource) => {
-    setResources(prevResources =>
-      prevResources.map(resource =>
-        resource.id === updatedResource.id ? { ...resource, ...updatedResource } : resource
+    setResources((prevResources) =>
+      prevResources.map((resource) =>
+        resource.id === updatedResource.id
+          ? { ...resource, ...updatedResource }
+          : resource
       )
     );
-    setSelectedResource(prev => ({ ...prev, ...updatedResource }));
+    setSelectedResource((prev) => ({ ...prev, ...updatedResource }));
   }, []);
 
   // Update comment counts when resources change
   const updateCommentCounts = useCallback(async () => {
-    const commentsRef = collection(database, 'Comments');
+    const commentsRef = collection(database, "Comments");
     const newCommentCounts = {};
 
     for (const resource of resources) {
@@ -223,15 +228,15 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
       <div className="resource-details__container">
         {selectedResource && Object.keys(selectedResource).length > 0 && (
           <ResourceDetailCard
-          selectedResource={selectedResource}
-          handleToggleBookmarked={handleToggleBookmarked}
-          savedBookmarks={savedBookmarks}
-          isBookmarked={isBookmarked}
-          comments={comments}
-          currentUser={currentUser}
-          onResourceUpdate={handleResourceUpdate}
-          onCommentAdded={handleCommentAdded}
-        />
+            selectedResource={selectedResource}
+            handleToggleBookmarked={handleToggleBookmarked}
+            savedBookmarks={savedBookmarks}
+            isBookmarked={isBookmarked}
+            comments={comments}
+            currentUser={currentUser}
+            onResourceUpdate={handleResourceUpdate}
+            onCommentAdded={handleCommentAdded}
+          />
         )}
       </div>
     </div>

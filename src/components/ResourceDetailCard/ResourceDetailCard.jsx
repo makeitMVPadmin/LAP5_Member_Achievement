@@ -5,9 +5,9 @@ import bookmarkedIcon from "../../assets/icons/bookmarked.svg";
 import Upvoting from "../Upvoting/Upvoting";
 import { Link } from "react-router-dom";
 import { Comments } from "../Comments/Comments";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
+import { PointsContext } from "../../App";
 
-// ResourceDetailCard.jsx
 const ResourceDetailCard = React.memo(
   ({
     selectedResource,
@@ -69,6 +69,12 @@ const ResourceDetailCard = React.memo(
       // }
     };
 
+    const { addPoints } = useContext(PointsContext);
+
+    const handleUpvote = () => {
+      addPoints(2);
+    };
+
     return (
       <>
         <section className="resource-details">
@@ -116,6 +122,7 @@ const ResourceDetailCard = React.memo(
                   initialUpvotes={localResource.upvote}
                   initialDownvotes={localResource.downvote}
                   onVoteChange={handleVoteChange}
+                  onClick={handleUpvote}
                 />
               </div>
             </div>

@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, createContext } from "react";
 import Header from "./components/Header/Header.jsx";
 import Home from "./pages/HomePage/HomePage.jsx";
 import ResourcePage from "./pages/ResourcePage/ResourcePage.jsx";
@@ -10,10 +10,53 @@ import ContributionsPage from "./pages/ContributionsPage/ContributionsPage.jsx";
 import { database } from "./config/firebase.js";
 import { doc, getDoc } from "@firebase/firestore";
 
+export const PointsContext = createContext();
+
 const App = () => {
   const [savedBookmarks, setSavedBookmarks] = useState([]);
   const [currentUser, setCurrentUser] = useState({}); // Sample current userID
-  const [points, setPoints] = useState(600);
+  // const [points, setPoints] = useState(600);
+  const [points, setPoints] = useState(() => {
+    const savedPoints = localStorage.getItem("points");
+    if (savedPoints === null) return 600;
+    const parsedPoints = parseInt(savedPoints, 10);
+    console.log("Saved Points:", savedPoints);
+    return !isNaN(parsedPoints) ? parsedPoints : 600;
+  });
+
+  const addPoints = (amount) => {
+    setPoints((prevPoints) => {
+      const newPoints = prevPoints + amount;
+      localStorage.setItem("points", newPoints);
+      return newPoints;
+    });
+  };
+
+  const deductPoints = (amount) => {
+    setPoints((prevPoints) => {
+      const newPoints = Math.max(prevPoints - amount, 0);
+      localStorage.setItem("points", newPoints);
+      console.log("Deducting Points:", newPoints);
+      return newPoints;
+    });
+  };
+
+  const handlePointsChange = (newPoints) => {
+    localStorage.setItem("points", newPoints);
+    setPoints(newPoints);
+  };
+
+  // const addPoints = (amount) => {
+  //   setPoints((prevPoints) => prevPoints + amount);
+  // };
+
+  // const deductPoints = (amount) => {
+  //   setPoints((prevPoints) => Math.max(prevPoints - amount, 0));
+  // };
+
+  // const handlePointsChange = (newPoints) => {
+  //   setPoints(newPoints);
+  // };
 
   console.log(currentUser);
 
@@ -48,57 +91,63 @@ const App = () => {
     localStorage.setItem("bookmarks", JSON.stringify(updatedBookmarks));
   };
 
-  const handlePointsChange = (newPoints) => {
-    setPoints(newPoints);
-  };
-
   return (
     <>
-      <ChakraProvider>
-        <BrowserRouter>
-          <Header />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route
-              path="/resource"
-              element={
-                <ResourcePage
-                  onBookmarkUpdate={handleBookmarkUpdate}
-                  currentUser={currentUser}
-                />
-              }
-            />
-            <Route
-              path="/bookmarked"
-              element={
-                <BookMarkedPage
-                  onBookmarkUpdate={handleBookmarkUpdate}
-                  bookmarkedResources={savedBookmarks}
-                  currentUser={currentUser}
-                />
-              }
-            />
-            <Route
-              path="/rewards"
-              element={
-                <RewardsPage
-                  points={points}
-                  onPointsChange={handlePointsChange}
-                />
-              }
-            />
-            <Route
-              path="/contributions"
-              element={
-                <ContributionsPage
-                  onBookmarkUpdate={handleBookmarkUpdate}
-                  currentUser={currentUser}
-                />
-              }
-            />
-          </Routes>
-        </BrowserRouter>
-      </ChakraProvider>
+      <PointsContext.Provider
+        value={{
+          points,
+          setPoints,
+          addPoints,
+          deductPoints,
+          handlePointsChange,
+        }}
+      >
+        <ChakraProvider>
+          <BrowserRouter>
+            <Header />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route
+                path="/resource"
+                element={
+                  <ResourcePage
+                    onBookmarkUpdate={handleBookmarkUpdate}
+                    currentUser={currentUser}
+                  />
+                }
+              />
+              <Route
+                path="/bookmarked"
+                element={
+                  <BookMarkedPage
+                    onBookmarkUpdate={handleBookmarkUpdate}
+                    bookmarkedResources={savedBookmarks}
+                    currentUser={currentUser}
+                  />
+                }
+              />
+              <Route
+                path="/rewards"
+                element={
+                  <RewardsPage
+                    points={points}
+                    onPointsChange={handlePointsChange}
+                  />
+                }
+              />
+              <Route
+                path="/contributions"
+                element={
+                  <ContributionsPage
+                    onBookmarkUpdate={handleBookmarkUpdate}
+                    currentUser={currentUser}
+                  />
+                }
+              />
+            </Routes>
+          </BrowserRouter>
+        </ChakraProvider>
+      </PointsContext.Provider>
     </>
   );
 };
