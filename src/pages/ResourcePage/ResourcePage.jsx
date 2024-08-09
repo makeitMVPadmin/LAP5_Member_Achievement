@@ -107,10 +107,10 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   useEffect(() => {
     if (resources.length > 0 && !activeResourceId) {
       const firstResourceId = resources[0].id;
-      setActiveResourceId(firstResourceId);
-      setSelectedResource(
-        resources.find((resource) => resource.id === firstResourceId)
-      );
+      if (activeResourceId !== firstResourceId) {
+        setActiveResourceId(firstResourceId);
+        setSelectedResource(resources.find(resource => resource.id === firstResourceId));
+      }
     }
   }, [resources, activeResourceId]);
 
@@ -163,10 +163,11 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
     }
   };
 
-  useEffect(() => {
-    console.log("Resources:", resources);
-    console.log("Selected Resource:", selectedResource);
-  }, [resources, selectedResource]);
+  // Removed this console log that was being used for debugging
+  // useEffect(() => {
+  //   console.log("Resources:", resources);
+  //   console.log("Selected Resource:", selectedResource);
+  // }, [resources, selectedResource]);
 
   const handleFilterChange = ({ type, skill, duration }) => {
     setType(type === "All" || type === "" ? [] : [type]);
@@ -194,21 +195,25 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
     }
 
     setCommentCounts(newCommentCounts);
-    setResources(prevResources =>
-      prevResources.map(resource => ({
-        ...resource,
-        commentCount: newCommentCounts[resource.id],
-      }))
-    );
-  }, [resources]);
+    // Removing this line to see if it prevents the infinite loop issue
+    // setResources(prevResources =>
+    //   prevResources.map(resource => ({
+    //     ...resource,
+    //     commentCount: newCommentCounts[resource.id],
+    //   }))
+    // );
+  }, []); // removed "resources" from dependency array to check inifinite loop. Please feel free to add it back if necessary.
 
   const handleCommentAdded = useCallback(() => {
     updateCommentCounts();
-  }, [updateCommentCounts]);
+  }, []); // Removed "updateCommentCounts" from dependency array to check infinite loop. Please feel free to add it back if necessary.
 
   useEffect(() => {
-    updateCommentCounts();
-  }, [resources, updateCommentCounts]);
+    // Adding a conditional check to make sure that it runs only when comments are not empty
+    if (resources.length > 0) {
+      updateCommentCounts();
+    }
+  }, []); // Removed "resources, updateCommentCounts" from dependency array to check infinite loop. Please feel free to add it back if necessary.
 
   return (
     <div className="resource__container">
