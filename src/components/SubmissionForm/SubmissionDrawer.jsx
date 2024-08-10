@@ -165,7 +165,7 @@ export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
                   <Box>
                     <FormControl isInvalid={errors.title}>
                       <FormLabel htmlFor="title" fontSize="20px" fontWeight="bold" _after={{ content: '" *"', color: "black" }} > Title </FormLabel>
-                      <Input id="title" placeholder="Enter a resource title." _placeholder={{ color: "grey" }} border="3px solid black" className="submission__inputField" _hover={{}} focusBorderColor="black" fontSize="20px"
+                      <Input id="title" placeholder="Enter a resource title." _placeholder={{ color: "grey" }} border="3px solid black" className="submission__inputField" _hover={{}} focusBorderColor="#0099ff" fontSize="20px"
                         {...register("title", { required: true })} />
                       <FormErrorMessage>{errors.title && "Title is required for submission"}</FormErrorMessage>
                     </FormControl>
@@ -175,7 +175,7 @@ export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
                   <Box>
                     <FormControl isInvalid={errors.discipline}>
                       <FormLabel htmlFor="discipline" fontSize="20px" fontWeight="bold" _after={{ content: '" *"', color: "black" }} marginTop="10px" > Discipline </FormLabel>
-                      <Select id="discipline" className="submission__inputField" border="3px solid black" _hover={{}} fontFamily="Poppins" fontWeight="bold" placeholder="Select" fontSize="20px" icon={<ChevronDownIcon />} iconSize="45px" iconColor="#0099FF" focusBorderColor="black" color={selectColors.discipline} onChange={handleColorChange}
+                      <Select id="discipline" className="submission__inputField" border="3px solid black" _hover={{}} fontFamily="Poppins" fontWeight="bold" placeholder="Select" fontSize="20px" icon={<ChevronDownIcon />} iconSize="45px" iconColor="#0099FF" focusBorderColor="#0099ff" color={selectColors.discipline} onChange={handleColorChange}
                         // sx is the styling for the dropdown menu
                         sx={{
                           '& option': {
@@ -202,7 +202,7 @@ export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
                   <Box>
                     <FormControl isInvalid={errors.type}>
                       <FormLabel htmlFor="type" fontSize="20px" fontWeight="bold" _after={{ content: '" *"', color: "black" }} marginTop="10px" > Type </FormLabel>
-                      <Select id="type" className="submission__inputField" border="3px solid black" _hover={{}} fontFamily="Poppins" fontWeight="bold" placeholder="Select" fontSize="20px" icon={<ChevronDownIcon />} iconSize="45px" iconColor="#0099FF" focusBorderColor="black" color={selectColors.type} onChange={handleColorChange}
+                      <Select id="type" className="submission__inputField" border="3px solid black" _hover={{}} fontFamily="Poppins" fontWeight="bold" placeholder="Select" fontSize="20px" icon={<ChevronDownIcon />} iconSize="45px" iconColor="#0099FF" focusBorderColor="#0099ff" color={selectColors.type} onChange={handleColorChange}
                         // sx: styling for the dropdown menu
                         sx={{
                           '& option': {
@@ -229,7 +229,7 @@ export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
                   <Box>
                     <FormControl isInvalid={errors.level}>
                       <FormLabel htmlFor="level" fontSize="20px" fontWeight="bold" _after={{ content: '" *"', color: "black" }} marginTop="10px" > Skill Level </FormLabel>
-                      <Select id="level" className="submission__inputField" border="3px solid black" _hover={{}} fontFamily="Poppins" fontWeight="bold" placeholder="Select" fontSize="20px" icon={<ChevronDownIcon />} iconSize="45px" iconColor="#0099FF" focusBorderColor="black" color={selectColors.level} onChange={handleColorChange}
+                      <Select id="level" className="submission__inputField" border="3px solid black" _hover={{}} fontFamily="Poppins" fontWeight="bold" placeholder="Select" fontSize="20px" icon={<ChevronDownIcon />} iconSize="45px" iconColor="#0099FF" focusBorderColor="#0099ff" color={selectColors.level} onChange={handleColorChange}
                         sx={{
                           '& option': {
                             color: 'black',
@@ -254,7 +254,7 @@ export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
                   <Box>
                     <FormControl isInvalid={errors.estDuration}>
                       <FormLabel htmlFor="estDuration" fontSize="20px" fontWeight="bold" _after={{ content: '" *"', color: "black" }} marginTop="10px"> Estimated Duration </FormLabel>
-                      <Select id="estDuration" className="submission__inputField" border="3px solid black" _hover={{}} fontFamily="Poppins" fontWeight="bold" placeholder="Select" fontSize="20px" icon={<ChevronDownIcon />} iconSize="45px" iconColor="#0099FF" focusBorderColor="black" color={selectColors.estDuration} onChange={handleColorChange}
+                      <Select id="estDuration" className="submission__inputField" border="3px solid black" _hover={{}} fontFamily="Poppins" fontWeight="bold" placeholder="Select" fontSize="20px" icon={<ChevronDownIcon />} iconSize="45px" iconColor="#0099FF" focusBorderColor="#0099ff" color={selectColors.estDuration} onChange={handleColorChange}
                         sx={{
                           '& option': {
                             color: 'black',
@@ -305,7 +305,7 @@ export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
                           {countWords(watch("description"))} / {MAX_WORD_COUNT}
                         </Text>
                       </div>
-                      <Textarea id="description" placeholder="The clearer and shorter the better." _placeholder={{ color: "grey" }} className="submission__inputField" border="3px solid black" _hover={{}} focusBorderColor="black" fontSize="20px" height="200px"
+                      <Textarea id="description" placeholder="The clearer and shorter the better." _placeholder={{ color: "grey" }} className="submission__inputField" border="3px solid black" _hover={{}} focusBorderColor="#0099ff" fontSize="20px" height="200px"
                         {...register("description", {
                           required: true,
                           validate: (value) => {
@@ -321,7 +321,7 @@ export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
                   <Box>
                     <FormControl isInvalid={errors.url}>
                       <FormLabel htmlFor="url" fontSize="20px" fontWeight="bold" _after={{ content: '" *"', color: "black" }} marginTop="10px" > URL </FormLabel>
-                      <Input type="url" id="url" placeholder="Enter the resource URL" _placeholder={{ color: "grey" }} className="submission__inputField" border="3px solid black" _hover={{}} focusBorderColor="black" fontSize="20px"
+                      <Input type="url" id="url" placeholder="Enter the resource URL" _placeholder={{ color: "grey" }} className="submission__inputField" border="3px solid black" _hover={{}} focusBorderColor="#0099ff" fontSize="20px"
                         {...register("url", { required: !file })} />
                       <FormErrorMessage>{errors.url && "URL is required if no file is uploaded"}</FormErrorMessage>
                     </FormControl>

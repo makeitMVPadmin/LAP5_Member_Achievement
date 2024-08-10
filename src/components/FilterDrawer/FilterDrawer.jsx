@@ -132,6 +132,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 border="3px solid black"
                 className="submission__inputField"
                 color={selectColors.type}
+                focusBorderColor="#0099ff"
                 sx={{
                   '& option': {
                     color: 'black',
@@ -172,6 +173,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 border="3px solid black"
                 className="submission__inputField"
                 color={selectColors.level}
+                focusBorderColor="#0099ff"
                 sx={{
                   '& option': {
                     color: 'black',
@@ -212,6 +214,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 border="3px solid black"
                 className="submission__inputField"
                 color={selectColors.estDuration}
+                focusBorderColor="#0099ff"
                 sx={{
                   '& option': {
                     color: 'black',
