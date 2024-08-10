@@ -23,6 +23,7 @@ export default function RedemptionOptions() {
         <Box className="header-container" onClick={onToggle}>
           <h2 className="rewards-redemption-title">How to Earn Points</h2>
           <IconButton
+            className="custom-size"
             aria-label={isOpen ? "Hide Options" : "Show Options"}
             icon={isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
             backgroundColor={"white"}

@@ -20,6 +20,7 @@ export default function RewardOptions() {
         <Box className="header-container" onClick={onToggle}>
           <h2 className="rewards-redemption-title">Reward Options</h2>
           <IconButton
+            className="custom-size"
             aria-label={isOpen ? "Hide Options" : "Show Options"}
             icon={isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
             backgroundColor={"white"}

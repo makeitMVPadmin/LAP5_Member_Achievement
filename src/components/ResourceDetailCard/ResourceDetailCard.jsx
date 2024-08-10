@@ -76,6 +76,14 @@ const ResourceDetailCard = React.memo(
       addPoints(20);
     };
 
+    const handleSubmitResourcePoints = () => {
+      addPoints(50);
+    };
+
+    const handleCommentPoints = () => {
+      addPoints(10);
+    };
+
     return (
       <>
         <section className="resource-details">
