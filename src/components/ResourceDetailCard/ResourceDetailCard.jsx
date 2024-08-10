@@ -68,6 +68,10 @@ const ResourceDetailCard = React.memo(
       addPoints(2);
     };
 
+    const handleMarkAsReadPoints = () => {
+      addPoints(10);
+    };
+
     return (
       <>
         <section className="resource-details">
@@ -172,7 +176,12 @@ const ResourceDetailCard = React.memo(
                 className={`resource-details__button ${
                   isRead ? "resource-details__button--read" : ""
                 }`}
-                onClick={handleToggleRead}
+                onClick={() => {
+                  handleToggleRead();
+                  if (!isRead) {
+                    handleMarkAsReadPoints();
+                  }
+                }}
                 aria-pressed={isRead}
                 aria-label={isRead ? "Read!" : "Mark as Read"}
               >
