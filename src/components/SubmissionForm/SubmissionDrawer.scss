@@ -37,11 +37,16 @@
   //   // flex-wrap: wrap;
   //   // max-height: 600px;
   //   // justify-content: space-between;
-  // }
+  //}
+
+  &__descBox {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+  }
 
   &__form-column {
     flex: 1;
-    // min-width: 410px;
     margin-right: 20px;
     margin-bottom: 30px;
   }
@@ -91,7 +96,7 @@
     box-shadow: 1px 1px 0 black;
     font-weight: bold;
     font-size: 20px;
-    color: black;
+    // color: black;
     // width: 100%;
     // max-width: 500px;
   }
@@ -108,8 +113,4 @@
     font-weight: bold;
     font-family: "Poppins";
   }
-
-  // &__inputField::selection {
-  //   color: grey;
-  // }
 }

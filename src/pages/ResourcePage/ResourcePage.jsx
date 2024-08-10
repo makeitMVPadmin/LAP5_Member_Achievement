@@ -22,7 +22,7 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   const getCommentsForSpecificResource = async (resourceId) => {
     const q = query(
       collection(database, "Comments"),
-      where("resourceID", "==", resourceId)
+      where("resourceId", "==", resourceId)
     );
 
     try {
@@ -39,32 +39,35 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   };
 
   useEffect(() => {
-    const getAllResourcesAndRatings = async () => {
+    const getAllResourcesAndComments = async () => {
       try {
         const resourcesCollectionRef = collection(database, "Resources");
+        const commentsCollectionRef = collection(database, "Comments");
+
         const resourcesSnapshot = await getDocs(resourcesCollectionRef);
-        if (!resourcesSnapshot.empty) {
-          const resourcesCollection = await Promise.all(
-            resourcesSnapshot.docs.map(async (doc) => {
-              const resourceData = { id: doc.id, ...doc.data() };
-              const comments = await getCommentsForSpecificResource(doc.id);
-              return { ...resourceData, commentsCount: comments.length };
-            })
-          );
-          setResources(resourcesCollection);
-          if (resourcesCollection.length > 0) {
-            setSelectedResource(resourcesCollection[0]);
-            setActiveResourceId(resourcesCollection[0].id);
-          }
-        } else {
-          console.log("No collection for resources found.");
+        const commentsSnapshot = await getDocs(commentsCollectionRef);
+
+        const resourcesCollection = await Promise.all(
+          resourcesSnapshot.docs.map(async (doc) => {
+            const resourceData = { id: doc.id, ...doc.data() };
+            const resourceComments = commentsSnapshot.docs
+              .filter((commentDoc) => commentDoc.data().resourceId === doc.id)
+              .map((commentDoc) => ({ id: commentDoc.id, ...commentDoc.data() }));
+            return { ...resourceData, comments: resourceComments, commentsCount: resourceComments.length };
+          })
+        );
+
+        setResources(resourcesCollection);
+        if (resourcesCollection.length > 0) {
+          setSelectedResource(resourcesCollection[0]);
+          setActiveResourceId(resourcesCollection[0].id);
         }
       } catch (err) {
-        console.error("Error fetching resources: ", err);
+        console.error("Error fetching resources and comments: ", err);
       }
     };
 
-    getAllResourcesAndRatings();
+    getAllResourcesAndComments();
   }, []);
 
   useEffect(() => {
@@ -104,10 +107,10 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   useEffect(() => {
     if (resources.length > 0 && !activeResourceId) {
       const firstResourceId = resources[0].id;
-      setActiveResourceId(firstResourceId);
-      setSelectedResource(
-        resources.find((resource) => resource.id === firstResourceId)
-      );
+      if (activeResourceId !== firstResourceId) {
+        setActiveResourceId(firstResourceId);
+        setSelectedResource(resources.find(resource => resource.id === firstResourceId));
+      }
     }
   }, [resources, activeResourceId]);
 
@@ -163,10 +166,11 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
     }
   };
 
-  useEffect(() => {
-    console.log("Resources:", resources);
-    console.log("Selected Resource:", selectedResource);
-  }, [resources, selectedResource]);
+  // Removed this console log that was being used for debugging
+  // useEffect(() => {
+  //   console.log("Resources:", resources);
+  //   console.log("Selected Resource:", selectedResource);
+  // }, [resources, selectedResource]);
 
   const handleFilterChange = ({ type, skill, duration }) => {
     setType(type === "All" || type === "" ? [] : [type]);
@@ -185,7 +189,6 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
     setSelectedResource((prev) => ({ ...prev, ...updatedResource }));
   }, []);
 
-  // Update comment counts when resources change
   const updateCommentCounts = useCallback(async () => {
     const commentsRef = collection(database, "Comments");
     const newCommentCounts = {};
@@ -197,15 +200,25 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
     }
 
     setCommentCounts(newCommentCounts);
-  }, [resources]);
+    // Removing this line to see if it prevents the infinite loop issue
+    // setResources(prevResources =>
+    //   prevResources.map(resource => ({
+    //     ...resource,
+    //     commentCount: newCommentCounts[resource.id],
+    //   }))
+    // );
+  }, []); // removed "resources" from dependency array to check inifinite loop. Please feel free to add it back if necessary.
 
   const handleCommentAdded = useCallback(() => {
     updateCommentCounts();
-  }, [updateCommentCounts]);
+  }, []); // Removed "updateCommentCounts" from dependency array to check infinite loop. Please feel free to add it back if necessary.
 
   useEffect(() => {
-    updateCommentCounts();
-  }, [resources, updateCommentCounts]);
+    // Adding a conditional check to make sure that it runs only when comments are not empty
+    if (resources.length > 0) {
+      updateCommentCounts();
+    }
+  }, []); // Removed "resources, updateCommentCounts" from dependency array to check infinite loop. Please feel free to add it back if necessary.
 
   return (
     <div className="resource__container">
