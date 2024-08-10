@@ -8,7 +8,8 @@ import { collection, addDoc } from "firebase/firestore";
 import { storage, database } from "../../config/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useForm } from "react-hook-form";
-import { Button, useDisclosure, Drawer, DrawerOverlay, DrawerContent, DrawerCloseButton, DrawerHeader, DrawerBody, Stack, Box, FormLabel, Input, Select, Text, Textarea, DrawerFooter, FormControl, FormErrorMessage,
+import {
+  Button, useDisclosure, Drawer, DrawerOverlay, DrawerContent, DrawerCloseButton, DrawerHeader, DrawerBody, Stack, Box, FormLabel, Input, Select, Text, Textarea, DrawerFooter, FormControl, FormErrorMessage,
 } from "@chakra-ui/react";
 
 export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
@@ -32,6 +33,19 @@ export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
     setSelectedOptions(options);
   }
 
+  // Consolidating user actions of SubmissionDrawer into this function
+  const handleClose = () => {
+    reset();
+    setFile(null);
+    setSelectColors({
+      discipline: 'grey',
+      type: 'grey',
+      level: 'grey',
+      estDuration: 'grey'
+    });
+    onClose();
+  };
+
   const onSubmit = async (data) => {
     try {
       console.log("Form data before processing:", data);
@@ -46,47 +60,45 @@ export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
         throw new Error("Upload a file or provide a URL");
       }
 
-  const selectedTags = selectedOptions.map((option) => option.value);
+      const selectedTags = selectedOptions.map((option) => option.value);
 
-  const newResource = {
-    name: currentUser
-      ? `${currentUser.firstName} ${currentUser.lastName.charAt(0)}.`
-      : "Anonymous",
-    userID: currentUser,
-    title: data.title,
-    discipline: data.discipline,
-    type: data.type,
-    level: data.level,
-    estDuration: data.estDuration,
-    description: data.description || "",
-    url: data.url,
-    tag1: selectedTags[0] || "",
-    tag2: selectedTags[1] || "",
-    tag3: selectedTags[2] || "",
-    tag4: selectedTags[3] || "",
-    comments: [],
-    commentsCount: 0,
-    likedByUser: [],
-    downvotedByUsers: [],
-    firstName: currentUser ? currentUser.firstName : "",
-    lastName: currentUser ? currentUser.lastName : "",
-  };
+      const newResource = {
+        name: currentUser
+          ? `${currentUser.firstName} ${currentUser.lastName.charAt(0)}.`
+          : "Anonymous",
+        userID: currentUser,
+        title: data.title,
+        discipline: data.discipline,
+        type: data.type,
+        level: data.level,
+        estDuration: data.estDuration,
+        description: data.description || "",
+        url: data.url,
+        tag1: selectedTags[0] || "",
+        tag2: selectedTags[1] || "",
+        tag3: selectedTags[2] || "",
+        tag4: selectedTags[3] || "",
+        comments: [],
+        commentsCount: 0,
+        likedByUser: [],
+        downvotedByUsers: [],
+        firstName: currentUser ? currentUser.firstName : "",
+        lastName: currentUser ? currentUser.lastName : "",
+      };
 
-  const docRef = await addDoc(
-    collection(database, "Resources"),
-    newResource
-    );
-    onFormSubmit({ id: docRef.id, ...newResource });
+      const docRef = await addDoc(
+        collection(database, "Resources"),
+        newResource
+      );
+      onFormSubmit({ id: docRef.id, ...newResource });
 
-    console.log("Form submitted successfully:", newResource);
-      // Clear the form and close the drawer
-    reset();
-    setFile(null);
-    onClose();
-    setShowModal(true);
-      } catch (error) {
-        console.error("Error submitting form:", error);
-      }
+      console.log("Form submitted successfully:", newResource);
+
+      handleClose();
+      setShowModal(true);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
   };
 
   const handleFileChange = (e) => {
@@ -94,9 +106,7 @@ export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
   };
 
   const handleCancel = () => {
-    reset(); // Reset the form fields
-    setFile(null);
-    onClose();
+    handleClose();
   };
 
   const countWords = (str) => {
@@ -138,10 +148,10 @@ export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
       </button>
 
       <div className="submission__container">
-        <Drawer isOpen={isOpen} placement="right" onClose={handleCancel} size="sm">
+        <Drawer isOpen={isOpen} placement="right" onClose={handleClose} size="sm">
           <DrawerOverlay />
           <DrawerContent sx={{ borderRadius: "30px 0px 0px 30px", border: "4px solid black" }} >
-          <DrawerCloseButton sx={{ color: "#0099FF", fontSize: "20px", fontWeight: "bolder" }} />
+            <DrawerCloseButton sx={{ color: "#0099FF", fontSize: "20px", fontWeight: "bolder" }} />
             <DrawerHeader>
               <h1 className="submission__header-title">Submit a Resource</h1>
               <p className="submission__small-text"> Share your learning resources with the community! </p>
@@ -155,8 +165,8 @@ export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
                   <Box>
                     <FormControl isInvalid={errors.title}>
                       <FormLabel htmlFor="title" fontSize="20px" fontWeight="bold" _after={{ content: '" *"', color: "black" }} > Title </FormLabel>
-                        <Input id="title" placeholder="Enter a resource title." _placeholder={{ color: "grey" }} border="3px solid black" className="submission__inputField" _hover={{}} focusBorderColor="black" fontSize="20px"
-                          {...register("title", { required: true })} />
+                      <Input id="title" placeholder="Enter a resource title." _placeholder={{ color: "grey" }} border="3px solid black" className="submission__inputField" _hover={{}} focusBorderColor="black" fontSize="20px"
+                        {...register("title", { required: true })} />
                       <FormErrorMessage>{errors.title && "Title is required for submission"}</FormErrorMessage>
                     </FormControl>
                   </Box>
@@ -164,26 +174,26 @@ export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
                   {/* DISCIPLINE */}
                   <Box>
                     <FormControl isInvalid={errors.discipline}>
-                      <FormLabel htmlFor="discipline" fontSize="20px" fontWeight="bold"  _after={{ content: '" *"', color: "black" }} marginTop="10px" > Discipline </FormLabel>
-                        <Select id="discipline" className="submission__inputField" border="3px solid black" _hover={{}} fontFamily="Poppins" fontWeight="bold" placeholder="Select" fontSize="20px" icon={<ChevronDownIcon />} iconSize="45px" iconColor="#0099FF" focusBorderColor="black" color={selectColors.discipline} onChange={handleColorChange}
-                          // sx is the styling for the dropdown menu
-                          sx={{
-                            '& option': {
-                              color: 'black',
-                            },
-                            '& option:first-of-type': {
-                              color: 'grey',
-                            },
-                          }}
-                          {...register("discipline", {
-                            required: true,
-                            onChange: handleColorChange
-                          })}>
-                          <option value="Software Engineering">Software Engineering</option>
-                          <option value="UX/UI Design">UX/UI Design</option>
-                          <option value="Product Management">Product Management</option>
-                          <option value="Data Science">Data Science</option>
-                        </Select>
+                      <FormLabel htmlFor="discipline" fontSize="20px" fontWeight="bold" _after={{ content: '" *"', color: "black" }} marginTop="10px" > Discipline </FormLabel>
+                      <Select id="discipline" className="submission__inputField" border="3px solid black" _hover={{}} fontFamily="Poppins" fontWeight="bold" placeholder="Select" fontSize="20px" icon={<ChevronDownIcon />} iconSize="45px" iconColor="#0099FF" focusBorderColor="black" color={selectColors.discipline} onChange={handleColorChange}
+                        // sx is the styling for the dropdown menu
+                        sx={{
+                          '& option': {
+                            color: 'black',
+                          },
+                          '& option:first-of-type': {
+                            color: 'grey',
+                          },
+                        }}
+                        {...register("discipline", {
+                          required: true,
+                          onChange: handleColorChange
+                        })}>
+                        <option value="Software Engineering">Software Engineering</option>
+                        <option value="UX/UI Design">UX/UI Design</option>
+                        <option value="Product Management">Product Management</option>
+                        <option value="Data Science">Data Science</option>
+                      </Select>
                       <FormErrorMessage>{errors.discipline && "Discipline is required"}</FormErrorMessage>
                     </FormControl>
                   </Box>
@@ -192,25 +202,25 @@ export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
                   <Box>
                     <FormControl isInvalid={errors.type}>
                       <FormLabel htmlFor="type" fontSize="20px" fontWeight="bold" _after={{ content: '" *"', color: "black" }} marginTop="10px" > Type </FormLabel>
-                        <Select id="type" className="submission__inputField" border="3px solid black" _hover={{}} fontFamily="Poppins" fontWeight="bold" placeholder="Select" fontSize="20px" icon={<ChevronDownIcon />} iconSize="45px" iconColor="#0099FF" focusBorderColor="black" color={selectColors.type} onChange={handleColorChange}
-                          // sx: styling for the dropdown menu
-                          sx={{
-                            '& option': {
-                              color: 'black',
-                            },
-                            '& option:first-of-type': {
-                              color: 'grey',
-                            },
-                          }}
-                          {...register("type", {
-                            required: true,
-                            onChange: handleColorChange
-                          })}>
-                          <option value="Article">Article</option>
-                          <option value="Blog">Blog</option>
-                          <option value="Video">Video</option>
-                          <option value="Course">Course</option>
-                        </Select>
+                      <Select id="type" className="submission__inputField" border="3px solid black" _hover={{}} fontFamily="Poppins" fontWeight="bold" placeholder="Select" fontSize="20px" icon={<ChevronDownIcon />} iconSize="45px" iconColor="#0099FF" focusBorderColor="black" color={selectColors.type} onChange={handleColorChange}
+                        // sx: styling for the dropdown menu
+                        sx={{
+                          '& option': {
+                            color: 'black',
+                          },
+                          '& option:first-of-type': {
+                            color: 'grey',
+                          },
+                        }}
+                        {...register("type", {
+                          required: true,
+                          onChange: handleColorChange
+                        })}>
+                        <option value="Article">Article</option>
+                        <option value="Blog">Blog</option>
+                        <option value="Video">Video</option>
+                        <option value="Course">Course</option>
+                      </Select>
                       <FormErrorMessage>{errors.type && "Type is required"}</FormErrorMessage>
                     </FormControl>
                   </Box>
@@ -219,23 +229,23 @@ export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
                   <Box>
                     <FormControl isInvalid={errors.level}>
                       <FormLabel htmlFor="level" fontSize="20px" fontWeight="bold" _after={{ content: '" *"', color: "black" }} marginTop="10px" > Skill Level </FormLabel>
-                        <Select id="level" className="submission__inputField" border="3px solid black" _hover={{}} fontFamily="Poppins" fontWeight="bold" placeholder="Select" fontSize="20px" icon={<ChevronDownIcon />} iconSize="45px" iconColor="#0099FF" focusBorderColor="black" color={selectColors.level} onChange={handleColorChange}
-                          sx={{
-                            '& option': {
-                              color: 'black',
-                            },
-                            '& option:first-of-type': {
-                              color: 'grey',
-                            },
-                          }}
-                          {...register("level", {
-                            required: true,
-                            onChange: handleColorChange
-                          })}>
-                          <option value="Beginner">Beginner</option>
-                          <option value="Intermediate">Intermediate</option>
-                          <option value="Advanced">Advanced</option>
-                        </Select>
+                      <Select id="level" className="submission__inputField" border="3px solid black" _hover={{}} fontFamily="Poppins" fontWeight="bold" placeholder="Select" fontSize="20px" icon={<ChevronDownIcon />} iconSize="45px" iconColor="#0099FF" focusBorderColor="black" color={selectColors.level} onChange={handleColorChange}
+                        sx={{
+                          '& option': {
+                            color: 'black',
+                          },
+                          '& option:first-of-type': {
+                            color: 'grey',
+                          },
+                        }}
+                        {...register("level", {
+                          required: true,
+                          onChange: handleColorChange
+                        })}>
+                        <option value="Beginner">Beginner</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Advanced">Advanced</option>
+                      </Select>
                       <FormErrorMessage>{errors.level && "Skill Level is required"}</FormErrorMessage>
                     </FormControl>
                   </Box>
@@ -244,29 +254,29 @@ export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
                   <Box>
                     <FormControl isInvalid={errors.estDuration}>
                       <FormLabel htmlFor="estDuration" fontSize="20px" fontWeight="bold" _after={{ content: '" *"', color: "black" }} marginTop="10px"> Estimated Duration </FormLabel>
-                        <Select id="estDuration" className="submission__inputField" border="3px solid black" _hover={{}} fontFamily="Poppins" fontWeight="bold" placeholder="Select" fontSize="20px" icon={<ChevronDownIcon />} iconSize="45px" iconColor="#0099FF" focusBorderColor="black" color={selectColors.estDuration} onChange={handleColorChange}
-                          sx={{
-                            '& option': {
-                              color: 'black',
-                            },
-                            '& option:first-of-type': {
-                              color: 'grey',
-                            },
-                          }}
-                          {...register("estDuration", {
-                            required: true,
-                            onChange: handleColorChange
-                          })}>
-                          <option value="3 min">3 min</option>
-                          <option value="5 min">5 min</option>
-                          <option value="7 min">7 min</option>
-                          <option value="10 min">10 min</option>
-                          <option value="20 min">20 min</option>
-                          <option value="30 min">30 min</option>
-                          <option value="40 min">40 min</option>
-                          <option value="50 min">50 min</option>
-                          <option value="60 min">60 min</option>
-                        </Select>
+                      <Select id="estDuration" className="submission__inputField" border="3px solid black" _hover={{}} fontFamily="Poppins" fontWeight="bold" placeholder="Select" fontSize="20px" icon={<ChevronDownIcon />} iconSize="45px" iconColor="#0099FF" focusBorderColor="black" color={selectColors.estDuration} onChange={handleColorChange}
+                        sx={{
+                          '& option': {
+                            color: 'black',
+                          },
+                          '& option:first-of-type': {
+                            color: 'grey',
+                          },
+                        }}
+                        {...register("estDuration", {
+                          required: true,
+                          onChange: handleColorChange
+                        })}>
+                        <option value="3 min">3 min</option>
+                        <option value="5 min">5 min</option>
+                        <option value="7 min">7 min</option>
+                        <option value="10 min">10 min</option>
+                        <option value="20 min">20 min</option>
+                        <option value="30 min">30 min</option>
+                        <option value="40 min">40 min</option>
+                        <option value="50 min">50 min</option>
+                        <option value="60 min">60 min</option>
+                      </Select>
                       <FormErrorMessage>{errors.estDuration && "Estimated Duration is required"}</FormErrorMessage>
                     </FormControl>
                   </Box>
@@ -275,13 +285,13 @@ export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
                   <Box>
                     <FormControl isInvalid={errors.tags}>
                       <FormLabel htmlFor="tags" fontSize="20px" fontWeight="bold" _after={{ content: '" *"', color: "black" }} marginTop="10px" > Tags </FormLabel>
-                        <SelectTags id="tags" ref={selectTagsRef} selectedOptions={selectedOptions} setSelectedOptions={handleSetSelectedOptions}
-                          {...register("tags",
-                            {
-                              validate: () => {
-                                return selectedOptions.length > 3
-                              }
-                            })} />
+                      <SelectTags id="tags" ref={selectTagsRef} selectedOptions={selectedOptions} setSelectedOptions={handleSetSelectedOptions}
+                        {...register("tags",
+                          {
+                            validate: () => {
+                              return selectedOptions.length > 3
+                            }
+                          })} />
                       <FormErrorMessage>{errors.tags && "Atleast 4 tags are required"}</FormErrorMessage>
                     </FormControl>
                   </Box>
@@ -290,20 +300,20 @@ export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
                   <Box>
                     <FormControl isInvalid={errors.description}>
                       <div className="submission__descBox">
-                        <FormLabel htmlFor="description" fontSize="20px" fontWeight="bold" _after={{ content: '" *"', color: "black" }} marginTop="-14px" marginRight="auto"  marginBottom="-10px" > Description </FormLabel>
-                          <Text className="submission__wordCount" fontSize="18px" marginLeft="auto" fontWeight="bold" marginBottom="10px" mt={2} color={countWords(watch("description")) > MAX_WORD_COUNT ? 'red.500' : 'grey'}>
-                            {countWords(watch("description"))} / {MAX_WORD_COUNT}
-                          </Text>
+                        <FormLabel htmlFor="description" fontSize="20px" fontWeight="bold" _after={{ content: '" *"', color: "black" }} marginTop="-14px" marginRight="auto" marginBottom="-10px" > Description </FormLabel>
+                        <Text className="submission__wordCount" fontSize="18px" marginLeft="auto" fontWeight="bold" marginBottom="10px" mt={2} color={countWords(watch("description")) > MAX_WORD_COUNT ? 'red.500' : 'grey'}>
+                          {countWords(watch("description"))} / {MAX_WORD_COUNT}
+                        </Text>
                       </div>
-                        <Textarea id="description" placeholder="The clearer and shorter the better." _placeholder={{ color: "grey" }} className="submission__inputField" border="3px solid black" _hover={{}} focusBorderColor="black" fontSize="20px" height="200px"
-                          {...register("description", {
-                            required: true,
-                            validate: (value) => {
-                              const wordCount = countWords(value);
-                              return wordCount <= MAX_WORD_COUNT || `Text must be ${MAX_WORD_COUNT} words or less`;
-                            }
-                          })} />
-                        <FormErrorMessage>{errors.description && `Text must be ${MAX_WORD_COUNT} words or less`}</FormErrorMessage>
+                      <Textarea id="description" placeholder="The clearer and shorter the better." _placeholder={{ color: "grey" }} className="submission__inputField" border="3px solid black" _hover={{}} focusBorderColor="black" fontSize="20px" height="200px"
+                        {...register("description", {
+                          required: true,
+                          validate: (value) => {
+                            const wordCount = countWords(value);
+                            return wordCount <= MAX_WORD_COUNT || `Text must be ${MAX_WORD_COUNT} words or less`;
+                          }
+                        })} />
+                      <FormErrorMessage>{errors.description && `Text must be ${MAX_WORD_COUNT} words or less`}</FormErrorMessage>
                     </FormControl>
                   </Box>
 
@@ -311,8 +321,8 @@ export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
                   <Box>
                     <FormControl isInvalid={errors.url}>
                       <FormLabel htmlFor="url" fontSize="20px" fontWeight="bold" _after={{ content: '" *"', color: "black" }} marginTop="10px" > URL </FormLabel>
-                        <Input type="url" id="url" placeholder="Enter the resource URL" _placeholder={{ color: "grey" }} className="submission__inputField" border="3px solid black" _hover={{}} focusBorderColor="black" fontSize="20px"
-                          {...register("url", { required: !file })} />
+                      <Input type="url" id="url" placeholder="Enter the resource URL" _placeholder={{ color: "grey" }} className="submission__inputField" border="3px solid black" _hover={{}} focusBorderColor="black" fontSize="20px"
+                        {...register("url", { required: !file })} />
                       <FormErrorMessage>{errors.url && "URL is required if no file is uploaded"}</FormErrorMessage>
                     </FormControl>
                   </Box>
@@ -325,7 +335,7 @@ export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
                   <Box>
                     <FormControl>
                       <FormLabel fontSize="20px" fontWeight="bold" _after={{ content: '" *"', color: "black" }} marginTop="10px" > File Upload </FormLabel>
-                        <UploadFile onFileChange={handleFileChange} />
+                      <UploadFile onFileChange={handleFileChange} />
                     </FormControl>
                   </Box>
                 </Box>
