@@ -72,6 +72,10 @@ const ResourceDetailCard = React.memo(
       addPoints(10);
     };
 
+    const handleBookmarkPoints = () => {
+      addPoints(20);
+    };
+
     return (
       <>
         <section className="resource-details">
@@ -80,7 +84,12 @@ const ResourceDetailCard = React.memo(
               <p className="resource-details__type">{selectedResource.type}</p>
               <img
                 src={isBookmarked ? bookmarkedIcon : bookmarkIcon}
-                onClick={handleToggleBookmarked}
+                onClick={() => {
+                  handleToggleBookmarked();
+                  if (!isBookmarked) {
+                    handleBookmarkPoints();
+                  }
+                }}
                 alt="bookmark icon"
                 className="resource-details__saved-icon"
                 aria-hidden="true"
