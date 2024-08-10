@@ -133,7 +133,7 @@ export default function NavBar({
             }`}
             onClick={() => handleSelectCategory("Product")}
           >
-            Product
+            Product Management
           </li>
           <li
             className={`nav__library-subitem ${
