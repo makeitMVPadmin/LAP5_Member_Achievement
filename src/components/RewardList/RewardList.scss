@@ -49,13 +49,13 @@
   }
 
   &__icon {
-    width: 0.75rem;
-    height: 0.75rem;
+    width: 0.85rem;
+    height: 0.85rem;
     margin-right: 0.2rem;
 
     @include desktop {
-      width: 0.875rem;
-      height: 0.875rem;
+      width: 0.95rem;
+      height: 0.95rem;
     }
   }
 }

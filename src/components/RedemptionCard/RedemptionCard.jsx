@@ -1,4 +1,4 @@
-import Coin from "../../assets/icons/coin.png";
+import Coin from "../../assets/images/points-coin.png";
 import "./RedemptionCard.scss";
 import rewardOptionsData from "../../data/reward-options.json";
 import RedemptionToast from "./RedemptionToast";

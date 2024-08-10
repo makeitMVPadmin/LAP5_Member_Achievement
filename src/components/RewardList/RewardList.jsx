@@ -1,6 +1,6 @@
 import "./RewardList.scss";
 import { useState } from "react";
-import Coin from "../../assets/icons/coin.png";
+import Coin from "../../assets/images/points-coin.png";
 import rewardOptionsData from "../../data/reward-options.json";
 
 export default function RewardList() {

@@ -15,7 +15,6 @@ export const PointsContext = createContext();
 const App = () => {
   const [savedBookmarks, setSavedBookmarks] = useState([]);
   const [currentUser, setCurrentUser] = useState({}); // Sample current userID
-  // const [points, setPoints] = useState(600);
   const [points, setPoints] = useState(() => {
     const savedPoints = localStorage.getItem("points");
     if (savedPoints === null) {
@@ -52,18 +51,6 @@ const App = () => {
     localStorage.setItem("points", newPoints);
     setPoints(newPoints);
   };
-
-  // const addPoints = (amount) => {
-  //   setPoints((prevPoints) => prevPoints + amount);
-  // };
-
-  // const deductPoints = (amount) => {
-  //   setPoints((prevPoints) => Math.max(prevPoints - amount, 0));
-  // };
-
-  // const handlePointsChange = (newPoints) => {
-  //   setPoints(newPoints);
-  // };
 
   console.log(currentUser);
 

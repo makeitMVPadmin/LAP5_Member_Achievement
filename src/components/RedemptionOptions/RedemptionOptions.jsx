@@ -26,12 +26,13 @@ export default function RedemptionOptions() {
             aria-label={isOpen ? "Hide Options" : "Show Options"}
             icon={isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
             backgroundColor={"white"}
+            color={"#0099ff"}
           />
         </Box>
 
         <Collapse in={isOpen}>
           <Box className="daily-redemption-options-container2" mt={4}>
-            <p className="options-description">
+            <p className="options-description options-description-first">
               Earn points by completing any of the actions listed below! Please
               note: certain actions have daily restrictions. You are welcome to
               continue completing these actions, but will only accumulate points
@@ -102,9 +103,9 @@ export default function RedemptionOptions() {
                     <span className="item-text">Submit a resource</span>
                   </div>
                   <div className="points">
-                    +2 points
+                    +50 points
                     <br />
-                    Daily limit: 14 points
+                    No daily limit
                   </div>
                 </div>
                 <div className="redemption-options-card">
