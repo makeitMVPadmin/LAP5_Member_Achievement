@@ -19,8 +19,8 @@ import {
 export const Comments = ({ comments, currentUser, resourceId, onCommentAdded }) => {
   console.log("Received comments in Comments component:", comments);
   const [postedComments, setPostedComments] = useState([]);
-  const [comment, setComment] = useState(""); // Add this line
-  const [showModal, setShowModal] = useState(false); // Add this line
+  const [comment, setComment] = useState("");
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     if (comments) {
