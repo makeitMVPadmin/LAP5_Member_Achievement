@@ -27,11 +27,13 @@ const ResourceDetailCard = React.memo(
 
     const handleVoteChange = useCallback(
       (resourceId, upvotes, downvotes) => {
-        setLocalResource((prev) => ({
-          ...prev,
-          upvote: upvotes,
-          downvote: downvotes,
-        }));
+        setLocalResource(prev => {
+          if (prev.upvote === upvotes && prev.downvote === downvotes) {
+            return prev;
+          }
+          return { ...prev, upvote: upvotes, downvote: downvotes };
+        });
+    
         if (onResourceUpdate) {
           onResourceUpdate({
             ...localResource,
@@ -43,8 +45,9 @@ const ResourceDetailCard = React.memo(
       },
       [localResource, onResourceUpdate]
     );
-
+    
     const [isRead, setIsRead] = useState(false);
+    
     useEffect(() => {
       const savedReadState = localStorage.getItem(selectedResource.id);
       if (savedReadState) {
