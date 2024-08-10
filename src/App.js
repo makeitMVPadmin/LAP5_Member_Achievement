@@ -18,11 +18,18 @@ const App = () => {
   // const [points, setPoints] = useState(600);
   const [points, setPoints] = useState(() => {
     const savedPoints = localStorage.getItem("points");
-    if (savedPoints === null) return 600;
+    if (savedPoints === null) {
+      localStorage.setItem("points", 600);
+      return 600;
+    }
     const parsedPoints = parseInt(savedPoints, 10);
     console.log("Saved Points:", savedPoints);
     return !isNaN(parsedPoints) ? parsedPoints : 600;
   });
+
+  useEffect(() => {
+    localStorage.setItem("points", points);
+  }, [points]);
 
   const addPoints = (amount) => {
     setPoints((prevPoints) => {

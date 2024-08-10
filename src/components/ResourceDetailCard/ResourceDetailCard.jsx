@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { Comments } from "../Comments/Comments";
 import React, { useState, useEffect, useCallback, useContext } from "react";
 import { PointsContext } from "../../App";
+import { add } from "date-fns";
 
 const ResourceDetailCard = React.memo(
   ({
@@ -27,13 +28,13 @@ const ResourceDetailCard = React.memo(
 
     const handleVoteChange = useCallback(
       (resourceId, upvotes, downvotes) => {
-        setLocalResource(prev => {
+        setLocalResource((prev) => {
           if (prev.upvote === upvotes && prev.downvote === downvotes) {
             return prev;
           }
           return { ...prev, upvote: upvotes, downvote: downvotes };
         });
-    
+
         if (onResourceUpdate) {
           onResourceUpdate({
             ...localResource,
@@ -45,9 +46,9 @@ const ResourceDetailCard = React.memo(
       },
       [localResource, onResourceUpdate]
     );
-    
+
     const [isRead, setIsRead] = useState(false);
-    
+
     useEffect(() => {
       const savedReadState = localStorage.getItem(selectedResource.id);
       if (savedReadState) {
@@ -55,26 +56,15 @@ const ResourceDetailCard = React.memo(
       }
     }, [selectedResource.id]);
 
-    // const updatePoints = (pointsToAdd) => {
-    //   const currentPoints = parseInt(localStorage.getItem("userPoints")) || 0;
-    //   const newPoints = currentPoints + pointsToAdd;
-    //   localStorage.setItem("userPoints", newPoints);
-    // };
-
     const handleToggleRead = () => {
       const newReadState = !isRead;
       setIsRead(newReadState);
       localStorage.setItem(selectedResource.id, JSON.stringify(newReadState));
-      // if (newReadState) {
-      //   updatePoints(10);
-      // } else {
-      //   updatePoints(-10);
-      // }
     };
 
     const { addPoints } = useContext(PointsContext);
 
-    const handleUpvote = () => {
+    const handleUpvotePoints = () => {
       addPoints(2);
     };
 
@@ -125,7 +115,8 @@ const ResourceDetailCard = React.memo(
                   initialUpvotes={localResource.upvote}
                   initialDownvotes={localResource.downvote}
                   onVoteChange={handleVoteChange}
-                  onClick={handleUpvote}
+                  onClick={handleUpvotePoints}
+                  addPoints={addPoints}
                 />
               </div>
             </div>
