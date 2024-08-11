@@ -17,6 +17,8 @@ export default function BookMarkedPage({ bookmarkedResources, currentUser, onBoo
   const [duration, setDuration] = useState("");
   const [comments, setComments] = useState([]);
   const [category, setCategory] = useState("All");
+  const [commentCounts, setCommentCounts] = useState({});
+
 
   useEffect(() => {
     setDisplayedBookmarks(bookmarkedResources);
@@ -129,6 +131,7 @@ export default function BookMarkedPage({ bookmarkedResources, currentUser, onBoo
           selectResource={handleSelectResource}
           activeResourceId={activeResourceId}
           currentUser={currentUser}
+          commentCounts={commentCounts}
         />
       </div>
       <div className="resource-details__container">
