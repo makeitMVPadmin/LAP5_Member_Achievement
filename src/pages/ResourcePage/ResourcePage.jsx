@@ -1,21 +1,15 @@
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
-  useContext,
-} from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import NavBar from "../../components/NavBar/NavBar";
 import ResourceDetailCard from "../../components/ResourceDetailCard/ResourceDetailCard";
 import ResourceList from "../../components/ResourceList/ResourceList";
 import "./ResourcePage.scss";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { database } from "../../config/firebase";
 
 export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   const [resources, setResources] = useState([]);
   const [selectedResource, setSelectedResource] = useState(null);
-  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [bookmarkedResources, setBookmarkedResources] = useState({});
   const [category, setCategory] = useState("All");
   const [type, setType] = useState("");
   const [level, setLevel] = useState("");
@@ -50,6 +44,14 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
           setSelectedResource(resourcesCollection[0]);
         }
 
+        // Initialize bookmarked resources from local storage
+        const savedBookmarks = JSON.parse(localStorage.getItem("bookmarks")) || [];
+        const bookmarkedState = savedBookmarks.reduce((acc, resource) => {
+          acc[resource.id] = true;
+          return acc;
+        }, {});
+        setBookmarkedResources(bookmarkedState);
+
         setIsLoading(false);
       } catch (err) {
         console.error("Error fetching resources and comments: ", err);
@@ -62,9 +64,7 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
 
   const handleSelectResource = useCallback(
     (clickedId) => {
-      const foundResource = resources.find(
-        (resource) => resource.id === clickedId
-      );
+      const foundResource = resources.find((resource) => resource.id === clickedId);
       if (foundResource) {
         setSelectedResource(foundResource);
       } else {
@@ -75,18 +75,23 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   );
 
   const handleToggleBookmarked = () => {
-    const newBookmarkedState = !isBookmarked;
-    setIsBookmarked(newBookmarkedState);
+    if (!selectedResource) return;
+
+    const newBookmarkedState = !bookmarkedResources[selectedResource.id];
+    setBookmarkedResources((prev) => ({
+      ...prev,
+      [selectedResource.id]: newBookmarkedState
+    }));
+
     let bookmarks = JSON.parse(localStorage.getItem("bookmarks")) || [];
 
     if (newBookmarkedState) {
       bookmarks.push(selectedResource);
     } else {
-      bookmarks = bookmarks.filter(
-        (bookmark) => bookmark.id !== selectedResource.id
-      );
+      bookmarks = bookmarks.filter((bookmark) => bookmark.id !== selectedResource.id);
     }
 
+    localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
     onBookmarkUpdate(bookmarks);
   };
 
@@ -112,10 +117,10 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
       prevResources.map((resource) =>
         resource.id === resourceId
           ? {
-              ...resource,
-              comments: [...(resource.comments || []), newComment],
-              commentsCount: (resource.commentsCount || 0) + 1,
-            }
+            ...resource,
+            comments: [...(resource.comments || []), newComment],
+            commentsCount: (resource.commentsCount || 0) + 1,
+          }
           : resource
       )
     );
@@ -128,7 +133,6 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
       }));
     }
   }, []);
-
   // Filter resources based on the category, type, skill, and duration
   const filteredResources = useMemo(() => {
     return resources.filter((resource) => {
@@ -168,8 +172,8 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
           <ResourceDetailCard
             selectedResource={selectedResource}
             handleToggleBookmarked={handleToggleBookmarked}
-            savedBookmarks={JSON.parse(localStorage.getItem("bookmarks")) || []}
-            isBookmarked={isBookmarked}
+            savedBookmarks={Object.values(bookmarkedResources).some(Boolean)}
+            isBookmarked={bookmarkedResources[selectedResource.id] || false}
             comments={selectedResource.comments}
             currentUser={currentUser}
             onResourceUpdate={handleResourceUpdate}
