@@ -8,9 +8,6 @@ import checkImg from "../../assets/images/check.png";
 
 
 export const CommentModal = ({closeModal}) => {
-
-
-
     return(
         <Box
         position="fixed"
@@ -19,8 +16,7 @@ export const CommentModal = ({closeModal}) => {
         width="500px"
         zIndex={9999}
         >
-        <Flex align="center" className="modal" 
-         >
+        <Flex align="center" className="modal">
             <img className="modalX" src={modalClose} alt="closeModal" onClick={closeModal} aria-label="close modal"/>   
             <Image src={checkImg} alt="success Icon"boxSize="80px" mr={4} />
             <Box>
@@ -28,11 +24,6 @@ export const CommentModal = ({closeModal}) => {
           <Text mb={2} fontWeight="bold" marginTop="-5px">Thank you for contributing to the Community Resource Library.</Text>
         </Box>
         </Flex>
-        {/* <div className="modal">
-            <img className="modalX" src={modalClose} alt="closeModal" onClick={closeModal} aria-label="close modal"/>
-            <h2 className="modalHeader">Success!</h2>
-            <p className="modalText">Thank you for contributing to the Community Resource Library.</p>
-        </div> */}
         </Box>
     )
 }
