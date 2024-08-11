@@ -81,7 +81,9 @@
 }
 
 .newComment {
-  // position: sticky;
+  position: absolute;
+  right: 1rem;
+  width: 48%;
   bottom: 0;
   display: flex;
   height: 107px;
@@ -96,6 +98,14 @@
   background: #fff;
   // margin-top: 2rem;
   box-shadow: 4px 4px 0 black;
+
+  @include desktop {
+    width: 57%;
+  }
+
+  @include large-desktop {
+    width: 59%;
+  }
 }
 
 .commentDivs {

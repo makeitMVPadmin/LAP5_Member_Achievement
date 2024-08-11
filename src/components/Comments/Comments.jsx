@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Input } from "@chakra-ui/react";
 import "./Comments.scss";
 import blankProfile from "../../assets/icons/BlankProfile.png";
@@ -15,8 +15,14 @@ import {
   where,
   getDocs,
 } from "firebase/firestore";
+import { PointsContext } from "../../App";
 
-export const Comments = ({ comments, currentUser, resourceId, onCommentAdded }) => {
+export const Comments = ({
+  comments,
+  currentUser,
+  resourceId,
+  onCommentAdded,
+}) => {
   console.log("Received comments in Comments component:", comments);
   const [postedComments, setPostedComments] = useState([]);
   const [comment, setComment] = useState("");
@@ -64,6 +70,11 @@ export const Comments = ({ comments, currentUser, resourceId, onCommentAdded }) 
     setShowModal(false);
   };
 
+  const { addPoints } = useContext(PointsContext);
+  const handleCommentPoints = () => {
+    addPoints(10);
+  };
+
   return (
     <div className="commentsContainer">
       <div className="comments">
@@ -88,7 +99,10 @@ export const Comments = ({ comments, currentUser, resourceId, onCommentAdded }) 
                           addSuffix: true,
                         })}
                       </div>
-                      <div className="thumbsup" aria-label="thumbs up Comment button">
+                      <div
+                        className="thumbsup"
+                        aria-label="thumbs up Comment button"
+                      >
                         <CommentVotes
                           commentId={postedComment.id}
                           currentUser={currentUser}
@@ -134,6 +148,7 @@ export const Comments = ({ comments, currentUser, resourceId, onCommentAdded }) 
               alt="arrow forward"
               className="resource__forward-arrow-icon"
               aria-hidden="true"
+              onClick={handleCommentPoints}
             />
           </button>
           {showModal && <CommentModal closeModal={closeModal} />}
