@@ -107,10 +107,12 @@ const Upvoting = React.memo(({ resourceId, currentUser, initialUpvotes, initialD
 
       setUpvotes(updatedData.upvote || 0);
       setDownvotes(updatedData.downvote || 0);
-      setVoteStatus(updatedData.likedByUser?.includes(userId) ? 'upvote' : 
-                    updatedData.downvotedByUsers?.includes(userId) ? 'downvote' : null);
+      setVoteStatus(updatedData.likedByUser?.includes(userId) ? 'upvote' :
+        updatedData.downvotedByUsers?.includes(userId) ? 'downvote' : null);
 
-      onVoteChange(resourceId, updatedData.upvote || 0, updatedData.downvote || 0);
+      if (onVoteChange) {
+        onVoteChange(updatedData.upvote || 0, updatedData.downvote || 0);
+      }
     } catch (error) {
       console.error("Error updating vote:", error);
     } finally {
