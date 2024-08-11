@@ -16,7 +16,8 @@
   margin-bottom: 0px;
   // position: relative;
   overflow: auto;
-  height: 17rem;
+  height: 250px;
+  padding-bottom: 10px;
 
   -webkit-overflow-scrolling: touch;
 }
@@ -65,6 +66,8 @@
 .commentsContainer {
   display: flex;
   flex-direction: column;
+  
+  padding: 0px;
 }
 
 .commentText {
@@ -83,31 +86,24 @@
 .newComment {
   position: absolute;
   right: 1rem;
-  width: 48%;
-  bottom: 0;
+  width: 50%;
+  bottom: -.2rem;
   display: flex;
-  height: 107px;
-  // margin-top: -5px;
+  height: 100px;
   align-items: center;
-  gap: 1rem;
-  // margin: 0.75rem;
-  margin-left: 0px;
+  margin: 0.75 0rem;
   margin-right: 0px;
   padding: 1rem;
+  margin-bottom: 1rem;
   @include border;
   background: #fff;
-  // margin-top: 2rem;
   box-shadow: 4px 4px 0 black;
+  width: 59.4%;
 
-  @include desktop {
-    width: 57%;
-  }
-
-  @include large-desktop {
-    width: 59%;
-  }
+  // @include large-desktop {
+  //   width: 59%;
+  // }
 }
-
 .commentDivs {
   position: relative;
   display: flex;
@@ -116,16 +112,18 @@
   align-items: flex-start;
   gap: 0.5rem;
   align-self: stretch;
-  margin: 0.75rem;
+  margin: 0.75 0rem;
   margin-left: 0px;
-  margin-right: 4px;
+  margin-right: 3px;
   padding-bottom: 1rem;
   padding: 0.5rem;
   @include border;
-  background: #fff;
+  // background: green;
   margin-bottom: 1rem;
   box-shadow: 4px 4px 0 black;
 }
+
+
 
 .resource__forward-arrow-icon {
   width: 2rem;
