@@ -27,9 +27,7 @@ export const RedemptionToast2 = () => {
 
   return (
     <>
-      <button className="reward__claim-button-approve">
-        Claim
-      </button>
+      
     <Box
       position="fixed"
       bottom="20px"
