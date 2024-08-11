@@ -12,6 +12,11 @@
   color: gray;
   font-weight: 700;
   line-height: 1.25;
+  margin-left: 0.4rem;
+
+  &-first {
+    margin-left: 0;
+  }
 }
 
 .rewards-redemption-title {
@@ -20,18 +25,18 @@
 }
 
 .rewards-redemption-title2 {
-  margin: 1rem 0 0.5rem;
+  margin: 1rem 0 0.5rem 0.4rem;
 }
 
 .rewards-right-container {
-  width: 70rem;
+  width: 76%;
 
   @include desktop {
-    width: 95rem;
+    width: 83%;
   }
 
   @include large-desktop {
-    width: 125rem;
+    width: 81.5%;
     margin: 0 1rem;
   }
 }
@@ -39,29 +44,34 @@
 .rewards-right-top {
   display: flex;
   align-items: center;
-  margin-top: 1.5rem;
+  justify-content: space-evenly;
+  margin: 1.5rem;
 }
 
 .rewards-redemption-cards {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  margin: 1rem 0.5rem 0 0;
+  flex-direction: row;
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex-wrap: nowrap;
+  padding: 1rem;
+  gap: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+
+  @include desktop {
+    gap: 2rem;
+  }
 }
 
 .points-balance-container {
   background-color: green;
 }
 
-/* .daily-redemption-options-container {
- 
-} */
-
 .rewards-redemption__container {
   display: flex;
   flex-direction: column;
   flex: 2;
-  /* background-color: blue; */
 }
 
 .pointsBar {
@@ -71,7 +81,7 @@
 
 .daily-redemption-options-container {
   @include thin-border;
-  margin: 1rem 1rem 1rem 0.4rem;
+  margin: 1rem 0rem 1rem 0.4rem;
   padding: 0 0.65rem 0.65rem;
 }
 
@@ -86,7 +96,7 @@
 .reward-options {
   &__container {
     @include thin-border;
-    margin: 1rem 1rem 1rem 0.4rem;
+    margin: 1rem 0rem 1rem 0.4rem;
     padding: 0 0.65rem 0.65rem;
   }
 

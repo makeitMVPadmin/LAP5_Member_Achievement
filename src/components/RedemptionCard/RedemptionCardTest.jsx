@@ -3,10 +3,6 @@ import "./RedemptionCard.scss";
 import RedemptionToast from "./RedemptionToast";
 
 export default function RedemptionCardTest({ deductPoints }) {
-  // const handleClaimReward = () => {
-  //   deductPoints(200);
-  // };
-
   return (
     <section className="reward">
       <div className="reward__heading-top">
@@ -15,7 +11,7 @@ export default function RedemptionCardTest({ deductPoints }) {
         </div>
         <div className="reward__content">
           <p className="reward__description">
-            Receive help finding and securing internship oppurtunities.
+            Receive help finding internship oppurtunities.
           </p>
           <div className="reward__point-container">
             <img src={Coin} alt="coin icon" className="coin-icon" />

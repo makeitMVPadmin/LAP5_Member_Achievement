@@ -23,15 +23,17 @@ export default function RedemptionOptions() {
         <Box className="header-container" onClick={onToggle}>
           <h2 className="rewards-redemption-title">How to Earn Points</h2>
           <IconButton
+            className="custom-size"
             aria-label={isOpen ? "Hide Options" : "Show Options"}
             icon={isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
             backgroundColor={"white"}
+            color={"#0099ff"}
           />
         </Box>
 
         <Collapse in={isOpen}>
           <Box className="daily-redemption-options-container2" mt={4}>
-            <p className="options-description">
+            <p className="options-description options-description-first">
               Earn points by completing any of the actions listed below! Please
               note: certain actions have daily restrictions. You are welcome to
               continue completing these actions, but will only accumulate points
@@ -48,13 +50,14 @@ export default function RedemptionOptions() {
                       width="24"
                       height="24"
                     />
-                    <span className="item-text">Like a resource</span>
+                    <div>
+                      <p className="item-text">Like a resource</p>
+                      <div>
+                        <p className="points">+2 points</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="points">
-                    +2 points
-                    <br />
-                    Daily limit: 14 points
-                  </div>
+                  <div className="daily-limit">Daily limit: 14 points</div>
                 </div>
                 <div className="redemption-options-card">
                   <div className="option-icon">
@@ -65,13 +68,14 @@ export default function RedemptionOptions() {
                       width="24"
                       height="24"
                     />
-                    <span className="item-text">Mark a resource as read</span>
+                    <div>
+                      <p className="item-text">Mark resource as read</p>
+                      <div>
+                        <p className="points">+10 points</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="points">
-                    +10 points
-                    <br />
-                    No daily limit
-                  </div>
+                  <div className="daily-limit">No daily limit</div>
                 </div>
                 <div className="redemption-options-card">
                   <div className="option-icon">
@@ -82,13 +86,14 @@ export default function RedemptionOptions() {
                       width="24"
                       height="24"
                     />
-                    <span className="item-text">Bookmark a resource</span>
+                    <div>
+                      <p className="item-text">Bookmark a resource</p>
+                      <div>
+                        <p className="points">+20 points</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="points">
-                    +20 points
-                    <br />
-                    No daily limit
-                  </div>
+                  <div className="daily-limit">No daily limit</div>
                 </div>
                 <div className="redemption-options-card">
                   <div className="option-icon">
@@ -99,13 +104,14 @@ export default function RedemptionOptions() {
                       width="24"
                       height="24"
                     />
-                    <span className="item-text">Submit a resource</span>
+                    <div>
+                      <p className="item-text">Submit a resource</p>
+                      <div>
+                        <p className="points">+50 points</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="points">
-                    +2 points
-                    <br />
-                    Daily limit: 14 points
-                  </div>
+                  <div className="daily-limit">No daily limit</div>
                 </div>
                 <div className="redemption-options-card">
                   <div className="option-icon">
@@ -116,13 +122,14 @@ export default function RedemptionOptions() {
                       width="24"
                       height="24"
                     />
-                    <span className="item-text">Comment on a resource</span>
+                    <div>
+                      <p className="item-text">Comment on a resource</p>
+                      <div>
+                        <p className="points">+10 points</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="points">
-                    +10 points
-                    <br />
-                    No daily limit
-                  </div>
+                  <div className="daily-limit">No daily limit</div>
                 </div>
               </div>
             </div>

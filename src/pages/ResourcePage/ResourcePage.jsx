@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useContext,
+} from "react";
 import NavBar from "../../components/NavBar/NavBar";
 import ResourceDetailCard from "../../components/ResourceDetailCard/ResourceDetailCard";
 import ResourceList from "../../components/ResourceList/ResourceList";
@@ -30,7 +36,11 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
           const resourceComments = commentsSnapshot.docs
             .filter((commentDoc) => commentDoc.data().resourceId === doc.id)
             .map((commentDoc) => ({ id: commentDoc.id, ...commentDoc.data() }));
-          return { ...resourceData, comments: resourceComments, commentsCount: resourceComments.length };
+          return {
+            ...resourceData,
+            comments: resourceComments,
+            commentsCount: resourceComments.length,
+          };
         });
 
         setResources(resourcesCollection);
@@ -52,7 +62,9 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
 
   const handleSelectResource = useCallback(
     (clickedId) => {
-      const foundResource = resources.find((resource) => resource.id === clickedId);
+      const foundResource = resources.find(
+        (resource) => resource.id === clickedId
+      );
       if (foundResource) {
         setSelectedResource(foundResource);
       } else {
@@ -99,7 +111,11 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
     setResources((prevResources) =>
       prevResources.map((resource) =>
         resource.id === resourceId
-          ? { ...resource, comments: [...(resource.comments || []), newComment], commentsCount: (resource.commentsCount || 0) + 1 }
+          ? {
+              ...resource,
+              comments: [...(resource.comments || []), newComment],
+              commentsCount: (resource.commentsCount || 0) + 1,
+            }
           : resource
       )
     );
@@ -116,8 +132,10 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   // Filter resources based on the category, type, skill, and duration
   const filteredResources = useMemo(() => {
     return resources.filter((resource) => {
-      const currentCategory = category === "All" || resource.discipline === category;
+      const currentCategory =
+        category === "All" || resource.discipline === category;
       const matchesType = type.length === 0 || type.includes(resource.type);
+
       const matchesLevel = level.length === 0 || level.includes(resource.level);
       const matchesEstDuration = estDuration.length === 0 || estDuration.includes(resource.estDuration);
 
@@ -130,7 +148,9 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
       <div className="resource__navbar-container">
         <NavBar
           onCategoryChange={setCategory}
-          onFormSubmit={(newResource) => setResources([...resources, newResource])}
+          onFormSubmit={(newResource) =>
+            setResources([...resources, newResource])
+          }
           onFilterChange={handleFilterChange}
           currentUser={currentUser}
         />

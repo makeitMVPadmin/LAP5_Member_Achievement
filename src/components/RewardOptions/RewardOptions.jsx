@@ -20,25 +20,24 @@ export default function RewardOptions() {
         <Box className="header-container" onClick={onToggle}>
           <h2 className="rewards-redemption-title">Reward Options</h2>
           <IconButton
+            className="custom-size"
             aria-label={isOpen ? "Hide Options" : "Show Options"}
             icon={isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
             backgroundColor={"white"}
+            color={"#0099ff"}
           />
         </Box>
 
         <Collapse in={isOpen}>
           <Box className="reward-options__container2" mt={4}>
             <p className="reward-options__description">
-              Keep saving those points! These are the rewards you can work
-              towards by earning more points.
+              Browse our full list of rewards and see the points required to
+              redeem each one.
             </p>
 
             <RewardList />
-
-            <RedemptionCard />
           </Box>
         </Collapse>
-        {/* )} */}
       </Box>
     </ChakraProvider>
   );

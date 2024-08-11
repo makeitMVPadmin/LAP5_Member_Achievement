@@ -5,10 +5,11 @@ import bookmarkedIcon from "../../assets/icons/bookmarked.svg";
 import Upvoting from "../Upvoting/Upvoting";
 import { Link } from "react-router-dom";
 import { Comments } from "../Comments/Comments";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
+import { PointsContext } from "../../App";
 
 // ResourceDetailCard.jsx
-const ResourceDetailCard = (({
+const ResourceDetailCard = ({
   selectedResource,
   handleToggleBookmarked,
   savedBookmarks,
@@ -61,6 +62,20 @@ const ResourceDetailCard = (({
     localStorage.setItem(selectedResource.id, JSON.stringify(newReadState));
   };
 
+  const { addPoints } = useContext(PointsContext);
+
+  const handleUpvotePoints = () => {
+    addPoints(2);
+  };
+
+  const handleMarkAsReadPoints = () => {
+    addPoints(10);
+  };
+
+  const handleBookmarkPoints = () => {
+    addPoints(20);
+  };
+
   return (
     <>
       <section className="resource-details">
@@ -69,7 +84,12 @@ const ResourceDetailCard = (({
             <p className="resource-details__type">{localResource.type}</p>
             <img
               src={isBookmarked ? bookmarkedIcon : bookmarkIcon}
-              onClick={handleToggleBookmarked}
+              onClick={() => {
+                handleToggleBookmarked();
+                if (!isBookmarked) {
+                  handleBookmarkPoints();
+                }
+              }}
               alt="bookmark icon"
               className="resource-details__saved-icon"
               aria-hidden="true"
@@ -77,9 +97,7 @@ const ResourceDetailCard = (({
           </div>
         </div>
         <div className="resource-details__heading-bottom">
-          <h1 className="resource-details__title">
-            {localResource.title}
-          </h1>
+          <h1 className="resource-details__title">{localResource.title}</h1>
         </div>
         <p className="resource-details__level">{localResource.level}</p>
         <div className="resource-details__tags-container" role="list">
@@ -89,11 +107,7 @@ const ResourceDetailCard = (({
             localResource.tag3,
             localResource.tag4,
           ].map((tag, index) => (
-            <div
-              key={index}
-              className="resource-details__tag"
-              role="listitem"
-            >
+            <div key={index} className="resource-details__tag" role="listitem">
               {tag}
             </div>
           ))}
@@ -103,12 +117,14 @@ const ResourceDetailCard = (({
           <div className="resource-details__rating-star-container">
             <div className="resource-details__stars">
               <Upvoting
+                onClick={handleUpvotePoints}
+                addPoints={addPoints}
                 resourceId={localResource.id}
                 currentUser={currentUser}
                 initialUpvotes={localResource.upvote}
                 initialDownvotes={localResource.downvote}
                 onVoteChange={(upvotes, downvotes) => {
-                  setLocalResource(prev => ({
+                  setLocalResource((prev) => ({
                     ...prev,
                     upvote: upvotes,
                     downvote: downvotes,
@@ -146,10 +162,7 @@ const ResourceDetailCard = (({
 
         <div className="resource-details__bottom-container">
           <div className="resource-details__author-container">
-            <div
-              className="resource-details__avatar"
-              aria-hidden="true"
-            ></div>
+            <div className="resource-details__avatar" aria-hidden="true"></div>
             <div className="resource-details__author">
               <p className="resource-details__submission">Submitted by: </p>
               <p className="resource-details__author-name">
@@ -173,9 +186,15 @@ const ResourceDetailCard = (({
               </button>
             </Link>
             <button
-              className={`resource-details__button ${isRead ? "resource-details__button--read" : ""
-                }`}
-              onClick={handleToggleRead}
+              className={`resource-details__button ${
+                isRead ? "resource-details__button--read" : ""
+              }`}
+              onClick={() => {
+                handleToggleRead();
+                if (!isRead) {
+                  handleMarkAsReadPoints();
+                }
+              }}
               aria-pressed={isRead}
               aria-label={isRead ? "Read!" : "Mark as Read"}
             >
@@ -200,6 +219,6 @@ const ResourceDetailCard = (({
       </div>
     </>
   );
-});
+};
 
 export default React.memo(ResourceDetailCard);
