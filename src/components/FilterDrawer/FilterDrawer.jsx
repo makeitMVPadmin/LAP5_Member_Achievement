@@ -193,7 +193,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 <option value="All">All</option>
               </Select>
               <FormLabel
-                htmlFor="estlevel"
+                htmlFor="estDuration"
                 fontSize="20px"
                 fontWeight="bold"
                 marginTop="10px"
