@@ -12,8 +12,8 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [category, setCategory] = useState("All");
   const [type, setType] = useState("");
-  const [skill, setSkill] = useState("");
-  const [duration, setDuration] = useState("");
+  const [level, setLevel] = useState("");
+  const [estDuration, setEstDuration] = useState("");
   const [commentCounts, setCommentCounts] = useState({});
   const [isLoading, setIsLoading] = useState(true);
 
@@ -24,7 +24,7 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
       try {
         const resourcesSnapshot = await getDocs(collection(database, "Resources"));
         const commentsSnapshot = await getDocs(collection(database, "Comments"));
-    
+
         const resourcesCollection = resourcesSnapshot.docs.map((doc) => {
           const resourceData = { id: doc.id, ...doc.data() };
           const resourceComments = commentsSnapshot.docs
@@ -32,9 +32,9 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
             .map((commentDoc) => ({ id: commentDoc.id, ...commentDoc.data() }));
           return { ...resourceData, comments: resourceComments, commentsCount: resourceComments.length };
         });
-    
+
         setResources(resourcesCollection);
-    
+
         // Automatically selects the first resource
         if (resourcesCollection.length > 0) {
           setSelectedResource(resourcesCollection[0]);
@@ -45,7 +45,7 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
         console.error("Error fetching resources and comments: ", err);
         setIsLoading(false);
       }
-    };    
+    };
 
     getAllResourcesAndComments();
   }, []);
@@ -78,10 +78,10 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
     onBookmarkUpdate(bookmarks);
   };
 
-  const handleFilterChange = ({ type, skill, duration }) => {
+  const handleFilterChange = ({ type, level, estDuration }) => {
     setType(type === "All" || type === "" ? [] : [type]);
-    setSkill(skill === "All" || skill === "" ? [] : [skill]);
-    setDuration(duration === "All" || duration === "" ? [] : [duration]);
+    setLevel(level === "All" || level === "" ? [] : [level]);
+    setEstDuration(estDuration === "All" || estDuration === "" ? [] : [estDuration]);
   };
 
   const handleResourceUpdate = useCallback((updatedResource) => {
@@ -103,7 +103,7 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
           : resource
       )
     );
-  
+
     if (selectedResource && selectedResource.id === resourceId) {
       setSelectedResource((prevSelected) => ({
         ...prevSelected,
@@ -118,12 +118,12 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
     return resources.filter((resource) => {
       const currentCategory = category === "All" || resource.discipline === category;
       const matchesType = type.length === 0 || type.includes(resource.type);
-      const matchesSkill = skill.length === 0 || skill.includes(resource.level);
-      const matchesDuration = duration.length === 0 || duration.includes(resource.duration);
+      const matchesLevel = level.length === 0 || level.includes(resource.level);
+      const matchesEstDuration = estDuration.length === 0 || estDuration.includes(resource.estDuration);
 
-      return currentCategory && matchesType && matchesSkill && matchesDuration;
+      return currentCategory && matchesType && matchesLevel && matchesEstDuration;
     });
-  }, [resources, category, type, skill, duration]);
+  }, [resources, category, type, level, estDuration]);
 
   return (
     <div className="resource__container">
@@ -144,17 +144,17 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
         />
       </div>
       <div className="resource-details__container">
-      {!isLoading && selectedResource && (
+        {!isLoading && selectedResource && (
           <ResourceDetailCard
-          selectedResource={selectedResource}
-          handleToggleBookmarked={handleToggleBookmarked}
-          savedBookmarks={JSON.parse(localStorage.getItem("bookmarks")) || []}
-          isBookmarked={isBookmarked}
-          comments={selectedResource.comments}
-          currentUser={currentUser}
-          onResourceUpdate={handleResourceUpdate}
-          onCommentAdded={handleCommentAdded}
-        />   
+            selectedResource={selectedResource}
+            handleToggleBookmarked={handleToggleBookmarked}
+            savedBookmarks={JSON.parse(localStorage.getItem("bookmarks")) || []}
+            isBookmarked={isBookmarked}
+            comments={selectedResource.comments}
+            currentUser={currentUser}
+            onResourceUpdate={handleResourceUpdate}
+            onCommentAdded={handleCommentAdded}
+          />
         )}
       </div>
     </div>
