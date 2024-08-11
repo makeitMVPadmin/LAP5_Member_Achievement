@@ -15,17 +15,17 @@ function RedemptionToast({ onClick }) {
       }, 5000);
     });
 
-    toast.promise(examplePromise, {
-      success: {
-        title: "Claim Complete!",
-        description: "A community leader will reach out to you shortly.",
-      },
-      error: {
-        title: "Promise rejected",
-        description: "Sorry, but you don't have enough points",
-      },
-      loading: { title: "Claiming Reward", description: "Please wait" },
-    });
+    // toast.promise(examplePromise, {
+    //   success: {
+    //     title: "Claim Complete!",
+    //     description: "A community leader will reach out to you shortly.",
+    //   },
+    //   error: {
+    //     title: "Promise rejected",
+    //     description: "Sorry, but you don't have enough points",
+    //   },
+    //   loading: { title: "Claiming Reward", description: "Please wait" },
+    // });
 
     try {
       await examplePromise;
