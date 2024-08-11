@@ -128,6 +128,7 @@ Samantha Lugtu | [LinkedIn](https://www.linkedin.com/in/samantha-lugtu-968b872a7
 Adiam Ahmed | [LinkedIn](https://www.linkedin.com/in/adiamahmed/) | [GitHub]()<br>
 Dayana Romero Villavicencio | [LinkedIn](https://www.linkedin.com/in/dayana-romero/) | [GitHub](https://github.com/drv0228)<br>
 Taylor Allen | [LinkedIn](https://www.linkedin.com/in/taylorintech/) | [GitHub](https://github.com/taylor-allen)<br>
+Christian Ocampo | [LinkedIn](https://www.linkedin.com/in/christianocampodev/) | [GitHub](https://github.com/cocampo1005)<br>
 
 
 **Designers**<br>
