@@ -28,6 +28,11 @@ export default function FilterDrawer({ onFilterChange }) {
     level: "",
     estDuration: "",
   });
+  const [selectColors, setSelectColors] = useState({
+    type: 'grey',
+    level: 'grey',
+    estDuration: 'grey'
+  });
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -39,6 +44,11 @@ export default function FilterDrawer({ onFilterChange }) {
       ...filters,
       [name]: value,
     }));
+
+    setSelectColors((prevColors) => ({
+      ...prevColors,
+      [name]: value ? 'black' : 'grey'
+    }));
   };
 
   const handleFilterChange = (event) => {
@@ -48,6 +58,11 @@ export default function FilterDrawer({ onFilterChange }) {
     if (typeof onFilterChange === "function") {
       event.preventDefault();
       onFilterChange(filters);
+      setSelectColors({
+        type: 'grey',
+        level: 'grey',
+        estDuration: 'grey'
+      });
       onClose();
     }
   };
@@ -57,6 +72,11 @@ export default function FilterDrawer({ onFilterChange }) {
       type: "",
       level: "",
       estDuration: "",
+    });
+    setSelectColors({
+      type: 'grey',
+      level: 'grey',
+      estDuration: 'grey'
     });
     onClose();
   };
@@ -111,6 +131,16 @@ export default function FilterDrawer({ onFilterChange }) {
                 iconColor="#0099FF"
                 border="3px solid black"
                 className="submission__inputField"
+                color={selectColors.type}
+                focusBorderColor="#0099ff"
+                sx={{
+                  '& option': {
+                    color: 'black',
+                  },
+                  '& option:first-of-type': {
+                    color: 'grey',
+                  },
+                }}
               >
                 <option value="" disabled>
                   Select
@@ -142,6 +172,16 @@ export default function FilterDrawer({ onFilterChange }) {
                 iconColor="#0099FF"
                 border="3px solid black"
                 className="submission__inputField"
+                color={selectColors.level}
+                focusBorderColor="#0099ff"
+                sx={{
+                  '& option': {
+                    color: 'black',
+                  },
+                  '& option:first-of-type': {
+                    color: 'grey',
+                  },
+                }}
               >
                 <option value="" disabled>
                   Select
@@ -173,6 +213,16 @@ export default function FilterDrawer({ onFilterChange }) {
                 iconColor="#0099FF"
                 border="3px solid black"
                 className="submission__inputField"
+                color={selectColors.estDuration}
+                focusBorderColor="#0099ff"
+                sx={{
+                  '& option': {
+                    color: 'black',
+                  },
+                  '& option:first-of-type': {
+                    color: 'grey',
+                  },
+                }}
               >
                 <option value="" disabled>
                   Select

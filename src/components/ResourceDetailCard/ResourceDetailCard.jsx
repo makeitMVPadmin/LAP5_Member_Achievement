@@ -7,217 +7,226 @@ import { Link } from "react-router-dom";
 import { Comments } from "../Comments/Comments";
 import React, { useState, useEffect, useCallback, useContext } from "react";
 import { PointsContext } from "../../App";
-import { add } from "date-fns";
 
-const ResourceDetailCard = React.memo(
-  ({
-    selectedResource,
-    handleToggleBookmarked,
-    savedBookmarks,
-    isBookmarked,
-    comments,
-    currentUser,
-    onResourceUpdate,
-    onCommentAdded,
-  }) => {
-    const [localResource, setLocalResource] = useState(selectedResource);
+// ResourceDetailCard.jsx
+const ResourceDetailCard = ({
+  selectedResource,
+  handleToggleBookmarked,
+  savedBookmarks,
+  isBookmarked,
+  comments,
+  currentUser,
+  onResourceUpdate,
+  onCommentAdded,
+}) => {
+  console.log("Received comments in ResourceDetailCard:", comments);
 
-    useEffect(() => {
-      setLocalResource(selectedResource);
-    }, [selectedResource]);
+  const [localResource, setLocalResource] = useState(selectedResource);
+  const [isRead, setIsRead] = useState(false);
 
-    const handleVoteChange = useCallback(
-      (resourceId, upvotes, downvotes) => {
-        setLocalResource((prev) => {
-          if (prev.upvote === upvotes && prev.downvote === downvotes) {
-            return prev;
-          }
-          return { ...prev, upvote: upvotes, downvote: downvotes };
-        });
+  useEffect(() => {
+    setLocalResource(selectedResource);
+  }, [selectedResource]);
 
-        if (onResourceUpdate) {
-          onResourceUpdate({
-            ...localResource,
-            id: resourceId,
-            upvote: upvotes,
-            downvote: downvotes,
-          });
-        }
-      },
-      [localResource, onResourceUpdate]
-    );
+  useEffect(() => {
+    const savedReadState = localStorage.getItem(selectedResource.id);
+    if (savedReadState) {
+      setIsRead(JSON.parse(savedReadState));
+    }
+  }, [selectedResource.id]);
 
-    const [isRead, setIsRead] = useState(false);
+  // const handleVoteChange = useCallback(
+  //   (resourceId, upvotes, downvotes) => {
+  //     setLocalResource(prev => {
+  //       if (prev.upvote === upvotes && prev.downvote === downvotes) {
+  //         return prev;
+  //       }
+  //       return { ...prev, upvote: upvotes, downvote: downvotes };
+  //     });
 
-    useEffect(() => {
-      const savedReadState = localStorage.getItem(selectedResource.id);
-      if (savedReadState) {
-        setIsRead(JSON.parse(savedReadState));
-      }
-    }, [selectedResource.id]);
+  //     if (onResourceUpdate) {
+  //       onResourceUpdate({
+  //         ...localResource,
+  //         id: resourceId,
+  //         upvote: upvotes,
+  //         downvote: downvotes,
+  //       });
+  //     }
+  //   },
+  //   [localResource, onResourceUpdate]
+  // );
 
-    const handleToggleRead = () => {
-      const newReadState = !isRead;
-      setIsRead(newReadState);
-      localStorage.setItem(selectedResource.id, JSON.stringify(newReadState));
-    };
+  const handleToggleRead = () => {
+    const newReadState = !isRead;
+    setIsRead(newReadState);
+    localStorage.setItem(selectedResource.id, JSON.stringify(newReadState));
+  };
 
-    const { addPoints } = useContext(PointsContext);
+  const { addPoints } = useContext(PointsContext);
 
-    const handleUpvotePoints = () => {
-      addPoints(2);
-    };
+  const handleUpvotePoints = () => {
+    addPoints(2);
+  };
 
-    const handleMarkAsReadPoints = () => {
-      addPoints(10);
-    };
+  const handleMarkAsReadPoints = () => {
+    addPoints(10);
+  };
 
-    const handleBookmarkPoints = () => {
-      addPoints(20);
-    };
+  const handleBookmarkPoints = () => {
+    addPoints(20);
+  };
 
-    const handleSubmitResourcePoints = () => {
-      addPoints(50);
-    };
+  const handleSubmitResourcePoints = () => {
+    addPoints(50);
+  };
 
-    const handleCommentPoints = () => {
-      addPoints(10);
-    };
+  const handleCommentPoints = () => {
+    addPoints(10);
+  };
 
-    return (
-      <>
-        <section className="resource-details">
-          <div className="resource-details__heading-top">
-            <div className="resource-details__heading-top-container">
-              <p className="resource-details__type">{selectedResource.type}</p>
-              <img
-                src={isBookmarked ? bookmarkedIcon : bookmarkIcon}
-                onClick={() => {
-                  handleToggleBookmarked();
-                  if (!isBookmarked) {
-                    handleBookmarkPoints();
+  return (
+    <>
+      <section className="resource-details">
+        <div className="resource-details__heading-top">
+          <div className="resource-details__heading-top-container">
+            <p className="resource-details__type">{localResource.type}</p>
+            <img
+              src={isBookmarked ? bookmarkedIcon : bookmarkIcon}
+              onClick={() => {
+                handleToggleBookmarked();
+                if (!isBookmarked) {
+                  handleBookmarkPoints();
+                }
+              }}
+              alt="bookmark icon"
+              className="resource-details__saved-icon"
+              aria-hidden="true"
+            />
+          </div>
+        </div>
+        <div className="resource-details__heading-bottom">
+          <h1 className="resource-details__title">{localResource.title}</h1>
+        </div>
+        <p className="resource-details__level">{localResource.level}</p>
+        <div className="resource-details__tags-container" role="list">
+          {[
+            localResource.tag1,
+            localResource.tag2,
+            localResource.tag3,
+            localResource.tag4,
+          ].map((tag, index) => (
+            <div key={index} className="resource-details__tag" role="listitem">
+              {tag}
+            </div>
+          ))}
+        </div>
+
+        <div className="resource-details__rating-timer-container">
+          <div className="resource-details__rating-star-container">
+            <div className="resource-details__stars">
+              <Upvoting
+                onClick={handleUpvotePoints}
+                addPoints={addPoints}
+                resourceId={localResource.id}
+                currentUser={currentUser}
+                initialUpvotes={localResource.upvote}
+                initialDownvotes={localResource.downvote}
+                onVoteChange={(upvotes, downvotes) => {
+                  setLocalResource((prev) => ({
+                    ...prev,
+                    upvote: upvotes,
+                    downvote: downvotes,
+                  }));
+                  if (onResourceUpdate) {
+                    onResourceUpdate({
+                      ...localResource,
+                      upvote: upvotes,
+                      downvote: downvotes,
+                    });
                   }
                 }}
-                alt="bookmark icon"
-                className="resource-details__saved-icon"
-                aria-hidden="true"
-              />
-            </div>
-          </div>
-          <div className="resource-details__heading-bottom">
-            <h1 className="resource-details__title">
-              {selectedResource.title}
-            </h1>
-          </div>
-          <p className="resource-details__level">{selectedResource.level}</p>
-          <div className="resource-details__tags-container" role="list">
-            {[
-              selectedResource.tag1,
-              selectedResource.tag2,
-              selectedResource.tag3,
-              selectedResource.tag4,
-            ].map((tag, index) => (
-              <div
-                key={index}
-                className="resource-details__tag"
-                role="listitem"
-              >
-                {tag}
-              </div>
-            ))}
-          </div>
-
-          <div className="resource-details__rating-timer-container">
-            <div className="resource-details__rating-star-container">
-              <div className="resource-details__stars">
-                <Upvoting
-                  resourceId={localResource.id}
-                  currentUser={currentUser}
-                  initialUpvotes={localResource.upvote}
-                  initialDownvotes={localResource.downvote}
-                  onVoteChange={handleVoteChange}
-                  onClick={handleUpvotePoints}
-                  addPoints={addPoints}
-                />
-              </div>
-            </div>
-
-            <div className="resource-details__timer">
-              <p className="resource-details__duration">
-                {selectedResource.estDuration}
-              </p>
-              <img
-                src={timerIcon}
-                alt="timer icon"
-                className="resource-details__timer-icon"
-                aria-hidden="true"
               />
             </div>
           </div>
 
-          <div className="resource-details__about">
-            <p className="resource-details__preview">
-              {selectedResource.description}{" "}
+          <div className="resource-details__timer">
+            <p className="resource-details__duration">
+              {localResource.estDuration}
             </p>
+            <img
+              src={timerIcon}
+              alt="timer icon"
+              className="resource-details__timer-icon"
+              aria-hidden="true"
+            />
           </div>
+        </div>
 
-          <div className="resource-details__bottom-container">
-            <div className="resource-details__author-container">
-              <div
-                className="resource-details__avatar"
-                aria-hidden="true"
-              ></div>
-              <div className="resource-details__author">
-                <p className="resource-details__submission">Submitted by: </p>
-                <p className="resource-details__author-name">
-                  {selectedResource.name}
-                </p>
-              </div>
-            </div>
-            <div className="resource-details__buttons-container">
-              <Link
-                to={selectedResource.url}
-                key=""
-                target="_blank"
-                rel="noopener noreferrer"
-                className="resource-details__link"
-              >
-                <button
-                  className="resource-details__resource-button"
-                  aria-label="Go to Resource"
-                >
-                  Go to Resource
-                </button>
-              </Link>
-              <button
-                className={`resource-details__button ${
-                  isRead ? "resource-details__button--read" : ""
-                }`}
-                onClick={() => {
-                  handleToggleRead();
-                  if (!isRead) {
-                    handleMarkAsReadPoints();
-                  }
-                }}
-                aria-pressed={isRead}
-                aria-label={isRead ? "Read!" : "Mark as Read"}
-              >
-                {isRead ? "Read!" : "Mark as Read"}
-              </button>
+        <div className="resource-details__about">
+          <p className="resource-details__preview">
+            {localResource.description}{" "}
+          </p>
+        </div>
+
+        <div className="resource-details__bottom-container">
+          <div className="resource-details__author-container">
+            <div className="resource-details__avatar" aria-hidden="true"></div>
+            <div className="resource-details__author">
+              <p className="resource-details__submission">Submitted by: </p>
+              <p className="resource-details__author-name">
+                {localResource.name}
+              </p>
             </div>
           </div>
-        </section>
-        <div className="resource-details__comments">
+          <div className="resource-details__buttons-container">
+            <Link
+              to={localResource.url}
+              key=""
+              target="_blank"
+              rel="noopener noreferrer"
+              className="resource-details__link"
+            >
+              <button
+                className="resource-details__resource-button"
+                aria-label="Go to Resource"
+              >
+                Go to Resource
+              </button>
+            </Link>
+            <button
+              className={`resource-details__button ${
+                isRead ? "resource-details__button--read" : ""
+              }`}
+              onClick={() => {
+                handleToggleRead();
+                if (!isRead) {
+                  handleMarkAsReadPoints();
+                }
+              }}
+              aria-pressed={isRead}
+              aria-label={isRead ? "Read!" : "Mark as Read"}
+            >
+              {isRead ? "Read!" : "Mark as Read"}
+            </button>
+          </div>
+        </div>
+      </section>
+      <div className="resource-details__comments">
+        {comments && (
           <Comments
             comments={comments}
             currentUser={currentUser}
-            resourceId={selectedResource.id}
-            onCommentAdded={onCommentAdded}
+            resourceId={localResource.id}
+            onCommentAdded={(resourceId, newComment) => {
+              if (onCommentAdded) {
+                onCommentAdded(resourceId, newComment);
+              }
+            }}
           />
-        </div>
-      </>
-    );
-  }
-);
+        )}
+      </div>
+    </>
+  );
+};
 
-export default ResourceDetailCard;
+export default React.memo(ResourceDetailCard);

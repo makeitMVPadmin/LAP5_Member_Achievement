@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useContext } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useContext,
+} from "react";
 import NavBar from "../../components/NavBar/NavBar";
 import ResourceDetailCard from "../../components/ResourceDetailCard/ResourceDetailCard";
 import ResourceList from "../../components/ResourceList/ResourceList";
@@ -9,133 +15,68 @@ import { database } from "../../config/firebase";
 export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   const [resources, setResources] = useState([]);
   const [selectedResource, setSelectedResource] = useState(null);
-  const [savedBookmarks, setSavedBookmarks] = useState([]);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [category, setCategory] = useState("All");
-  const [activeResourceId, setActiveResourceId] = useState(null);
   const [type, setType] = useState("");
   const [skill, setSkill] = useState("");
   const [duration, setDuration] = useState("");
-  const [comments, setComments] = useState([]);
   const [commentCounts, setCommentCounts] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
 
-  const getCommentsForSpecificResource = async (resourceId) => {
-    const q = query(
-      collection(database, "Comments"),
-      where("resourceId", "==", resourceId)
-    );
-
-    try {
-      const querySnapshot = await getDocs(q);
-      const results = [];
-      querySnapshot.forEach((doc) => {
-        results.push({ id: doc.id, ...doc.data() });
-      });
-      return results;
-    } catch (err) {
-      console.error(err);
-      return [];
-    }
-  };
-
+  // Fetching all resources and comments only once
   useEffect(() => {
     const getAllResourcesAndComments = async () => {
+      setIsLoading(true);
       try {
-        const resourcesCollectionRef = collection(database, "Resources");
-        const commentsCollectionRef = collection(database, "Comments");
-
-        const resourcesSnapshot = await getDocs(resourcesCollectionRef);
-        const commentsSnapshot = await getDocs(commentsCollectionRef);
-
-        const resourcesCollection = await Promise.all(
-          resourcesSnapshot.docs.map(async (doc) => {
-            const resourceData = { id: doc.id, ...doc.data() };
-            const resourceComments = commentsSnapshot.docs
-              .filter((commentDoc) => commentDoc.data().resourceId === doc.id)
-              .map((commentDoc) => ({ id: commentDoc.id, ...commentDoc.data() }));
-            return { ...resourceData, comments: resourceComments, commentsCount: resourceComments.length };
-          })
+        const resourcesSnapshot = await getDocs(
+          collection(database, "Resources")
+        );
+        const commentsSnapshot = await getDocs(
+          collection(database, "Comments")
         );
 
+        const resourcesCollection = resourcesSnapshot.docs.map((doc) => {
+          const resourceData = { id: doc.id, ...doc.data() };
+          const resourceComments = commentsSnapshot.docs
+            .filter((commentDoc) => commentDoc.data().resourceId === doc.id)
+            .map((commentDoc) => ({ id: commentDoc.id, ...commentDoc.data() }));
+          return {
+            ...resourceData,
+            comments: resourceComments,
+            commentsCount: resourceComments.length,
+          };
+        });
+
         setResources(resourcesCollection);
+
+        // Automatically selects the first resource
         if (resourcesCollection.length > 0) {
           setSelectedResource(resourcesCollection[0]);
-          setActiveResourceId(resourcesCollection[0].id);
         }
+
+        setIsLoading(false);
       } catch (err) {
         console.error("Error fetching resources and comments: ", err);
+        setIsLoading(false);
       }
     };
 
     getAllResourcesAndComments();
   }, []);
 
-  useEffect(() => {
-    const savedResources = JSON.parse(localStorage.getItem("resources")) || [];
-    if (savedResources.length > 0) {
-      setResources(savedResources);
-      setSelectedResource(savedResources[0]);
-      setActiveResourceId(savedResources[0]?.id);
-    }
-  }, []);
-
-  useEffect(() => {
-    const fetchComments = async () => {
-      if (selectedResource) {
-        const resourceComments = await getCommentsForSpecificResource(
-          selectedResource.id
-        );
-        setComments(resourceComments);
-      }
-    };
-
-    fetchComments();
-  }, [selectedResource]);
-
-  const handleFormSubmit = (newResource) => {
-    const updatedResources = [...resources, newResource];
-    setResources(updatedResources);
-    console.log("Updated Resources:", updatedResources);
-    localStorage.setItem("resources", JSON.stringify(updatedResources));
-
-    if (!selectedResource) {
-      setSelectedResource(newResource);
-      setActiveResourceId(newResource.id);
-    }
-  };
-
-  useEffect(() => {
-    if (resources.length > 0 && !activeResourceId) {
-      const firstResourceId = resources[0].id;
-      if (activeResourceId !== firstResourceId) {
-        setActiveResourceId(firstResourceId);
-        setSelectedResource(resources.find(resource => resource.id === firstResourceId));
-      }
-    }
-  }, [resources, activeResourceId]);
-
-  useEffect(() => {
-    if (selectedResource) {
-      const savedBookmarks =
-        JSON.parse(localStorage.getItem("bookmarks")) || [];
-      const isBookmarked = savedBookmarks.some(
-        (bookmark) => bookmark.id === selectedResource.id
+  const handleSelectResource = useCallback(
+    (clickedId) => {
+      const foundResource = resources.find(
+        (resource) => resource.id === clickedId
       );
-      setIsBookmarked(isBookmarked);
-      setSavedBookmarks(savedBookmarks);
-    }
-  }, [selectedResource]);
-
-  const filteredResources = resources.filter((resource) => {
-    const currentCategory =
-      category === "All" || resource.discipline === category;
-    const matchesType = type.length === 0 || type.includes(resource.type);
-    const matchesSkill = skill.length === 0 || skill.includes(resource.level);
-    const matchesDuration =
-      duration.length === 0 || duration.includes(resource.duration);
-
-    return currentCategory && matchesType && matchesSkill && matchesDuration;
-  });
+      if (foundResource) {
+        setSelectedResource(foundResource);
+      } else {
+        console.error("Resource not found for id:", clickedId);
+      }
+    },
+    [resources]
+  );
 
   const handleToggleBookmarked = () => {
     const newBookmarkedState = !isBookmarked;
@@ -152,25 +93,6 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
 
     onBookmarkUpdate(bookmarks);
   };
-
-  const handleSelectResource = (clickedId) => {
-    const foundResource = resources.find(
-      (resource) => resource.id === clickedId
-    );
-    if (foundResource) {
-      console.log("Setting selected resource:", foundResource);
-      setSelectedResource(foundResource);
-      setActiveResourceId(clickedId);
-    } else {
-      console.error("Resource not found for id:", clickedId);
-    }
-  };
-
-  // Removed this console log that was being used for debugging
-  // useEffect(() => {
-  //   console.log("Resources:", resources);
-  //   console.log("Selected Resource:", selectedResource);
-  // }, [resources, selectedResource]);
 
   const handleFilterChange = ({ type, skill, duration }) => {
     setType(type === "All" || type === "" ? [] : [type]);
@@ -189,43 +111,50 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
     setSelectedResource((prev) => ({ ...prev, ...updatedResource }));
   }, []);
 
-  const updateCommentCounts = useCallback(async () => {
-    const commentsRef = collection(database, "Comments");
-    const newCommentCounts = {};
+  const handleCommentAdded = useCallback((resourceId, newComment) => {
+    setResources((prevResources) =>
+      prevResources.map((resource) =>
+        resource.id === resourceId
+          ? {
+              ...resource,
+              comments: [...(resource.comments || []), newComment],
+              commentsCount: (resource.commentsCount || 0) + 1,
+            }
+          : resource
+      )
+    );
 
-    for (const resource of resources) {
-      const q = query(commentsRef, where("resourceId", "==", resource.id));
-      const querySnapshot = await getDocs(q);
-      newCommentCounts[resource.id] = querySnapshot.size;
+    if (selectedResource && selectedResource.id === resourceId) {
+      setSelectedResource((prevSelected) => ({
+        ...prevSelected,
+        comments: [...(prevSelected.comments || []), newComment],
+        commentsCount: (prevSelected.commentsCount || 0) + 1,
+      }));
     }
+  }, []);
 
-    setCommentCounts(newCommentCounts);
-    // Removing this line to see if it prevents the infinite loop issue
-    // setResources(prevResources =>
-    //   prevResources.map(resource => ({
-    //     ...resource,
-    //     commentCount: newCommentCounts[resource.id],
-    //   }))
-    // );
-  }, []); // removed "resources" from dependency array to check inifinite loop. Please feel free to add it back if necessary.
+  // Filter resources based on the category, type, skill, and duration
+  const filteredResources = useMemo(() => {
+    return resources.filter((resource) => {
+      const currentCategory =
+        category === "All" || resource.discipline === category;
+      const matchesType = type.length === 0 || type.includes(resource.type);
+      const matchesSkill = skill.length === 0 || skill.includes(resource.level);
+      const matchesDuration =
+        duration.length === 0 || duration.includes(resource.duration);
 
-  const handleCommentAdded = useCallback(() => {
-    updateCommentCounts();
-  }, []); // Removed "updateCommentCounts" from dependency array to check infinite loop. Please feel free to add it back if necessary.
-
-  useEffect(() => {
-    // Adding a conditional check to make sure that it runs only when comments are not empty
-    if (resources.length > 0) {
-      updateCommentCounts();
-    }
-  }, []); // Removed "resources, updateCommentCounts" from dependency array to check infinite loop. Please feel free to add it back if necessary.
+      return currentCategory && matchesType && matchesSkill && matchesDuration;
+    });
+  }, [resources, category, type, skill, duration]);
 
   return (
     <div className="resource__container">
       <div className="resource__navbar-container">
         <NavBar
           onCategoryChange={setCategory}
-          onFormSubmit={handleFormSubmit}
+          onFormSubmit={(newResource) =>
+            setResources([...resources, newResource])
+          }
           onFilterChange={handleFilterChange}
           currentUser={currentUser}
         />
@@ -234,18 +163,18 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
         <ResourceList
           resources={filteredResources}
           selectResource={handleSelectResource}
-          activeResourceId={activeResourceId}
+          activeResourceId={selectedResource?.id}
           commentCounts={commentCounts}
         />
       </div>
       <div className="resource-details__container">
-        {selectedResource && Object.keys(selectedResource).length > 0 && (
+        {!isLoading && selectedResource && (
           <ResourceDetailCard
             selectedResource={selectedResource}
             handleToggleBookmarked={handleToggleBookmarked}
-            savedBookmarks={savedBookmarks}
+            savedBookmarks={JSON.parse(localStorage.getItem("bookmarks")) || []}
             isBookmarked={isBookmarked}
-            comments={comments}
+            comments={selectedResource.comments}
             currentUser={currentUser}
             onResourceUpdate={handleResourceUpdate}
             onCommentAdded={handleCommentAdded}

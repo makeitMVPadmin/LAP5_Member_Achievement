@@ -1,3 +1,8 @@
+/*===============
+    UPVOTING
+===============*/
+// src/components/Upvoting/Upvoting.jsx
+
 import React, { useState, useEffect, useCallback, useContext } from "react";
 import { PointsContext } from "../../App";
 import "./Upvoting.scss";
@@ -20,7 +25,6 @@ const Upvoting = React.memo(
     initialUpvotes,
     initialDownvotes,
     onVoteChange,
-    onClick,
   }) => {
     const [upvotes, setUpvotes] = useState(initialUpvotes);
     const [downvotes, setDownvotes] = useState(initialDownvotes);
@@ -143,11 +147,9 @@ const Upvoting = React.memo(
               : null
           );
 
-          onVoteChange(
-            resourceId,
-            updatedData.upvote || 0,
-            updatedData.downvote || 0
-          );
+          if (onVoteChange) {
+            onVoteChange(updatedData.upvote || 0, updatedData.downvote || 0);
+          }
         } catch (error) {
           console.error("Error updating vote:", error);
         } finally {
