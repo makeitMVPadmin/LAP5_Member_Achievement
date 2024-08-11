@@ -6,10 +6,8 @@ import { database } from "../../config/firebase";
 import ResourceDetailCard from "../../components/ResourceDetailCard/ResourceDetailCard";
 import ResourceList from "../../components/ResourceList/ResourceList";
 
-
 function ContributionsPage({ currentUser, onBookmarkUpdate }) {
   const [contributions, setContributions] = useState([]);
-  const currentUserId = currentUser.userId 
   const [resources, setResources] = useState([]);
   const [selectedResource, setSelectedResource] = useState(null);
   const [savedBookmarks, setSavedBookmarks] = useState([]);
@@ -20,7 +18,7 @@ function ContributionsPage({ currentUser, onBookmarkUpdate }) {
   const [type, setType] = useState("");
   const [skill, setSkill] = useState("");
   const [duration, setDuration] = useState("");
-
+  const [commentCounts, setCommentCounts] = useState({});
 
   useEffect(() => {
     const getAllContributedResources = async () => {
@@ -28,7 +26,7 @@ function ContributionsPage({ currentUser, onBookmarkUpdate }) {
         const resourcesCollectionRef = collection(database, "Resources");
         const userResourcesQuery = query(
           resourcesCollectionRef,
-          where("userID", "==", currentUserId)
+          where("userContributionId", "==", currentUser.id)
         );
         const querySnapshot = await getDocs(userResourcesQuery);
         const resourcesData = querySnapshot.docs.map((doc) => ({
@@ -36,7 +34,8 @@ function ContributionsPage({ currentUser, onBookmarkUpdate }) {
           ...doc.data(),
         }));
         setContributions(resourcesData);
-        setResources(resourcesData)
+        setResources(resourcesData);
+        console.log(resourcesData);
       } catch (error) {
         console.error("Error fetching user resources: ", error);
       }
@@ -94,7 +93,6 @@ function ContributionsPage({ currentUser, onBookmarkUpdate }) {
     fetchComments();
   }, [selectedResource]);
 
-
   useEffect(() => {
     if (resources.length > 0 && !activeResourceId) {
       const firstResourceId = resources[0].id;
@@ -122,7 +120,8 @@ function ContributionsPage({ currentUser, onBookmarkUpdate }) {
       category === "All" || resource.discipline === category;
     const matchesType = type.length === 0 || type.includes(resource.type);
     const matchesSkill = skill.length === 0 || skill.includes(resource.level);
-    const matchesDuration = duration.length === 0 || duration.includes(resource.duration);
+    const matchesDuration =
+      duration.length === 0 || duration.includes(resource.duration);
 
     return currentCategory && matchesType && matchesSkill && matchesDuration;
   });
@@ -132,8 +131,6 @@ function ContributionsPage({ currentUser, onBookmarkUpdate }) {
     setSkill(skill === "All" || skill === "" ? [] : [skill]);
     setDuration(duration === "All" || duration === "" ? [] : [duration]);
   };
-  
-
 
   const handleToggleBookmarked = () => {
     const newBookmarkedState = !isBookmarked;
@@ -152,7 +149,9 @@ function ContributionsPage({ currentUser, onBookmarkUpdate }) {
   };
 
   const handleSelectResource = (clickedId) => {
-    const foundResource = resources.find((resource) => resource.id === clickedId);
+    const foundResource = resources.find(
+      (resource) => resource.id === clickedId
+    );
     if (foundResource) {
       console.log("Setting selected resource:", foundResource);
       setSelectedResource(foundResource);
@@ -168,12 +167,14 @@ function ContributionsPage({ currentUser, onBookmarkUpdate }) {
   }, [resources, selectedResource]);
 
   const handleResourceUpdate = useCallback((updatedResource) => {
-    setResources(prevResources =>
-      prevResources.map(resource =>
-        resource.id === updatedResource.id ? { ...resource, ...updatedResource } : resource
+    setResources((prevResources) =>
+      prevResources.map((resource) =>
+        resource.id === updatedResource.id
+          ? { ...resource, ...updatedResource }
+          : resource
       )
     );
-    setSelectedResource(prev => ({ ...prev, ...updatedResource }));
+    setSelectedResource((prev) => ({ ...prev, ...updatedResource }));
   }, []);
 
   const handleFormSubmit = (newResource) => {
@@ -187,7 +188,6 @@ function ContributionsPage({ currentUser, onBookmarkUpdate }) {
       setActiveResourceId(newResource.id);
     }
   };
-
 
   return (
     <div className="resource__container">
@@ -204,6 +204,7 @@ function ContributionsPage({ currentUser, onBookmarkUpdate }) {
           resources={contributions}
           selectResource={handleSelectResource}
           activeResourceId={activeResourceId}
+          commentCounts={commentCounts}
         />
       </div>
       <div className="resource-details__container">

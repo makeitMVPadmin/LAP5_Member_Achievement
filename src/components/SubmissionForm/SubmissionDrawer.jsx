@@ -92,6 +92,7 @@ export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
           ? `${currentUser.firstName} ${currentUser.lastName.charAt(0)}.`
           : "Anonymous",
         userID: currentUser,
+        userContributionId: currentUser.id,
         title: data.title,
         discipline: data.discipline,
         type: data.type,

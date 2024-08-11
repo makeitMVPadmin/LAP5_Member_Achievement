@@ -18,8 +18,8 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [category, setCategory] = useState("All");
   const [type, setType] = useState("");
-  const [skill, setSkill] = useState("");
-  const [duration, setDuration] = useState("");
+  const [level, setLevel] = useState("");
+  const [estDuration, setEstDuration] = useState("");
   const [commentCounts, setCommentCounts] = useState({});
   const [isLoading, setIsLoading] = useState(true);
 
@@ -28,12 +28,8 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
     const getAllResourcesAndComments = async () => {
       setIsLoading(true);
       try {
-        const resourcesSnapshot = await getDocs(
-          collection(database, "Resources")
-        );
-        const commentsSnapshot = await getDocs(
-          collection(database, "Comments")
-        );
+        const resourcesSnapshot = await getDocs(collection(database, "Resources"));
+        const commentsSnapshot = await getDocs(collection(database, "Comments"));
 
         const resourcesCollection = resourcesSnapshot.docs.map((doc) => {
           const resourceData = { id: doc.id, ...doc.data() };
@@ -94,10 +90,10 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
     onBookmarkUpdate(bookmarks);
   };
 
-  const handleFilterChange = ({ type, skill, duration }) => {
+  const handleFilterChange = ({ type, level, estDuration }) => {
     setType(type === "All" || type === "" ? [] : [type]);
-    setSkill(skill === "All" || skill === "" ? [] : [skill]);
-    setDuration(duration === "All" || duration === "" ? [] : [duration]);
+    setLevel(level === "All" || level === "" ? [] : [level]);
+    setEstDuration(estDuration === "All" || estDuration === "" ? [] : [estDuration]);
   };
 
   const handleResourceUpdate = useCallback((updatedResource) => {
@@ -139,13 +135,13 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
       const currentCategory =
         category === "All" || resource.discipline === category;
       const matchesType = type.length === 0 || type.includes(resource.type);
-      const matchesSkill = skill.length === 0 || skill.includes(resource.level);
-      const matchesDuration =
-        duration.length === 0 || duration.includes(resource.duration);
 
-      return currentCategory && matchesType && matchesSkill && matchesDuration;
+      const matchesLevel = level.length === 0 || level.includes(resource.level);
+      const matchesEstDuration = estDuration.length === 0 || estDuration.includes(resource.estDuration);
+
+      return currentCategory && matchesType && matchesLevel && matchesEstDuration;
     });
-  }, [resources, category, type, skill, duration]);
+  }, [resources, category, type, level, estDuration]);
 
   return (
     <div className="resource__container">
