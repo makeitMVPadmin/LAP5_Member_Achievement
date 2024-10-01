@@ -22,7 +22,7 @@ const App = () => {
       return 600;
     }
     const parsedPoints = parseInt(savedPoints, 10);
-    console.log("Saved Points:", savedPoints);
+    // console.log("Saved Points:", savedPoints);
     return !isNaN(parsedPoints) ? parsedPoints : 600;
   });
 
@@ -42,7 +42,7 @@ const App = () => {
     setPoints((prevPoints) => {
       const newPoints = Math.max(prevPoints - amount, 0);
       localStorage.setItem("points", newPoints);
-      console.log("Deducting Points:", newPoints);
+      // console.log("Deducting Points:", newPoints);
       return newPoints;
     });
   };
@@ -52,7 +52,7 @@ const App = () => {
     setPoints(newPoints);
   };
 
-  console.log(currentUser);
+  // console.log(currentUser);
 
   useEffect(() => {
     // Fetch user data from Firestore
@@ -65,7 +65,7 @@ const App = () => {
         if (userSnapshot.exists()) {
           setCurrentUser(userSnapshot.data());
         } else {
-          console.log("No such user!");
+          // console.log("No such user!");
         }
       } catch (error) {
         console.error("Error fetching user data: ", error);

@@ -31,7 +31,7 @@ import {
 import { PointsContext } from "../../App.jsx";
 
 export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
-  console.log(currentUser);
+  // console.log(currentUser);
   const MAX_WORD_COUNT = 200;
   const selectTagsRef = useRef(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -73,7 +73,7 @@ export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
 
   const onSubmit = async (data) => {
     try {
-      console.log("Form data before processing:", data);
+      // console.log("Form data before processing:", data);
 
       if (file) {
         const fileRef = ref(storage, `resourceUploads/${file.name}`);
@@ -118,7 +118,7 @@ export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
       );
       onFormSubmit({ id: docRef.id, ...newResource });
 
-      console.log("Form submitted successfully:", newResource);
+      // console.log("Form submitted successfully:", newResource);
 
       handleClose();
       setShowModal(true);
@@ -149,12 +149,12 @@ export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
   };
 
   const test = countWords(watch("description"));
-  console.log("description type", typeof test);
-  console.log("the actual description:", test);
+  // console.log("description type", typeof test);
+  // console.log("the actual description:", test);
 
   const compareNumbers = () => {
     if (test < MAX_WORD_COUNT) {
-      console.log("true");
+      // console.log("true");
     }
   };
   compareNumbers();

@@ -35,7 +35,7 @@ function ContributionsPage({ currentUser, onBookmarkUpdate }) {
         }));
         setContributions(resourcesData);
         setResources(resourcesData);
-        console.log(resourcesData);
+        // console.log(resourcesData);
       } catch (error) {
         console.error("Error fetching user resources: ", error);
       }
@@ -46,11 +46,11 @@ function ContributionsPage({ currentUser, onBookmarkUpdate }) {
 
   // Just to show the log of contributions update after it's been set. Can be deleted.
   // useEffect(() => {
-  //   console.log("Contributions:");
-  //   console.log(contributions);
+  //   // console.log("Contributions:");
+  //   // console.log(contributions);
   // }, [contributions]);
 
-  console.log(contributions);
+  // console.log(contributions);
 
   const getCommentsForSpecificResource = async (resourceId) => {
     const q = query(
@@ -153,7 +153,7 @@ function ContributionsPage({ currentUser, onBookmarkUpdate }) {
       (resource) => resource.id === clickedId
     );
     if (foundResource) {
-      console.log("Setting selected resource:", foundResource);
+      // console.log("Setting selected resource:", foundResource);
       setSelectedResource(foundResource);
       setActiveResourceId(clickedId);
     } else {
@@ -162,8 +162,8 @@ function ContributionsPage({ currentUser, onBookmarkUpdate }) {
   };
 
   useEffect(() => {
-    console.log("Resources:", resources);
-    console.log("Selected Resource:", selectedResource);
+    // console.log("Resources:", resources);
+    // console.log("Selected Resource:", selectedResource);
   }, [resources, selectedResource]);
 
   const handleResourceUpdate = useCallback((updatedResource) => {
@@ -180,7 +180,7 @@ function ContributionsPage({ currentUser, onBookmarkUpdate }) {
   const handleFormSubmit = (newResource) => {
     const updatedResources = [...resources, newResource];
     setResources(updatedResources);
-    console.log("Updated Resources:", updatedResources);
+    // console.log("Updated Resources:", updatedResources);
     localStorage.setItem("resources", JSON.stringify(updatedResources));
 
     if (!selectedResource) {

@@ -20,8 +20,8 @@
     transition: none;
 
     &:hover {
-      transform: none;
       @include thin-border;
+      transform: none;
       cursor: default;
     }
   }
@@ -137,6 +137,8 @@
 }
 
 .reward__claim-button-error {
+  @include thin-border;
+  @include button;
   background-color: gray;
   color: $black;
   padding: 7px;
@@ -144,8 +146,6 @@
   border-radius: 5px;
   width: 93%;
   margin-bottom: 1px;
-  @include thin-border;
-  @include button;
   cursor: default;
 
   @include desktop {
@@ -163,6 +163,8 @@
 }
 
 .reward__claim-button-approve {
+  @include thin-border;
+  @include button;
   background-color: $light-blue;
   color: $black;
   padding: 7px;
@@ -170,8 +172,6 @@
   border-radius: 5px;
   width: 93%;
   margin-bottom: 1px;
-  @include thin-border;
-  @include button;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
   &:hover {

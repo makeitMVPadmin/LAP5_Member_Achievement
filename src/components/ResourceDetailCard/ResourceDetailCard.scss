@@ -202,6 +202,7 @@
   }
 
   &__resource-button {
+    @include thin-border;
     @include button;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     background-color: $light-blue;
@@ -213,10 +214,10 @@
       transform: scale(1.025);
     }
 
-    @include thin-border;
   }
 
   &__button {
+    @include thin-border;
     @include button;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     margin-bottom: 0;
@@ -237,7 +238,6 @@
     &--read {
       background-color: $light-blue;
     }
-    @include thin-border;
   }
 
   &__link {

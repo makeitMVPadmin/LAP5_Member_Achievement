@@ -1,18 +1,15 @@
-import React, { useState } from 'react';
-import Upvoting from '../Upvoting/Upvoting';
-import "../ResourceCard/ResourceCard.scss"
+import React, { useState } from "react";
+import Upvoting from "../Upvoting/Upvoting";
+import "../ResourceCard/ResourceCard.scss";
 import timerIcon from "../../assets/icons/timer-2-svgrepo-com.png";
 import arrowForwardIcon from "../../assets/icons/blue-arrow-forward-svgrepo-com.png";
 import { Link } from "react-router-dom";
 
-
 const Contribution = () => {
-  
-  const formData = JSON.parse(localStorage.getItem('formData')) || {};
-  console.log (formData)
+  const formData = JSON.parse(localStorage.getItem("formData")) || {};
+  // console.log (formData)
 
   const { resource, selectResource, isActive } = formData;
-  
 
   const handleClickCard = () => {
     selectResource(resource.title);
@@ -67,6 +64,6 @@ const Contribution = () => {
       </div>
     </section>
   );
-}
+};
 
-export default Contribution
+export default Contribution;

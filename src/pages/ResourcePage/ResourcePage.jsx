@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import NavBar from "../../components/NavBar/NavBar";
 import ResourceDetailCard from "../../components/ResourceDetailCard/ResourceDetailCard";
@@ -17,7 +18,7 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   const [commentCounts, setCommentCounts] = useState({});
   const [isLoading, setIsLoading] = useState(true);
 
-  console.log("RESOURCES: ", resources);
+  // console.log("RESOURCES: ", resources);
   // Fetching all resources and comments only once
   useEffect(() => {
     const getAllResourcesAndComments = async () => {
@@ -199,3 +200,8 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
     </div>
   );
 }
+
+ResourcePage.propTypes = {
+  currentUser: PropTypes.object.isRequired,
+  onBookmarkUpdate: PropTypes.func.isRequired,
+};

@@ -4,8 +4,11 @@ import ResourceList from "../../components/ResourceList/ResourceList";
 import "./BookMarkedPage.scss";
 import ResourceDetailCard from "../../components/ResourceDetailCard/ResourceDetailCard";
 
-
-export default function BookMarkedPage({ bookmarkedResources, currentUser, onBookmarkUpdate }) {
+export default function BookMarkedPage({
+  bookmarkedResources,
+  currentUser,
+  onBookmarkUpdate,
+}) {
   const [displayedBookmarks, setDisplayedBookmarks] = useState([]);
   const [displaySelectedResource, setdisplaySelectedResource] = useState([]);
   const [selectedResource, setSelectedResource] = useState(null);
@@ -19,17 +22,18 @@ export default function BookMarkedPage({ bookmarkedResources, currentUser, onBoo
   const [category, setCategory] = useState("All");
   const [commentCounts, setCommentCounts] = useState({});
 
-
   useEffect(() => {
     setDisplayedBookmarks(bookmarkedResources);
   }, [bookmarkedResources]);
 
-  console.log(displayedBookmarks);
+  // console.log(displayedBookmarks);
 
   const handleSelectResource = (clickedId) => {
-    const foundResource = displayedBookmarks.find((resource) => resource.id === clickedId);
+    const foundResource = displayedBookmarks.find(
+      (resource) => resource.id === clickedId
+    );
     if (foundResource) {
-      console.log("Setting selected resource:", foundResource);
+      // console.log("Setting selected resource:", foundResource);
       setSelectedResource(foundResource);
       setActiveResourceId(clickedId);
     } else {
@@ -37,12 +41,12 @@ export default function BookMarkedPage({ bookmarkedResources, currentUser, onBoo
     }
   };
 
-  console.log(displaySelectedResource)
+  // console.log(displaySelectedResource)
 
   const handleFormSubmit = (newResource) => {
     const updatedResources = [...displayedBookmarks, newResource];
     setDisplayedBookmarks(updatedResources);
-    console.log("Updated Resources:", updatedResources);
+    // console.log("Updated Resources:", updatedResources);
     localStorage.setItem("resources", JSON.stringify(updatedResources));
 
     if (!selectedResource) {
@@ -73,7 +77,6 @@ export default function BookMarkedPage({ bookmarkedResources, currentUser, onBoo
     onBookmarkUpdate(bookmarks);
   };
 
-
   useEffect(() => {
     if (displayedBookmarks.length > 0 && !activeResourceId) {
       const firstResourceId = displayedBookmarks[0].id;
@@ -94,15 +97,18 @@ export default function BookMarkedPage({ bookmarkedResources, currentUser, onBoo
       setIsBookmarked(isBookmarked);
       setSavedBookmarks(savedBookmarks);
     }
+    console.log("selected resource: ", selectedResource);
   }, [selectedResource]);
 
   const handleResourceUpdate = useCallback((updatedResource) => {
-    setDisplayedBookmarks(prevResources =>
-      prevResources.map(resource =>
-        resource.id === updatedResource.id ? { ...resource, ...updatedResource } : resource
+    setDisplayedBookmarks((prevResources) =>
+      prevResources.map((resource) =>
+        resource.id === updatedResource.id
+          ? { ...resource, ...updatedResource }
+          : resource
       )
     );
-    setSelectedResource(prev => ({ ...prev, ...updatedResource }));
+    setSelectedResource((prev) => ({ ...prev, ...updatedResource }));
   }, []);
 
   const filteredResources = displayedBookmarks.filter((resource) => {
@@ -110,7 +116,8 @@ export default function BookMarkedPage({ bookmarkedResources, currentUser, onBoo
       category === "All" || resource.discipline === category;
     const matchesType = type.length === 0 || type.includes(resource.type);
     const matchesSkill = skill.length === 0 || skill.includes(resource.level);
-    const matchesDuration = duration.length === 0 || duration.includes(resource.duration);
+    const matchesDuration =
+      duration.length === 0 || duration.includes(resource.duration);
 
     return currentCategory && matchesType && matchesSkill && matchesDuration;
   });
@@ -118,7 +125,7 @@ export default function BookMarkedPage({ bookmarkedResources, currentUser, onBoo
   return (
     <div className="resource__container">
       <div className="resource__navbar-container">
-        <NavBar 
+        <NavBar
           onCategoryChange={setCategory}
           onFormSubmit={handleFormSubmit}
           onFilterChange={handleFilterChange}
