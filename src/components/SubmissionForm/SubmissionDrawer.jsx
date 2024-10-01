@@ -28,7 +28,7 @@ import {
   FormControl,
   FormErrorMessage,
 } from "@chakra-ui/react";
-import { PointsContext } from "../../App";
+import { PointsContext } from "../../App.jsx";
 
 export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
   console.log(currentUser);
