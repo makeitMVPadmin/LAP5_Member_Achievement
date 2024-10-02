@@ -17,7 +17,6 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   const [estDuration, setEstDuration] = useState("");
   const [commentCounts, setCommentCounts] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  console.log('ResourcePageOIAHDSGUIAHGJKADSFJAKJSF');
 
   // console.log("RESOURCES: ", resources);
   // Fetching all resources and comments only once
