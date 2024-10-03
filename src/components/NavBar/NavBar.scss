@@ -43,10 +43,10 @@
 
     &:hover,
     &.active {
+      @include thin-border;
       cursor: pointer;
       background-color: $yellow;
       color: $black;
-      @include thin-border;
       box-shadow: none;
       border: none;
     }
@@ -115,12 +115,12 @@
     }
 
     &-subitem {
+      @include thin-border;
       font-size: 0.65rem;
       letter-spacing: -0.025rem;
       margin: 0.25rem 0;
       padding: 0.35rem;
       font-weight: 800;
-      @include thin-border;
       border-color: transparent;
       box-shadow: none;
 

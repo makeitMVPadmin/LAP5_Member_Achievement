@@ -35,7 +35,7 @@ const HomePage = () => {
   const handleFormSubmit = (newResource) => {
     const updatedResources = [...resources, newResource];
     setResources(updatedResources);
-    console.log("Updated Resources:", updatedResources);
+    // console.log("Updated Resources:", updatedResources);
     localStorage.setItem("resources", JSON.stringify(updatedResources));
 
     if (!selectedResource) {

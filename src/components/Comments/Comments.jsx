@@ -23,7 +23,7 @@ export const Comments = ({
   resourceId,
   onCommentAdded,
 }) => {
-  console.log("Received comments in Comments component:", comments);
+  // console.log("Received comments in Comments component:", comments);
   const [postedComments, setPostedComments] = useState([]);
   const [comment, setComment] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -82,7 +82,7 @@ export const Comments = ({
           postedComments
             .sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate())
             .map((postedComment) => {
-              console.log("Rendering comment:", postedComment);
+              // console.log("Rendering comment:", postedComment);
               return (
                 <div key={postedComment.id} className="commentDivs">
                   <img

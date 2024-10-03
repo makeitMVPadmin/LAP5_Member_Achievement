@@ -19,7 +19,7 @@ const ResourceDetailCard = ({
   onResourceUpdate,
   onCommentAdded,
 }) => {
-  console.log("Received comments in ResourceDetailCard:", comments);
+  // console.log("Received comments in ResourceDetailCard:", comments);
 
   const [localResource, setLocalResource] = useState(selectedResource);
   const [isRead, setIsRead] = useState(false);
