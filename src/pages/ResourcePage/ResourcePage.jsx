@@ -1,14 +1,20 @@
 import PropTypes from "prop-types";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { collection, getDocs } from "firebase/firestore";
+
+import { database } from "../../config/firebase";
+
 import NavBar from "../../components/NavBar/NavBar";
 import ResourceDetailCard from "../../components/ResourceDetailCard/ResourceDetailCard";
 import ResourceList from "../../components/ResourceList/ResourceList";
-import "./ResourcePage.scss";
-import { collection, getDocs } from "firebase/firestore";
-import { database } from "../../config/firebase";
 
+import "./ResourcePage.scss";
+
+import useResourceStore from "../../stores/resource-store";
+
+// currentUser should be global state.
 export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
-  const [resources, setResources] = useState([]);
+  // const [resources, setResources] = useState([]);
   const [selectedResource, setSelectedResource] = useState(null);
   const [bookmarkedResources, setBookmarkedResources] = useState({});
   const [category, setCategory] = useState("All");
@@ -16,52 +22,21 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   const [level, setLevel] = useState("");
   const [estDuration, setEstDuration] = useState("");
   const [commentCounts, setCommentCounts] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); // keep
+
+  const { resources, getResources, getCurrentResource, setCurrentResource } =
+    useResourceStore();
 
   // console.log("RESOURCES: ", resources);
   // Fetching all resources and comments only once
   useEffect(() => {
     const getAllResourcesAndComments = async () => {
-      setIsLoading(true);
       try {
-        const resourcesSnapshot = await getDocs(
-          collection(database, "Resources")
-        );
-        const commentsSnapshot = await getDocs(
-          collection(database, "Comments")
-        );
-
-        const resourcesCollection = resourcesSnapshot.docs.map((doc) => {
-          const resourceData = { id: doc.id, ...doc.data() };
-          const resourceComments = commentsSnapshot.docs
-            .filter((commentDoc) => commentDoc.data().resourceId === doc.id)
-            .map((commentDoc) => ({ id: commentDoc.id, ...commentDoc.data() }));
-          return {
-            ...resourceData,
-            comments: resourceComments,
-            commentsCount: resourceComments.length,
-          };
-        });
-
-        setResources(resourcesCollection);
-
-        // Automatically selects the first resource
-        if (resourcesCollection.length > 0) {
-          setSelectedResource(resourcesCollection[0]);
-        }
-
-        // Initialize bookmarked resources from local storage
-        const savedBookmarks =
-          JSON.parse(localStorage.getItem("bookmarks")) || [];
-        const bookmarkedState = savedBookmarks.reduce((acc, resource) => {
-          acc[resource.id] = true;
-          return acc;
-        }, {});
-        setBookmarkedResources(bookmarkedState);
-
-        setIsLoading(false);
+        setIsLoading(true);
+        getResources();
       } catch (err) {
         console.error("Error fetching resources and comments: ", err);
+      } finally {
         setIsLoading(false);
       }
     };
@@ -166,6 +141,7 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   return (
     <div className="resource__container">
       <div className="resource__navbar-container">
+        {/* Move to App.jsx to reduce redundancy */}
         <NavBar
           onCategoryChange={setCategory}
           onFormSubmit={(newResource) =>
@@ -175,28 +151,32 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
           currentUser={currentUser}
         />
       </div>
-      <div className="resource__cards">
-        <ResourceList
-          resources={filteredResources}
-          selectResource={handleSelectResource}
-          activeResourceId={selectedResource?.id}
-          commentCounts={commentCounts}
-        />
-      </div>
-      <div className="resource-details__container">
-        {!isLoading && selectedResource && (
-          <ResourceDetailCard
-            selectedResource={selectedResource}
-            handleToggleBookmarked={handleToggleBookmarked}
-            savedBookmarks={Object.values(bookmarkedResources).some(Boolean)}
-            isBookmarked={bookmarkedResources[selectedResource.id] || false}
-            comments={selectedResource.comments}
-            currentUser={currentUser}
-            onResourceUpdate={handleResourceUpdate}
-            onCommentAdded={handleCommentAdded}
+      {/* This fragment remains, all else goes. */}
+      <>
+        <div className="resource__cards">
+          {/* Give resourceList access to the store, and pass in a filter function? */}
+          <ResourceList
+            resources={filteredResources}
+            selectResource={handleSelectResource}
+            activeResourceId={selectedResource?.id}
+            commentCounts={commentCounts}
           />
-        )}
-      </div>
+        </div>
+        <div className="resource-details__container">
+          {!isLoading && selectedResource && (
+            <ResourceDetailCard
+              selectedResource={selectedResource}
+              handleToggleBookmarked={handleToggleBookmarked}
+              savedBookmarks={Object.values(bookmarkedResources).some(Boolean)}
+              isBookmarked={bookmarkedResources[selectedResource.id] || false}
+              comments={selectedResource.comments}
+              currentUser={currentUser}
+              onResourceUpdate={handleResourceUpdate}
+              onCommentAdded={handleCommentAdded}
+            />
+          )}
+        </div>
+      </>
     </div>
   );
 }
