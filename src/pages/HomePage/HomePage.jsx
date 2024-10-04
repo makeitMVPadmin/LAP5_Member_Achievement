@@ -9,12 +9,14 @@ const HomePage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false); //
   const [resources, setResources] = useState([]);
   const [selectedResource, setSelectedResource] = useState(null);
-  const [category, setCategory] = useState("All");
   const [type, setType] = useState([]);
   const [activeResourceId, setActiveResourceId] = useState(null);
   const [sortField, setSortField] = useState(null);
   const [sortAscending, setSortAscending] = useState(true);
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
+
+  // TODO: should be removed
+  const [category, setCategory] = useState("All");
 
   useEffect(() => {
     const hasSeenModal = sessionStorage.getItem("hasSeenOnboardingModal");
@@ -32,11 +34,12 @@ const HomePage = () => {
     setOnboardingCompleted(true);
   };
 
+  // TODO: This is the form submission for "Upload Resource"
   const handleFormSubmit = (newResource) => {
     const updatedResources = [...resources, newResource];
     setResources(updatedResources);
-    // console.log("Updated Resources:", updatedResources);
     localStorage.setItem("resources", JSON.stringify(updatedResources));
+    console.log("Updated Resources:", updatedResources);
 
     if (!selectedResource) {
       setSelectedResource(newResource);
@@ -64,7 +67,7 @@ const HomePage = () => {
       <div className="resource__navbar-container">
         <NavBar
           onTypeChange={setType}
-          onCategoryChange={setCategory}
+          onCategoryChange={setCategory} // TODO: Should be removed
           onFormSubmit={handleFormSubmit}
           sortBySkill={sortSkill}
           sortByDuration={sortDuration}

@@ -29,14 +29,16 @@ export default function FilterDrawer({ onFilterChange }) {
     estDuration: "",
   });
   const [selectColors, setSelectColors] = useState({
-    type: 'grey',
-    level: 'grey',
-    estDuration: 'grey'
+    type: "grey",
+    level: "grey",
+    estDuration: "grey",
   });
 
   const location = useLocation();
   const navigate = useNavigate();
 
+  // TODO: Remove
+  // Tied to handleFilterChange but doesn't do anything
   const handleChange = (event) => {
     const { name, value } = event.target;
 
@@ -47,10 +49,13 @@ export default function FilterDrawer({ onFilterChange }) {
 
     setSelectColors((prevColors) => ({
       ...prevColors,
-      [name]: value ? 'black' : 'grey'
+      [name]: value ? "black" : "grey",
     }));
   };
 
+  // TODO: Remove
+  // This is why filters menu doesn't work on home page, but you navigate to resource page with none of the filter options actually set.
+  // They are hardcoded to default so there's no point for this to exist.
   const handleFilterChange = (event) => {
     if (location.pathname !== "/resource") {
       navigate("/resource");
@@ -59,9 +64,9 @@ export default function FilterDrawer({ onFilterChange }) {
       event.preventDefault();
       onFilterChange(filters);
       setSelectColors({
-        type: 'grey',
-        level: 'grey',
-        estDuration: 'grey'
+        type: "grey",
+        level: "grey",
+        estDuration: "grey",
       });
       onClose();
     }
@@ -74,9 +79,9 @@ export default function FilterDrawer({ onFilterChange }) {
       estDuration: "",
     });
     setSelectColors({
-      type: 'grey',
-      level: 'grey',
-      estDuration: 'grey'
+      type: "grey",
+      level: "grey",
+      estDuration: "grey",
     });
     onClose();
   };
@@ -85,7 +90,6 @@ export default function FilterDrawer({ onFilterChange }) {
     <>
       <button className="filter__button" onClick={onOpen}>
         <SettingsIcon boxSize="1.15rem" className="filter__icon" />
-        {/* <Icon as={SettingsIcon} className="filter__icon" /> */}
         <p className="filter__button-name">Filters</p>
       </button>
       <div>
@@ -134,11 +138,11 @@ export default function FilterDrawer({ onFilterChange }) {
                 color={selectColors.type}
                 focusBorderColor="#0099ff"
                 sx={{
-                  '& option': {
-                    color: 'black',
+                  "& option": {
+                    color: "black",
                   },
-                  '& option:first-of-type': {
-                    color: 'grey',
+                  "& option:first-of-type": {
+                    color: "grey",
                   },
                 }}
               >
@@ -176,11 +180,11 @@ export default function FilterDrawer({ onFilterChange }) {
                 color={selectColors.level}
                 focusBorderColor="#0099ff"
                 sx={{
-                  '& option': {
-                    color: 'black',
+                  "& option": {
+                    color: "black",
                   },
-                  '& option:first-of-type': {
-                    color: 'grey',
+                  "& option:first-of-type": {
+                    color: "grey",
                   },
                 }}
               >
@@ -217,11 +221,11 @@ export default function FilterDrawer({ onFilterChange }) {
                 color={selectColors.estDuration}
                 focusBorderColor="#0099ff"
                 sx={{
-                  '& option': {
-                    color: 'black',
+                  "& option": {
+                    color: "black",
                   },
-                  '& option:first-of-type': {
-                    color: 'grey',
+                  "& option:first-of-type": {
+                    color: "grey",
                   },
                 }}
               >

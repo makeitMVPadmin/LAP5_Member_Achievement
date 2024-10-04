@@ -10,7 +10,7 @@ import "./NavBar.scss";
 import FilterDrawer from "../FilterDrawer/FilterDrawer";
 
 export default function NavBar({
-  onCategoryChange,
+  onCategoryChange, // TODO: Should be removed
   onFormSubmit,
   onFilterChange,
   currentUser,
@@ -21,6 +21,8 @@ export default function NavBar({
   const location = useLocation();
   const navigate = useNavigate();
 
+  // TODO: This is the dropdown menu for "Learning Library"
+  // Probably should be removed in place of "Learning Hub" Tag Filters
   const toggleLibraryMenu = () => {
     if (typeof onCategoryChange === "function") {
       onCategoryChange(category);
@@ -29,10 +31,7 @@ export default function NavBar({
     setIsLibraryOpen(!isLibraryOpen);
   };
 
-  const handleMouseEnter = () => {
-    setIsLibraryOpen(true);
-  };
-
+  // TODO: Remove
   const handleSelectCategory = (category) => {
     if (location.pathname !== "/resource") {
       navigate("/resource");
@@ -43,13 +42,14 @@ export default function NavBar({
 
     setCategory(category);
   };
-
+  // TODO: Remove
   const checkLocation = () => {
     if (location.pathname !== "/resource") {
       navigate("/resource");
     }
   };
 
+  // TODO: Double check stateful values and cleanup after unnecessary state is removed
   return (
     <nav className="nav__list">
       <li
