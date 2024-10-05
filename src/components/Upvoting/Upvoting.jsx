@@ -3,9 +3,7 @@
 ===============*/
 // src/components/Upvoting/Upvoting.jsx
 
-import React, { useState, useEffect, useCallback, useContext } from "react";
-import { PointsContext } from "../../App";
-import "./Upvoting.scss";
+import { useState, useEffect, useCallback, useContext, memo } from "react";
 import {
   getFirestore,
   doc,
@@ -15,10 +13,15 @@ import {
   arrayRemove,
   increment,
 } from "firebase/firestore";
+
+import { PointsContext } from "../../App";
+import useResourceStore from "../../stores/resource-store";
+
 import ThumbIcon from "../../assets/icons/thumbsUpComments.svg";
 import ThumbIconActive from "../../assets/icons/thumbsUpCommentsActive.svg";
+import "./Upvoting.scss";
 
-const Upvoting = React.memo(
+const Upvoting = memo(
   ({
     resourceId,
     currentUser,
@@ -31,6 +34,8 @@ const Upvoting = React.memo(
     const [voteStatus, setVoteStatus] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const db = getFirestore();
+
+    const { currentResource, updateResource } = useResourceStore();
 
     useEffect(() => {
       const fetchVoteStatus = async () => {
@@ -86,6 +91,14 @@ const Upvoting = React.memo(
           const currentData = docSnap.data();
           let updates = {};
 
+          if (currentData?.likedByUser?.includes(userId)) {
+            //
+          }
+
+          if (currentData?.downvotedByUsers?.includes(userId)) {
+            //
+          }
+
           if (voteType === "upvote") {
             if (
               currentData.likedByUser &&
@@ -132,7 +145,7 @@ const Upvoting = React.memo(
             }
           }
 
-          await updateDoc(docRef, updates);
+          // await updateDoc(docRef, updates);
 
           const updatedDocSnap = await getDoc(docRef);
           const updatedData = updatedDocSnap.data();
@@ -140,9 +153,9 @@ const Upvoting = React.memo(
           setUpvotes(updatedData.upvote || 0);
           setDownvotes(updatedData.downvote || 0);
           setVoteStatus(
-            updatedData.likedByUser?.includes(userId)
+            updatedData.likedByUser?.includes(currentUser.id)
               ? "upvote"
-              : updatedData.downvotedByUsers?.includes(userId)
+              : updatedData.downvotedByUsers?.includes(currentUser.id)
               ? "downvote"
               : null
           );
@@ -158,6 +171,50 @@ const Upvoting = React.memo(
       },
       [isLoading, currentUser, resourceId, db, onVoteChange]
     );
+
+    const handleUpvote = useCallback(async () => {
+      if (currentResource?.likedByUsers?.includes(currentUser.id)) {
+        updateResource(currentResource.id, {
+          likedByUsers:
+            currentResource.likedByUsers.toFiltered(
+              (id) => id !== currentUser.id
+            ) || [],
+        });
+      } else {
+        updateResource(currentResource.id, {
+          likedByUsers: [
+            currentUser.id,
+            ...(currentResource?.likedByUsers || []),
+          ],
+          downvotedByUsers:
+            currentResource?.downvotedByUsers?.filter(
+              (id) => id !== currentUser.id
+            ) || [],
+        });
+      }
+    }, [isLoading, currentUser, currentResource]);
+
+    const handleDownvote = useCallback(async () => {
+      if (currentResource?.downvotedByUsers?.includes(currentUser.id)) {
+        updateResource(currentResource.id, {
+          downvotedByUsers:
+            currentResource?.downvotedByUsers?.filter(
+              (id) => id !== currentUser.id
+            ) || [],
+        });
+      } else {
+        updateResource(currentResource.id, {
+          downvotedByUsers: [
+            currentUser.id,
+            ...(currentResource?.downvotedByUsers || []),
+          ],
+          likedByUsers:
+            currentResource?.likedByUsers?.toFiltered(
+              (id) => id !== currentUser.id
+            ) || [],
+        });
+      }
+    }, [isLoading, currentUser, currentResource]);
 
     const { addPoints } = useContext(PointsContext);
 
@@ -177,11 +234,12 @@ const Upvoting = React.memo(
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              handleVote("upvote");
-              handleUpvotePoints();
+              handleUpvote();
             }}
           />
-          <span className="voting__count">{upvotes}</span>
+          <span className="voting__count">
+            {currentResource?.likedByUsers?.length || 0}
+          </span>
         </div>
         <div className="voting__container">
           <img
@@ -193,14 +251,16 @@ const Upvoting = React.memo(
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              handleVote("downvote");
+              handleUpvote();
             }}
           />
-          <span className="voting__count">{downvotes}</span>
+          <span className="voting__count">
+            {currentResource?.dislikedByUsers?.length || 0}
+          </span>
         </div>
       </div>
     );
   }
 );
 
-export default Upvoting;
+export { Upvoting };

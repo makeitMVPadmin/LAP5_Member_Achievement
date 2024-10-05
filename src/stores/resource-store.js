@@ -1,12 +1,12 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
 
 import { database } from "../config/firebase";
 
 const useResourceStore = create(
   immer((set, get) => ({
-    currentResource: {},
+    currentResource: null,
     resources: [],
     getResources: async () => {
       const resourcesSnapshot = await getDocs(
@@ -30,10 +30,40 @@ const useResourceStore = create(
           };
         });
       });
+
+      if (!get().currentResource) {
+        set((state) => {
+          state.currentResource = get().resources[0];
+        });
+      }
     },
-    getCurrentResource: (id) => get().resources.find((el) => id === el.id),
-    setCurrentResource: (resource) =>
-      set((state) => (state.currentResource = resource)),
+    setCurrentResource: (id) => {
+      set((state) => {
+        state.currentResource = get().resources.find((el) => id === el.id);
+      });
+    },
+    updateResource: (id, patch) => {
+      /**
+       * {upvotes: 10, dowvotes: 5}
+       * find the element with the correct ID from resources
+       * update the object with the values from the patch,
+       * update Firebase with the data, and then update the store with the data
+       */
+      const resourceIdx = get().resources.findIndex((el) => id === el.id);
+      const currentResource = {
+        ...get().resources[resourceIdx],
+        ...patch,
+      };
+      const resourcesRef = doc(database, "Resources", currentResource.id);
+
+      let updatedResource = structuredClone(currentResource);
+      delete updatedResource.id;
+
+      updateDoc(resourcesRef, updatedResource);
+      set((state) => {
+        state.resources.splice(resourceIdx, 1, currentResource);
+      });
+    },
     getComments: () => set({ bears: 0 }),
     getBookmarked: (newBears) => set({ bears: newBears }),
     getLikes: (newBears) => set({ bears: newBears }),

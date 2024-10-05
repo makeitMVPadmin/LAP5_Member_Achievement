@@ -1,12 +1,17 @@
-import "./ResourceDetailCard.scss";
+import { useState, useEffect, useCallback, useContext, memo } from "react";
+import { Link } from "react-router-dom";
+
+import { PointsContext } from "../../App";
+import { Comments } from "../Comments/Comments";
+import { Upvoting } from "../Upvoting/Upvoting";
+
+import useResourceStore from "../../stores/resource-store";
+
 import timerIcon from "../../assets/icons/timer.png";
 import bookmarkIcon from "../../assets/icons/bookmark-svgrepo-com.svg";
 import bookmarkedIcon from "../../assets/icons/bookmarked.svg";
-import Upvoting from "../Upvoting/Upvoting";
-import { Link } from "react-router-dom";
-import { Comments } from "../Comments/Comments";
-import React, { useState, useEffect, useCallback, useContext } from "react";
-import { PointsContext } from "../../App";
+
+import "./ResourceDetailCard.scss";
 
 // ResourceDetailCard.jsx
 const ResourceDetailCard = ({
@@ -16,24 +21,26 @@ const ResourceDetailCard = ({
   isBookmarked,
   comments,
   currentUser,
-  onResourceUpdate,
   onCommentAdded,
 }) => {
   // console.log("Received comments in ResourceDetailCard:", comments);
 
-  const [localResource, setLocalResource] = useState(selectedResource);
+  // const [currentResource, setLocalResource] = useState(selectedResource);
   const [isRead, setIsRead] = useState(false);
 
-  useEffect(() => {
-    setLocalResource(selectedResource);
-  }, [selectedResource]);
+  const { currentResource, updateResource } =
+    useResourceStore();
+
+  // useEffect(() => {
+  //   setLocalResource(selectedResource);
+  // }, [selectedResource]);
 
   useEffect(() => {
-    const savedReadState = localStorage.getItem(selectedResource.id);
+    const savedReadState = localStorage.getItem(currentResource.id);
     if (savedReadState) {
       setIsRead(JSON.parse(savedReadState));
     }
-  }, [selectedResource.id]);
+  }, [currentResource.id]);
 
   // const handleVoteChange = useCallback(
   //   (resourceId, upvotes, downvotes) => {
@@ -46,14 +53,14 @@ const ResourceDetailCard = ({
 
   //     if (onResourceUpdate) {
   //       onResourceUpdate({
-  //         ...localResource,
+  //         ...currentResource,
   //         id: resourceId,
   //         upvote: upvotes,
   //         downvote: downvotes,
   //       });
   //     }
   //   },
-  //   [localResource, onResourceUpdate]
+  //   [currentResource, onResourceUpdate]
   // );
 
   const handleToggleRead = () => {
@@ -81,7 +88,7 @@ const ResourceDetailCard = ({
       <section className="resource-details">
         <div className="resource-details__heading-top">
           <div className="resource-details__heading-top-container">
-            <p className="resource-details__type">{localResource.type}</p>
+            <p className="resource-details__type">{currentResource.type}</p>
             <img
               src={isBookmarked ? bookmarkedIcon : bookmarkIcon}
               onClick={() => {
@@ -97,15 +104,15 @@ const ResourceDetailCard = ({
           </div>
         </div>
         <div className="resource-details__heading-bottom">
-          <h1 className="resource-details__title">{localResource.title}</h1>
+          <h1 className="resource-details__title">{currentResource.title}</h1>
         </div>
-        <p className="resource-details__level">{localResource.level}</p>
+        <p className="resource-details__level">{currentResource.level}</p>
         <div className="resource-details__tags-container" role="list">
           {[
-            localResource.tag1,
-            localResource.tag2,
-            localResource.tag3,
-            localResource.tag4,
+            currentResource.tag1,
+            currentResource.tag2,
+            currentResource.tag3,
+            currentResource.tag4,
           ].map((tag, index) => (
             <div key={index} className="resource-details__tag" role="listitem">
               {tag}
@@ -119,23 +126,14 @@ const ResourceDetailCard = ({
               <Upvoting
                 onClick={handleUpvotePoints}
                 addPoints={addPoints}
-                resourceId={localResource.id}
+                resourceId={currentResource.id}
                 currentUser={currentUser}
-                initialUpvotes={localResource.upvote}
-                initialDownvotes={localResource.downvote}
+                initialUpvotes={currentResource.upvote}
+                initialDownvotes={currentResource.downvote}
                 onVoteChange={(upvotes, downvotes) => {
-                  setLocalResource((prev) => ({
-                    ...prev,
-                    upvote: upvotes,
-                    downvote: downvotes,
-                  }));
-                  if (onResourceUpdate) {
-                    onResourceUpdate({
-                      ...localResource,
-                      upvote: upvotes,
-                      downvote: downvotes,
-                    });
-                  }
+                  updateResource(currentResource.id, {
+                    upvotes, downvotes
+                  })
                 }}
               />
             </div>
@@ -143,7 +141,7 @@ const ResourceDetailCard = ({
 
           <div className="resource-details__timer">
             <p className="resource-details__duration">
-              {localResource.estDuration}
+              {currentResource.estDuration}
             </p>
             <img
               src={timerIcon}
@@ -156,7 +154,7 @@ const ResourceDetailCard = ({
 
         <div className="resource-details__about">
           <p className="resource-details__preview">
-            {localResource.description}{" "}
+            {currentResource.description}{" "}
           </p>
         </div>
 
@@ -166,13 +164,13 @@ const ResourceDetailCard = ({
             <div className="resource-details__author">
               <p className="resource-details__submission">Submitted by: </p>
               <p className="resource-details__author-name">
-                {localResource.name}
+                {currentResource.name}
               </p>
             </div>
           </div>
           <div className="resource-details__buttons-container">
             <Link
-              to={localResource.url}
+              to={currentResource.url}
               key=""
               target="_blank"
               rel="noopener noreferrer"
@@ -208,7 +206,7 @@ const ResourceDetailCard = ({
           <Comments
             comments={comments}
             currentUser={currentUser}
-            resourceId={localResource.id}
+            resourceId={currentResource.id}
             onCommentAdded={(resourceId, newComment) => {
               if (onCommentAdded) {
                 onCommentAdded(resourceId, newComment);
@@ -221,4 +219,4 @@ const ResourceDetailCard = ({
   );
 };
 
-export default React.memo(ResourceDetailCard);
+export default memo(ResourceDetailCard);

@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { collection, getDocs } from "firebase/firestore";
 
 import { database } from "../../config/firebase";
@@ -15,7 +15,6 @@ import useResourceStore from "../../stores/resource-store";
 // currentUser should be global state.
 export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   // const [resources, setResources] = useState([]);
-  const [selectedResource, setSelectedResource] = useState(null);
   const [bookmarkedResources, setBookmarkedResources] = useState({});
   const [category, setCategory] = useState("All");
   const [type, setType] = useState("");
@@ -24,7 +23,7 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   const [commentCounts, setCommentCounts] = useState({});
   const [isLoading, setIsLoading] = useState(true); // keep
 
-  const { resources, getResources, getCurrentResource, setCurrentResource } =
+  const { resources, currentResource, getResources, setCurrentResource } =
     useResourceStore();
 
   // console.log("RESOURCES: ", resources);
@@ -33,7 +32,7 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
     const getAllResourcesAndComments = async () => {
       try {
         setIsLoading(true);
-        getResources();
+        await getResources();
       } catch (err) {
         console.error("Error fetching resources and comments: ", err);
       } finally {
@@ -50,7 +49,7 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
         (resource) => resource.id === clickedId
       );
       if (foundResource) {
-        setSelectedResource(foundResource);
+        setCurrentResource(clickedId);
       } else {
         console.error("Resource not found for id:", clickedId);
       }
@@ -59,21 +58,21 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   );
 
   const handleToggleBookmarked = () => {
-    if (!selectedResource) return;
+    if (!currentResource) return;
 
-    const newBookmarkedState = !bookmarkedResources[selectedResource.id];
+    const newBookmarkedState = !bookmarkedResources[currentResource.id];
     setBookmarkedResources((prev) => ({
       ...prev,
-      [selectedResource.id]: newBookmarkedState,
+      [currentResource.id]: newBookmarkedState,
     }));
 
     let bookmarks = JSON.parse(localStorage.getItem("bookmarks")) || [];
 
     if (newBookmarkedState) {
-      bookmarks.push(selectedResource);
+      bookmarks.push(currentResource);
     } else {
       bookmarks = bookmarks.filter(
-        (bookmark) => bookmark.id !== selectedResource.id
+        (bookmark) => bookmark.id !== currentResource.id
       );
     }
 
@@ -89,17 +88,6 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
     );
   };
 
-  const handleResourceUpdate = useCallback((updatedResource) => {
-    setResources((prevResources) =>
-      prevResources.map((resource) =>
-        resource.id === updatedResource.id
-          ? { ...resource, ...updatedResource }
-          : resource
-      )
-    );
-    setSelectedResource((prev) => ({ ...prev, ...updatedResource }));
-  }, []);
-
   const handleCommentAdded = useCallback((resourceId, newComment) => {
     setResources((prevResources) =>
       prevResources.map((resource) =>
@@ -113,7 +101,7 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
       )
     );
 
-    if (selectedResource && selectedResource.id === resourceId) {
+    if (currentResource && currentResource.id === resourceId) {
       setSelectedResource((prevSelected) => ({
         ...prevSelected,
         comments: [...(prevSelected.comments || []), newComment],
@@ -121,6 +109,7 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
       }));
     }
   }, []);
+
   // Filter resources based on the category, type, skill, and duration
   const filteredResources = useMemo(() => {
     return resources.filter((resource) => {
@@ -158,20 +147,18 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
           <ResourceList
             resources={filteredResources}
             selectResource={handleSelectResource}
-            activeResourceId={selectedResource?.id}
+            activeResourceId={currentResource?.id}
             commentCounts={commentCounts}
           />
         </div>
         <div className="resource-details__container">
-          {!isLoading && selectedResource && (
+          {!isLoading && currentResource && (
             <ResourceDetailCard
-              selectedResource={selectedResource}
               handleToggleBookmarked={handleToggleBookmarked}
               savedBookmarks={Object.values(bookmarkedResources).some(Boolean)}
-              isBookmarked={bookmarkedResources[selectedResource.id] || false}
-              comments={selectedResource.comments}
+              isBookmarked={bookmarkedResources[currentResource.id] || false}
+              comments={currentResource.comments}
               currentUser={currentUser}
-              onResourceUpdate={handleResourceUpdate}
               onCommentAdded={handleCommentAdded}
             />
           )}
