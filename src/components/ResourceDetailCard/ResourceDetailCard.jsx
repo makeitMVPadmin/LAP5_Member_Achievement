@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback, useContext, memo } from "react";
-import { Link } from "react-router-dom";
+import {memo, useContext, useEffect, useState} from "react";
+import {Link} from "react-router-dom";
 
-import { PointsContext } from "../../App";
-import { Comments } from "../Comments/Comments";
-import { Upvoting } from "../Upvoting/Upvoting";
+import {PointsContext} from "../../App";
+import {Comments} from "../Comments/Comments";
+import {Upvoting} from "../Upvoting/Upvoting";
 
 import useResourceStore from "../../stores/resource-store";
 

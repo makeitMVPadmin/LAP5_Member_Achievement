@@ -1,8 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { query, collection, where, getDocs, getDoc } from "firebase/firestore";
-import { database } from "../../config/firebase";
-import arrowForwardIcon from "../../assets/icons/blue-arrow-forward-svgrepo-com.png";
+import React from "react";
 import timerIcon from "../../assets/icons/timer.png";
 import "./ResourceCard.scss";
 import upvoteImg from "../../assets/images/upvote.png";
@@ -12,17 +8,12 @@ export default function ResourceCard({
   id,
   resource,
   selectResource,
-  isActive,
-  commentCount,
+  isActive
 }) {
   const handleClickCard = () => {
     selectResource(id);
   };
-
-  useEffect(() => {
-    (async () => console.log((await getDoc(resource.type)).data()))();
-  }, []);
-
+  
   return (
     <section
       className={`resource ${isActive ? "resource--active" : ""}`}
@@ -38,7 +29,7 @@ export default function ResourceCard({
     >
       <div className="resource__heading-top">
         <div className="resource__heading-top-container">
-          <p className="resource__type">{JSON.stringify(resource?.type)}</p>
+          <p className="resource__type">{resource?.type}</p>
         </div>
       </div>
       <div className="resource__heading-bottom">
@@ -47,33 +38,36 @@ export default function ResourceCard({
           <div className="resource__icons resource__icons-img-upvote">
             <img
               className="resource__icons-img"
+              // TODO: replace with hero-icon
               src={upvoteImg}
               alt="upvote icon"
             />
-            <p className="resource__upvotes-total">{"0"}</p>
+            <p className="resource__upvotes-total">{resource?.upvote_count}</p>
           </div>
           <div className="resource__icons">
             <img
               className="resource__icons-img"
+              // TODO: replace with hero-icon
               src={commentsImg}
               alt="comments icon"
             />
             <p className="resource__comments-total">
-              {resource?.commentsCount}
+              {resource?.comments?.length ?? 0}
             </p>
           </div>
           <div className="resource__timer">
             <img
+              // TODO: replace with hero-icon
               src={timerIcon}
               alt="timer icon"
               className="resource__timer-icon"
               aria-hidden="true"
             />
-            <p className="resource__duration">{resource?.estDuration}</p>
+            <p className="resource__duration">{resource?.duration_min}</p>
           </div>
         </div>
       </div>
-      <p className="resource__level">{resource?.difficulty?.title}</p>
+      <p className="resource__level">{resource?.difficulty}</p>
     </section>
   );
 }

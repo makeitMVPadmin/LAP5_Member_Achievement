@@ -1,8 +1,5 @@
 import PropTypes from "prop-types";
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { collection, getDocs } from "firebase/firestore";
-
-import { database } from "../../config/firebase";
+import {useCallback, useEffect, useMemo, useState} from "react";
 
 import NavBar from "../../components/NavBar/NavBar";
 import ResourceDetailCard from "../../components/ResourceDetailCard/ResourceDetailCard";
@@ -24,8 +21,8 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   const [isLoading, setIsLoading] = useState(true); // keep
 
   const { resources, currentResource, loadResources } = useResourceStore();
-
-  // console.log("RESOURCES: ", resources);
+  // TEST
+  console.log("resources: ", resources);
   // Fetching all resources and comments only once
   useEffect(() => {
     const getAllResourcesAndComments = async () => {
