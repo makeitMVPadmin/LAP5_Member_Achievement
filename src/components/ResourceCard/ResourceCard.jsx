@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { query, collection, where, getDocs } from "firebase/firestore";
+import { query, collection, where, getDocs, getDoc } from "firebase/firestore";
 import { database } from "../../config/firebase";
 import arrowForwardIcon from "../../assets/icons/blue-arrow-forward-svgrepo-com.png";
 import timerIcon from "../../assets/icons/timer.png";
@@ -9,14 +9,19 @@ import upvoteImg from "../../assets/images/upvote.png";
 import commentsImg from "../../assets/images/comments.png";
 
 export default function ResourceCard({
+  id,
   resource,
   selectResource,
   isActive,
   commentCount,
 }) {
   const handleClickCard = () => {
-    selectResource(resource.id);
+    selectResource(id);
   };
+
+  useEffect(() => {
+    (async () => console.log((await getDoc(resource.type)).data()))();
+  }, []);
 
   return (
     <section
@@ -33,11 +38,11 @@ export default function ResourceCard({
     >
       <div className="resource__heading-top">
         <div className="resource__heading-top-container">
-          <p className="resource__type">{resource.type}</p>
+          <p className="resource__type">{JSON.stringify(resource?.type)}</p>
         </div>
       </div>
       <div className="resource__heading-bottom">
-        <h1 className="resource__title">{resource.title}</h1>
+        <h1 className="resource__title">{resource?.title}</h1>
         <div className="resource__icons-container">
           <div className="resource__icons resource__icons-img-upvote">
             <img
@@ -45,7 +50,7 @@ export default function ResourceCard({
               src={upvoteImg}
               alt="upvote icon"
             />
-            <p className="resource__upvotes-total">{resource.upvote || "0"}</p>
+            <p className="resource__upvotes-total">{"0"}</p>
           </div>
           <div className="resource__icons">
             <img
@@ -53,7 +58,9 @@ export default function ResourceCard({
               src={commentsImg}
               alt="comments icon"
             />
-            <p className="resource__comments-total">{resource.commentsCount}</p>
+            <p className="resource__comments-total">
+              {resource?.commentsCount}
+            </p>
           </div>
           <div className="resource__timer">
             <img
@@ -62,11 +69,11 @@ export default function ResourceCard({
               className="resource__timer-icon"
               aria-hidden="true"
             />
-            <p className="resource__duration">{resource.estDuration}</p>
+            <p className="resource__duration">{resource?.estDuration}</p>
           </div>
         </div>
       </div>
-      <p className="resource__level">{resource.level}</p>
+      <p className="resource__level">{resource?.difficulty?.title}</p>
     </section>
   );
 }

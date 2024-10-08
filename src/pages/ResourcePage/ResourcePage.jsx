@@ -23,8 +23,7 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   const [commentCounts, setCommentCounts] = useState({});
   const [isLoading, setIsLoading] = useState(true); // keep
 
-  const { resources, currentResource, getResources, setCurrentResource } =
-    useResourceStore();
+  const { resources, currentResource, loadResources } = useResourceStore();
 
   // console.log("RESOURCES: ", resources);
   // Fetching all resources and comments only once
@@ -32,7 +31,7 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
     const getAllResourcesAndComments = async () => {
       try {
         setIsLoading(true);
-        await getResources();
+        await loadResources();
       } catch (err) {
         console.error("Error fetching resources and comments: ", err);
       } finally {
@@ -112,19 +111,17 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
 
   // Filter resources based on the category, type, skill, and duration
   const filteredResources = useMemo(() => {
-    return resources.filter((resource) => {
-      const currentCategory =
-        category === "All" || resource.discipline === category;
-      const matchesType = type.length === 0 || type.includes(resource.type);
-
-      const matchesLevel = level.length === 0 || level.includes(resource.level);
-      const matchesEstDuration =
-        estDuration.length === 0 || estDuration.includes(resource.estDuration);
-
-      return (
-        currentCategory && matchesType && matchesLevel && matchesEstDuration
-      );
-    });
+    // return resources?.filter((resource) => {
+    //   const currentCategory =
+    //     category === "All" || resource.discipline === category;
+    //   const matchesType = type.length === 0 || type.includes(resource.type);
+    //   const matchesLevel = level.length === 0 || level.includes(resource.level);
+    //   const matchesEstDuration =
+    //     estDuration.length === 0 || estDuration.includes(resource.estDuration);
+    //   return (
+    //     currentCategory && matchesType && matchesLevel && matchesEstDuration
+    //   );
+    // });
   }, [resources, category, type, level, estDuration]);
 
   return (
@@ -145,7 +142,7 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
         <div className="resource__cards">
           {/* Give resourceList access to the store, and pass in a filter function? */}
           <ResourceList
-            resources={filteredResources}
+            resources={resources}
             selectResource={handleSelectResource}
             activeResourceId={currentResource?.id}
             commentCounts={commentCounts}

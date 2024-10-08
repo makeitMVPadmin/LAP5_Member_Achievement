@@ -10,25 +10,32 @@ export default function ResourceList({
 }) {
   // Removed the previous useEffect and created a new array with updated comment counts
   const updatedResources = useMemo(() => {
-    return resources.map(resource => ({
+    return resources?.map((resource) => ({
       ...resource,
-      commentCount: commentCounts[resource.id] || 0
+      commentCount: commentCounts[resource.id] || 0,
     }));
   }, [resources, commentCounts]);
 
   return (
     <section className="resourceList" aria-label="Resource List">
       <div className="resourceList__wrapper" role="list">
-        {updatedResources.length > 0 ? (
-          updatedResources.map((resource) => (
-            <ResourceCard
-              key={resource.id}
-              resource={resource}
-              selectResource={selectResource}
-              isActive={resource.id === activeResourceId}
-              commentCount={resource.commentCount}
-            />
-          ))
+        {updatedResources?.length > 0 ? (
+          updatedResources.map((resource) => {
+            try {
+              return (
+                <ResourceCard
+                  key={resource.id}
+                  id={resource.id}
+                  resource={resource.data}
+                  selectResource={selectResource}
+                  isActive={resource.id === activeResourceId}
+                  commentCount={resource?.commentCount}
+                />
+              );
+            } catch {
+              return <>{JSON.stringify(resource)}</>;
+            }
+          })
         ) : (
           <p>No resources available for this category.</p>
         )}
