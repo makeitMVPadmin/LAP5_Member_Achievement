@@ -30,9 +30,9 @@ export default function FilterDrawer({ onFilterChange }) {
     estDuration: "",
   });
   const [selectColors, setSelectColors] = useState({
-    type: 'grey',
-    level: 'grey',
-    estDuration: 'grey'
+    type: "grey",
+    level: "grey",
+    estDuration: "grey",
   });
 
   const location = useLocation();
@@ -48,7 +48,7 @@ export default function FilterDrawer({ onFilterChange }) {
 
     setSelectColors((prevColors) => ({
       ...prevColors,
-      [name]: value ? 'black' : 'grey'
+      [name]: value ? "black" : "grey",
     }));
   };
 
@@ -60,9 +60,9 @@ export default function FilterDrawer({ onFilterChange }) {
       event.preventDefault();
       onFilterChange(filters);
       setSelectColors({
-        type: 'grey',
-        level: 'grey',
-        estDuration: 'grey'
+        type: "grey",
+        level: "grey",
+        estDuration: "grey",
       });
       onClose();
     }
@@ -75,9 +75,9 @@ export default function FilterDrawer({ onFilterChange }) {
       estDuration: "",
     });
     setSelectColors({
-      type: 'grey',
-      level: 'grey',
-      estDuration: 'grey'
+      type: "grey",
+      level: "grey",
+      estDuration: "grey",
     });
     onClose();
   };
@@ -88,7 +88,7 @@ export default function FilterDrawer({ onFilterChange }) {
         {/* <SettingsIcon boxSize="1.15rem" className="filter__icon" /> */}
         {/* <Icon as={SettingsIcon} className="filter__icon" />
          */}
-          <img src={filterBy} alt="filter icon" className="filter__icon" />
+        <img src={filterBy} alt="filter icon" className="filter__icon" />
         <p className="filter__button-name">Filter by</p>
       </button>
       <div>
@@ -109,130 +109,124 @@ export default function FilterDrawer({ onFilterChange }) {
               sx={{ color: "#0099FF", fontSize: "20px", fontWeight: "bolder" }}
             />
             <DrawerHeader>
-            <h1 className="submission__header-title">Advanced</h1>
+              <h1 className="submission__header-title">Advanced</h1>
               <h1 className="submission__header-title">Filters</h1>
-              <h3 className="">Narrow your search results</h3>
+              <h3 className="subtitle">Narrow your search results</h3>
             </DrawerHeader>
             <DrawerBody className="submission__form-container">
-              <FormLabel
-                htmlFor="type"
-                marginTop="10px"
-                fontSize="20px"
-                fontWeight="bold"
-                pt={2}
-                mb={3}
-              >
-            
-              </FormLabel>
               <Select
                 id="type"
                 name="type"
+                placeholder="Type"
                 value={filters.type}
                 onChange={handleChange}
                 _hover={{}}
-                fontSize="20px"
+                fontSize="1.5rem"
                 icon={<ChevronDownIcon />}
                 iconSize="45px"
                 iconColor="#0099FF"
                 border="none"
+                boxShadow="none" 
                 className="submission__inputField"
-                color={selectColors.type}
-                focusBorderColor="#0099ff"
+                // color={selectColors.type}
+                color="#000000"
+                marginTop="8"
+                focusBorderColor="#000000"
+                _focus={{
+                  border: "3px solid black",  
+                  boxShadow: "0px 4px 5px -2px black",
+                }}
                 sx={{
-                  '& option': {
-                    color: 'black',
+                  "& option": {
+                    color: "black",
+                    backgroundColor: "white"
                   },
-                  '& option:first-of-type': {
-                    color: 'grey',
+                  "& option:first-of-type": {
+                    color: "grey",
                   },
                 }}
               >
-                <option value="" disabled>
-                  Type
-                </option>
+                <option value="" disabled></option>
                 <option value="Article">Article</option>
                 <option value="Blog">Blog</option>
                 <option value="Course">Course</option>
                 <option value="Video">Video</option>
                 <option value="All">All</option>
               </Select>
-              <FormLabel
-                htmlFor="level"
-                fontSize="20px"
-                fontWeight="bold"
-                marginTop="10px"
-                pt={2}
-                mb={3}
-              >
-                
-              </FormLabel>
+
               <Select
                 id="level"
                 name="level"
+                placeholder="Skill Level"
                 value={filters.level}
                 onChange={handleChange}
                 _hover={{}}
-                fontSize="20px"
+                fontSize="1.5rem"
                 icon={<ChevronDownIcon />}
                 iconSize="45px"
                 iconColor="#0099FF"
+                marginTop="8"
                 border="none"
+                boxShadow="none" 
                 className="submission__inputField"
-                color={selectColors.level}
-                // focusBorderColor="#0099ff"
+                // color={selectColors.level}
+                color="#000000"
+                focusBorderColor="#000000"
+                _focus={{
+                  border: "3px solid black",
+                  boxShadow: "0px 4px 5px -2px black",
+                }}
                 sx={{
-                  '& option': {
-                    color: 'black',
+                  "& option": {
+                    color: "black",
+                    backgroundColor: "white"
                   },
-                  '& option:first-of-type': {
-                    color: 'grey',
+                  "& option:first-of-type": {
+                    color: "grey",
                   },
                 }}
               >
-                <option value="" disabled>
-                Skill Level
-                </option>
+                <option value="" disabled></option>
                 <option value="Beginner">Beginner</option>
                 <option value="Intermediate">Intermediate</option>
                 <option value="Advanced">Advanced</option>
                 <option value="All">All</option>
               </Select>
-              <FormLabel
-                htmlFor="estDuration"
-                fontSize="20px"
-                fontWeight="bold"
-                marginTop="10px"
-                pt={2}
-                mb={3}
-              >
-  
-              </FormLabel>
+             
               <Select
                 id="estDuration"
                 name="estDuration"
+                placeholder="Estimated Duration"
                 value={filters.estDuration}
                 onChange={handleChange}
                 _hover={{}}
                 icon={<ChevronDownIcon />}
-                fontSize="20px"
+                fontSize="1.5rem"
                 iconSize="45px"
                 iconColor="#0099FF"
                 border="none"
+                boxShadow="none"
                 className="submission__inputField"
-                color={selectColors.estDuration}
-                // focusBorderColor="#0099ff"
+                // color={selectColors.estDuration}
+                color="#000000"
+                marginTop="8"
+                focusBorderColor="#000000"
+                _focus={{
+                  border: "3px solid black",
+                  boxShadow: "0px 4px 5px -2px black",
+                }}
                 sx={{
-                  '& option': {
-                    color: 'black',
+                  "& option": {
+                    color: "white",
+                    backgroundColor: "white"
                   },
-                  '& option:first-of-type': {
-                    color: 'grey',
+                  "& option:first-of-type": {
+                    color: "grey",
                   },
                 }}
+                
               >
-                <option value="" disabled>
-                Estimated Duration
-                </option>
+                <option value="" disabled></option>
                 <option value="3 min">3 min</option>
                 <option value="5 min">5 min</option>
                 <option value="7 min">7 min</option>
