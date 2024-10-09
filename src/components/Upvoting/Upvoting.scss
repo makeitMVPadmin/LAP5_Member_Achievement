@@ -4,9 +4,13 @@
 @use "../../styles/partials/global" as *;
 
 .voting {
+  padding: 0;
+  margin: 0;
+  border: none;
+  box-shadow: none;
   @include flex-box(column, flex-start, center);
   gap: 1rem;
-  
+
   @include tablet {
     @include flex-box(row, center, flex-start);
     justify-content: space-between;
