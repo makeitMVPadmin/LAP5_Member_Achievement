@@ -109,7 +109,9 @@ export default function FilterDrawer({ onFilterChange }) {
               sx={{ color: "#0099FF", fontSize: "20px", fontWeight: "bolder" }}
             />
             <DrawerHeader>
-              <h1 className="submission__header-title">Filter Resources</h1>
+            <h1 className="submission__header-title">Advanced</h1>
+              <h1 className="submission__header-title">Filters</h1>
+              <h3 className="">Narrow your search results</h3>
             </DrawerHeader>
             <DrawerBody className="submission__form-container">
               <FormLabel
@@ -120,7 +122,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 pt={2}
                 mb={3}
               >
-                Type
+            
               </FormLabel>
               <Select
                 id="type"
@@ -132,7 +134,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 icon={<ChevronDownIcon />}
                 iconSize="45px"
                 iconColor="#0099FF"
-                border="3px solid black"
+                border="none"
                 className="submission__inputField"
                 color={selectColors.type}
                 focusBorderColor="#0099ff"
@@ -146,7 +148,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 }}
               >
                 <option value="" disabled>
-                  Select
+                  Type
                 </option>
                 <option value="Article">Article</option>
                 <option value="Blog">Blog</option>
@@ -162,7 +164,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 pt={2}
                 mb={3}
               >
-                Skill
+                
               </FormLabel>
               <Select
                 id="level"
@@ -174,10 +176,10 @@ export default function FilterDrawer({ onFilterChange }) {
                 icon={<ChevronDownIcon />}
                 iconSize="45px"
                 iconColor="#0099FF"
-                border="3px solid black"
+                border="none"
                 className="submission__inputField"
                 color={selectColors.level}
-                focusBorderColor="#0099ff"
+                // focusBorderColor="#0099ff"
                 sx={{
                   '& option': {
                     color: 'black',
@@ -188,7 +190,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 }}
               >
                 <option value="" disabled>
-                  Select
+                Skill Level
                 </option>
                 <option value="Beginner">Beginner</option>
                 <option value="Intermediate">Intermediate</option>
@@ -203,7 +205,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 pt={2}
                 mb={3}
               >
-                Duration
+  
               </FormLabel>
               <Select
                 id="estDuration"
@@ -215,10 +217,10 @@ export default function FilterDrawer({ onFilterChange }) {
                 fontSize="20px"
                 iconSize="45px"
                 iconColor="#0099FF"
-                border="3px solid black"
+                border="none"
                 className="submission__inputField"
                 color={selectColors.estDuration}
-                focusBorderColor="#0099ff"
+                // focusBorderColor="#0099ff"
                 sx={{
                   '& option': {
                     color: 'black',
@@ -229,7 +231,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 }}
               >
                 <option value="" disabled>
-                  Select
+                Estimated Duration
                 </option>
                 <option value="3 min">3 min</option>
                 <option value="5 min">5 min</option>
@@ -259,7 +261,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 onClick={handleCancel}
                 className="submission__form-button"
               >
-                Cancel
+                Clear
               </Button>
               <Button
                 bg="#0099FF"
@@ -276,7 +278,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 type="submit"
                 onClick={handleFilterChange}
               >
-                Confirm
+                Search
               </Button>
             </DrawerFooter>
           </DrawerContent>

@@ -8,7 +8,7 @@ import "./ResourcePage.scss";
 import { collection, getDocs } from "firebase/firestore";
 import { database } from "../../config/firebase";
 
-export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
+export default function ResourcePage({ currentUser, onBookmarkUpdate, onFilterChange }) {
   const [resources, setResources] = useState([]);
   const [selectedResource, setSelectedResource] = useState(null);
   const [bookmarkedResources, setBookmarkedResources] = useState({});
@@ -172,13 +172,13 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
           onFormSubmit={(newResource) =>
             setResources([...resources, newResource])
           }
-          onFilterChange={handleFilterChange}
+          // onFilterChange={handleFilterChange}
           currentUser={currentUser}
         />
       </div>
       <div className="resource__cards">
     
-          <FilterDrawer  />
+          <FilterDrawer onFilterChange={handleFilterChange} />
       
         <ResourceList
           resources={filteredResources}
