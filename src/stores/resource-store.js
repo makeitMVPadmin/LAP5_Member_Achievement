@@ -10,57 +10,39 @@ const useResourceStore = create((set, get) => ({
 	currentResource: null,
 	loadResources: async () => {
 		const resourceSnap = await getDocs(collection(db, "rf_Resources"));
-		if (!resourceSnap) {
+
+		if (resourceSnap.empty) {
 			return
 		}
+		
+		const resources = [];
 
-		// I once was a nice piece of code...
-		// Then I took a firebase/firestore arrow to the knee
-		// let resources = [];
-		// resourceSnap.forEach((res) => {
-		// 	resources.push({
-		// 		id: res.id,
-		// 		data: res.data(),
-		// 	});
-		// });
+		for (const doc of resourceSnap.docs) {
+			const resourceData = doc.data();
+			
+			const tags = []; // we have to handle cases where new resources may not have any engagement
+			if (Array.isArray(resourceData.tags) && resourceData.tags.length > 0) {
+				for (const tagRef of resourceData.tags) {
+					const tagSnap = await getDoc(tagRef);
+					tags.push(tagSnap.data());
+				}
+			}
 
-		// I'm sorry 😢 I know it's ugly but blame firebase for now.
-		const resources = await Promise.all(
-				resourceSnap.docs.map(async (doc) => {
-					const resourceData = doc.data();
-					// this gets the field/attribute on rf_Resources document
-					const tags = await Promise.all(
-						resourceData.tags.map(async (tagRef) => {
-							const tagsSnap = await getDoc(tagRef)
-							return tagsSnap.data();
-					}))
-					// const tagsSnap = await getDocs(tagsRef);
-					// const tags = tagsSnap.docs.map(async (doc) => {
-					// 	return {...doc.data()}
-					// })
-					return {id: doc.id, data: { ...resourceData, tags } };
-				}))
+			const comments = [];
+			if (Array.isArray(resourceData.comments) && resourceData.comments.length > 0) {
+				for (const commentsRef of resourceData.comments) {
+					const commentSnap = await getDoc(commentsRef);
+					comments.push(commentSnap.data());
+				}
+			}
+
+			resources.push({ id: doc.id, data: { ...resourceData, tags, comments }})
+		}
 
 		set((_state) => ({
 			resources,
 		}));
 	},
-	// getResourceComments: async (id) => {
-	// 	const commentQuery = query(
-	// 		collection(db, "rf_ResourceComment"),
-	// 		where("resource", "==", id)
-	// 	);
-	// 	const commentSnap = await getDocs(commentQuery);
-	//
-	// 	if (commentSnap) {
-	// 		set((_state) => ({
-	// 			resourceComments: commentSnap.map((comment) => ({
-	// 				id: comment.id,
-	// 				data: comment.data(),
-	// 			})),
-	// 		}));
-	// 	}
-	// },
 	updateResource: (id, patch) => {
 		/**
 		 * {upvotes: 10, dowvotes: 5}

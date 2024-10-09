@@ -20,9 +20,11 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   const [commentCounts, setCommentCounts] = useState({});
   const [isLoading, setIsLoading] = useState(true); // keep
 
-  const { resources, currentResource, loadResources } = useResourceStore();
-  // TEST
-  console.log("resources: ", resources);
+  const { resources, currentResource, loadResources, loadResourcesCollectionWithRefs } = useResourceStore();
+  
+  // TEST SECTION
+  console.log("all resources: ", resources);
+  
   // Fetching all resources and comments only once
   useEffect(() => {
     const getAllResourcesAndComments = async () => {
@@ -35,7 +37,6 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
         setIsLoading(false);
       }
     };
-
     getAllResourcesAndComments();
   }, []);
 
