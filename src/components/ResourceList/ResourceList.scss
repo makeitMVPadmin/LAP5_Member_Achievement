@@ -4,6 +4,10 @@
 @use "../../styles/partials/global" as *;
 
 .resourceList {
+  margin: 0;
+  padding: 0;
+  border: none;
+  box-shadow: none;
   &__wrapper {
     cursor: pointer;
   }
