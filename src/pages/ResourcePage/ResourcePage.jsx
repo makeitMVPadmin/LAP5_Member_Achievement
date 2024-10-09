@@ -1,12 +1,14 @@
 import PropTypes from "prop-types";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import NavBar from "../../components/NavBar/NavBar";
+import SearchBar from "../../components/SearchBar/SearchBar";
 import FilterDrawer from "../../components/FilterDrawer/FilterDrawer";
 import ResourceDetailCard from "../../components/ResourceDetailCard/ResourceDetailCard";
 import ResourceList from "../../components/ResourceList/ResourceList";
 import "./ResourcePage.scss";
 import { collection, getDocs } from "firebase/firestore";
 import { database } from "../../config/firebase";
+import NoMatchesFoundCard from "../../components/NoMatchesFoundCard/NoMatchesFoundCard";
 
 export default function ResourcePage({ currentUser, onBookmarkUpdate, onFilterChange }) {
   const [resources, setResources] = useState([]);
@@ -16,10 +18,10 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate, onFilterCh
   const [type, setType] = useState("");
   const [level, setLevel] = useState("");
   const [estDuration, setEstDuration] = useState("");
+  const [search, setSearch] = useState("");
   const [commentCounts, setCommentCounts] = useState({});
   const [isLoading, setIsLoading] = useState(true);
 
-  // console.log("RESOURCES: ", resources);
   // Fetching all resources and comments only once
   useEffect(() => {
     const getAllResourcesAndComments = async () => {
@@ -157,12 +159,19 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate, onFilterCh
       const matchesLevel = level.length === 0 || level.includes(resource.level);
       const matchesEstDuration =
         estDuration.length === 0 || estDuration.includes(resource.estDuration);
+      const includesSearchTerm = resource.title
+        .toLowerCase()
+        .includes(search.toLocaleLowerCase());
 
       return (
-        currentCategory && matchesType && matchesLevel && matchesEstDuration
+        currentCategory &&
+        matchesType &&
+        matchesLevel &&
+        matchesEstDuration &&
+        includesSearchTerm
       );
     });
-  }, [resources, category, type, level, estDuration]);
+  }, [resources, category, type, level, estDuration, search]);
 
   return (
     <div className="resource__container">
@@ -176,29 +185,43 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate, onFilterCh
           currentUser={currentUser}
         />
       </div>
-      <div className="resource__cards">
-    
+      <div className="search__bar">
+        <SearchBar searchTerm={search} onSearch={setSearch} />
+        {isLoading && <p>Loading...</p>}
+        {!isLoading && filteredResources.length > 0 ? (
+          <div className="resource__container">
+            <div className="resource__cards">
+          
           <FilterDrawer onFilterChange={handleFilterChange} />
       
         <ResourceList
-          resources={filteredResources}
-          selectResource={handleSelectResource}
-          activeResourceId={selectedResource?.id}
-          commentCounts={commentCounts}
-        />
-      </div>
-      <div className="resource-details__container">
-        {!isLoading && selectedResource && (
-          <ResourceDetailCard
-            selectedResource={selectedResource}
-            handleToggleBookmarked={handleToggleBookmarked}
-            savedBookmarks={Object.values(bookmarkedResources).some(Boolean)}
-            isBookmarked={bookmarkedResources[selectedResource.id] || false}
-            comments={selectedResource.comments}
-            currentUser={currentUser}
-            onResourceUpdate={handleResourceUpdate}
-            onCommentAdded={handleCommentAdded}
-          />
+                resources={filteredResources}
+                selectResource={handleSelectResource}
+                activeResourceId={selectedResource?.id}
+                commentCounts={commentCounts}
+              />
+            </div>
+            <div className="resource-details__container">
+              {selectedResource && (
+                <ResourceDetailCard
+                  selectedResource={selectedResource}
+                  handleToggleBookmarked={handleToggleBookmarked}
+                  savedBookmarks={Object.values(bookmarkedResources).some(
+                    Boolean
+                  )}
+                  isBookmarked={
+                    bookmarkedResources[selectedResource.id] || false
+                  }
+                  comments={selectedResource.comments}
+                  currentUser={currentUser}
+                  onResourceUpdate={handleResourceUpdate}
+                  onCommentAdded={handleCommentAdded}
+                />
+              )}
+            </div>
+          </div>
+        ) : (
+          !isLoading && <NoMatchesFoundCard searchQueryText={search} />
         )}
       </div>
     </div>

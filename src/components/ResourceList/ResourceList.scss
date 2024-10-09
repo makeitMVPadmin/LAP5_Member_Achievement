@@ -5,6 +5,9 @@
 
 .resourceList {
   margin: 0rem 0 0.5rem 0;
+  padding: 0;
+  border: none;
+  box-shadow: none;
   &__wrapper {
     cursor: pointer;
   }
