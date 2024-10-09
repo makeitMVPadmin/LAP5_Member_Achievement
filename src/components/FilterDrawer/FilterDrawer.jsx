@@ -13,13 +13,14 @@ import {
   Icon,
   // useToast - will use when user tested and upload successful
 } from "@chakra-ui/react";
-import { SettingsIcon } from "@chakra-ui/icons";
+// import { SettingsIcon } from "@chakra-ui/icons";
+
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import uploadIcon from "../../assets/icons/upload-folder-svgrepo-com.png";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import "./FilterDrawer.scss";
-
+import filterBy from "../../assets/icons/filter-by.svg";
 export default function FilterDrawer({ onFilterChange }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -84,9 +85,11 @@ export default function FilterDrawer({ onFilterChange }) {
   return (
     <>
       <button className="filter__button" onClick={onOpen}>
-        <SettingsIcon boxSize="1.15rem" className="filter__icon" />
-        {/* <Icon as={SettingsIcon} className="filter__icon" /> */}
-        <p className="filter__button-name">Filters</p>
+        {/* <SettingsIcon boxSize="1.15rem" className="filter__icon" /> */}
+        {/* <Icon as={SettingsIcon} className="filter__icon" />
+         */}
+          <img src={filterBy} alt="filter icon" className="filter__icon" />
+        <p className="filter__button-name">Filter by</p>
       </button>
       <div>
         <Drawer

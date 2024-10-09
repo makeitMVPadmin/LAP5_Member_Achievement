@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import NavBar from "../../components/NavBar/NavBar";
+import FilterDrawer from "../../components/FilterDrawer/FilterDrawer";
 import ResourceDetailCard from "../../components/ResourceDetailCard/ResourceDetailCard";
 import ResourceList from "../../components/ResourceList/ResourceList";
 import "./ResourcePage.scss";
@@ -176,6 +177,9 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
         />
       </div>
       <div className="resource__cards">
+    
+          <FilterDrawer  />
+      
         <ResourceList
           resources={filteredResources}
           selectResource={handleSelectResource}
