@@ -5,7 +5,7 @@
     "launch": "launchacademybackend"
   },
   "targets": {
-    "memberdatap3": {
+    "launchacademybackend": {
       "hosting": {
         "library": [
           "communiti-learninghub"
