@@ -3,18 +3,19 @@ import timerIcon from "../../assets/icons/timer.png";
 import "./ResourceCard.scss";
 import upvoteImg from "../../assets/images/upvote.png";
 import commentsImg from "../../assets/images/comments.png";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 
 export default function ResourceCard({
   id,
   resource,
-  // selectResource,
-  isActive
 }) {
   const navigate = useNavigate();
   const handleNavigate = () => {
     navigate(`/resource/${id}`);
   };
+  const { id: resourceId } = useParams()
+  
+  const isActive = id === resourceId;
   
   return (
     <section

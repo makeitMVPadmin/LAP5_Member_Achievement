@@ -3,9 +3,7 @@ import ResourceCard from "../ResourceCard/ResourceCard.jsx";
 
 // TODO: Remove this middle dep and just map over ResourceCard in ResourcePage
 export default function ResourceList({
-  resources,
-  // selectResource,
-  // activeResourceId,
+  resources
 }) {
 
   return (

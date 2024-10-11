@@ -2,21 +2,21 @@ import PropTypes from "prop-types";
 import {useCallback, useEffect, useMemo, useState} from "react";
 
 import NavBar from "../../components/NavBar/NavBar";
-import ResourceList from "../../components/ResourceList/ResourceList";
 
 import "./ResourcePage.scss";
 
 import useResourceStore from "../../stores/resource-store";
 import {Outlet} from "react-router-dom";
+import ResourceCard from "../../components/ResourceCard/ResourceCard.jsx";
 
 // currentUser should be global state.
 export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   // const [resources, setResources] = useState([]);
   const [bookmarkedResources, setBookmarkedResources] = useState({});
   const [category, setCategory] = useState("All");
-  const [type, setType] = useState("");
-  const [level, setLevel] = useState("");
-  const [estDuration, setEstDuration] = useState("");
+  // const [type, setType] = useState("");
+  // const [level, setLevel] = useState("");
+  // const [estDuration, setEstDuration] = useState("");
   const [commentCounts, setCommentCounts] = useState({});
   const [isLoading, setIsLoading] = useState(true); // keep
 
@@ -123,7 +123,7 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
     //     currentCategory && matchesType && matchesLevel && matchesEstDuration
     //   );
     // });
-  }, [resources, category, type, level, estDuration]);
+  }, [resources, category]);
 
   return (
     <div className="resource__container">
@@ -142,24 +142,42 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
       <>
         <div className="resource__cards">
           {/* Give resourceList access to the store, and pass in a filter function? */}
-          <ResourceList
-            resources={loadedResources}
-            // selectResource={handleSelectResource}
-            // activeResourceId={currentResource?.id}
-            commentCounts={commentCounts}
-          />
+          <section className="resourceList" aria-label="Resource List">
+            <div className="resourceList__wrapper" role="list">
+              {loadedResources?.length > 0 ? (
+                loadedResources.map((resource) => {
+                  return (
+                    <ResourceCard
+                      key={resource.id}
+                      id={resource.id}
+                      resource={resource.data}
+                      // selectResource={selectResource}
+                    />
+                  );
+                })
+              ) : (
+                <p>No resources available for this category.</p>
+              )}
+            </div>
+          </section>
+          {/*<ResourceList*/}
+          {/*  resources={loadedResources}*/}
+          {/*  // selectResource={handleSelectResource}*/}
+          {/*  // activeResourceId={currentResource?.id}*/}
+          {/*  commentCounts={commentCounts}*/}
+          {/*/>*/}
         </div>
         <div className="resource-details__container">
-            <Outlet />
-            {/*// TODO:*/}
-            {/*// <ResourceDetailCard*/}
-            {/*//   handleToggleBookmarked={handleToggleBookmarked}*/}
-            {/*//   savedBookmarks={Object.values(bookmarkedResources).some(Boolean)}*/}
-            {/*//   isBookmarked={bookmarkedResources[currentResource.id] || false}*/}
-            {/*//   // comments={currentResource.comments}*/}
-            {/*//   currentUser={currentUser}*/}
-            {/*//   onCommentAdded={handleCommentAdded}*/}
-            {/*// />*/}
+          <Outlet/>
+          {/*// TODO:*/}
+          {/*// <ResourceDetailCard*/}
+          {/*//   handleToggleBookmarked={handleToggleBookmarked}*/}
+          {/*//   savedBookmarks={Object.values(bookmarkedResources).some(Boolean)}*/}
+          {/*//   isBookmarked={bookmarkedResources[currentResource.id] || false}*/}
+          {/*//   // comments={currentResource.comments}*/}
+          {/*//   currentUser={currentUser}*/}
+          {/*//   onCommentAdded={handleCommentAdded}*/}
+          {/*// />*/}
         </div>
       </>
     </div>
