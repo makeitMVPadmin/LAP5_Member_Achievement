@@ -5,7 +5,7 @@ import {database as db} from "../config/firebase";
 import {getDoc} from "@firebase/firestore";
 
 const useResourceStore = create((set, get) => ({
-	resources: [],
+	resources: new Map(),
 	resourceComments: [],
 	currentResource: null,
 	loadResources: async () => {
@@ -15,7 +15,7 @@ const useResourceStore = create((set, get) => ({
 			return
 		}
 		
-		const resources = [];
+		const resources = new Map();
 
 		for (const doc of resourceSnap.docs) {
 			const resourceData = doc.data();
@@ -36,12 +36,19 @@ const useResourceStore = create((set, get) => ({
 				}
 			}
 
-			resources.push({ id: doc.id, data: { ...resourceData, tags, comments }})
+			resources.set(doc.id, { id: doc.id, data: { ...resourceData, tags, comments }})
 		}
-
+		
 		set((_state) => ({
 			resources,
 		}));
+	},
+	getResource: (resourceId) => {
+		const resource = get().resources.get(resourceId);
+			if (!resource) {
+				return null;
+			}
+			return resource;
 	},
 	updateResource: (id, patch) => {
 		/**
@@ -65,8 +72,10 @@ const useResourceStore = create((set, get) => ({
 			state.resources.splice(resourceIdx, 1, currentResource);
 		});
 	},
-	getBookmarked: (newBears) => set({bears: newBears}),
-	getLikes: (newBears) => set({bears: newBears}),
+	getBookmarked: (resourceId) => set((prevState) => {
+		
+	}),
+	getLikes: () => set({}),
 }));
 
 export default useResourceStore;

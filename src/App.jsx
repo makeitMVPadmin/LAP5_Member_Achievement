@@ -1,14 +1,15 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useState, useEffect, createContext } from "react";
+import {BrowserRouter, Route, Routes} from "react-router-dom";
+import {createContext, useEffect, useState} from "react";
 import Header from "./components/Header/Header.jsx";
 import Home from "./pages/HomePage/HomePage.jsx";
 import ResourcePage from "./pages/ResourcePage/ResourcePage.jsx";
-import { ChakraProvider } from "@chakra-ui/react";
+import {ChakraProvider} from "@chakra-ui/react";
 import RewardsPage from "./pages/RewardsPage/RewardsPage.jsx";
 import BookMarkedPage from "./pages/BookMarkedPage/BookMarkedPage.jsx";
 import ContributionsPage from "./pages/ContributionsPage/ContributionsPage.jsx";
-import { database } from "./config/firebase.js";
-import { doc, getDoc } from "@firebase/firestore";
+import {database} from "./config/firebase.js";
+import {doc, getDoc} from "@firebase/firestore";
+import ResourceDetailCard from "./components/ResourceDetailCard/ResourceDetailCard.jsx";
 
 export const PointsContext = createContext();
 
@@ -85,6 +86,22 @@ const App = () => {
     localStorage.setItem("bookmarks", JSON.stringify(updatedBookmarks));
   };
 
+  // TEST
+  // const {loadResources} = useResourceStore();
+  // useEffect(() => {
+  //   const getAllResourcesAndComments = async () => {
+  //     try {
+  //       // setIsLoading(true);
+  //       await loadResources();
+  //     } catch (err) {
+  //       console.error("Error fetching resources and comments: ", err);
+  //     } finally {
+  //       // setIsLoading(!isLoading);
+  //     }
+  //   };
+  //   getAllResourcesAndComments();
+  // }, []);
+  
   return (
     <>
       <PointsContext.Provider
@@ -109,7 +126,13 @@ const App = () => {
                     currentUser={currentUser}
                   />
                 }
-              />
+              >
+                <Route
+                  path=":id"
+                  element={<ResourceDetailCard />}
+                />
+              </Route>
+              
               <Route
                 path="/bookmarked"
                 element={

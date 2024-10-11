@@ -1,10 +1,11 @@
 import "./ResourceList.scss";
 import ResourceCard from "../ResourceCard/ResourceCard.jsx";
 
+// TODO: Remove this middle dep and just map over ResourceCard in ResourcePage
 export default function ResourceList({
   resources,
-  selectResource,
-  activeResourceId,
+  // selectResource,
+  // activeResourceId,
 }) {
 
   return (
@@ -17,8 +18,7 @@ export default function ResourceList({
                   key={resource.id}
                   id={resource.id}
                   resource={resource.data}
-                  selectResource={selectResource}
-                  isActive={resource.id === activeResourceId}
+                  // selectResource={selectResource}
                 />
               );
           })

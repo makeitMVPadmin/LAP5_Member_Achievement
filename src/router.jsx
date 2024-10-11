@@ -1,9 +1,10 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import HomePage from "./pages/HomePage/HomePage";
 import ResourcePage from "./pages/ResourcePage/ResourcePage";
 import BookMarkedPage from "./pages/BookMarkedPage/BookMarkedPage";
 import ContributionsPage from "./pages/ContributionsPage/ContributionsPage";
 import RewardsPage from "./pages/RewardsPage/RewardsPage";
+import ResourceDetailCard from "./components/ResourceDetailCard/ResourceDetailCard.jsx";
 
 function createAppRouter() {
   createBrowserRouter([
@@ -18,6 +19,12 @@ function createAppRouter() {
         {
           path: "/resource",
           element: <ResourcePage />,
+          children: [
+            {
+              path: "/:id",
+              element: <ResourceDetailCard />
+            }
+          ]
         },
         {
           path: "/contributions",

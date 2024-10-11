@@ -2,12 +2,12 @@ import PropTypes from "prop-types";
 import {useCallback, useEffect, useMemo, useState} from "react";
 
 import NavBar from "../../components/NavBar/NavBar";
-import ResourceDetailCard from "../../components/ResourceDetailCard/ResourceDetailCard";
 import ResourceList from "../../components/ResourceList/ResourceList";
 
 import "./ResourcePage.scss";
 
 import useResourceStore from "../../stores/resource-store";
+import {Outlet} from "react-router-dom";
 
 // currentUser should be global state.
 export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
@@ -20,39 +20,42 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   const [commentCounts, setCommentCounts] = useState({});
   const [isLoading, setIsLoading] = useState(true); // keep
 
-  const { resources, currentResource, loadResources, loadResourcesCollectionWithRefs } = useResourceStore();
+  const { resources, currentResource, loadResources } = useResourceStore();
   
   // TEST SECTION
-  console.log("all resources: ", resources);
+  // console.log("all resources: ", resources);
+  const loadedResources = useMemo(() => {
+    return Array.from(resources.values())
+  }, [resources])
   
   // Fetching all resources and comments only once
   useEffect(() => {
     const getAllResourcesAndComments = async () => {
       try {
-        setIsLoading(true);
+        // setIsLoading(true);
         await loadResources();
       } catch (err) {
         console.error("Error fetching resources and comments: ", err);
       } finally {
-        setIsLoading(false);
+        setIsLoading(!isLoading);
       }
     };
     getAllResourcesAndComments();
   }, []);
 
-  const handleSelectResource = useCallback(
-    (clickedId) => {
-      const foundResource = resources.find(
-        (resource) => resource.id === clickedId
-      );
-      if (foundResource) {
-        setCurrentResource(clickedId);
-      } else {
-        console.error("Resource not found for id:", clickedId);
-      }
-    },
-    [resources]
-  );
+  // const handleSelectResource = useCallback(
+  //   (clickedId) => {
+  //     const foundResource = resources.find(
+  //       (resource) => resource.id === clickedId
+  //     );
+  //     if (foundResource) {
+  //       setCurrentResource(clickedId);
+  //     } else {
+  //       console.error("Resource not found for id:", clickedId);
+  //     }
+  //   },
+  //   [resources]
+  // );
 
   const handleToggleBookmarked = () => {
     if (!currentResource) return;
@@ -140,23 +143,23 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
         <div className="resource__cards">
           {/* Give resourceList access to the store, and pass in a filter function? */}
           <ResourceList
-            resources={resources}
-            selectResource={handleSelectResource}
-            activeResourceId={currentResource?.id}
+            resources={loadedResources}
+            // selectResource={handleSelectResource}
+            // activeResourceId={currentResource?.id}
             commentCounts={commentCounts}
           />
         </div>
         <div className="resource-details__container">
-          {!isLoading && currentResource && (
-            <ResourceDetailCard
-              handleToggleBookmarked={handleToggleBookmarked}
-              savedBookmarks={Object.values(bookmarkedResources).some(Boolean)}
-              isBookmarked={bookmarkedResources[currentResource.id] || false}
-              comments={currentResource.comments}
-              currentUser={currentUser}
-              onCommentAdded={handleCommentAdded}
-            />
-          )}
+            <Outlet />
+            {/*// TODO:*/}
+            {/*// <ResourceDetailCard*/}
+            {/*//   handleToggleBookmarked={handleToggleBookmarked}*/}
+            {/*//   savedBookmarks={Object.values(bookmarkedResources).some(Boolean)}*/}
+            {/*//   isBookmarked={bookmarkedResources[currentResource.id] || false}*/}
+            {/*//   // comments={currentResource.comments}*/}
+            {/*//   currentUser={currentUser}*/}
+            {/*//   onCommentAdded={handleCommentAdded}*/}
+            {/*// />*/}
         </div>
       </>
     </div>

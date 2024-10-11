@@ -3,29 +3,31 @@ import timerIcon from "../../assets/icons/timer.png";
 import "./ResourceCard.scss";
 import upvoteImg from "../../assets/images/upvote.png";
 import commentsImg from "../../assets/images/comments.png";
+import {useNavigate} from "react-router-dom";
 
 export default function ResourceCard({
   id,
   resource,
-  selectResource,
+  // selectResource,
   isActive
 }) {
-  const handleClickCard = () => {
-    selectResource(id);
+  const navigate = useNavigate();
+  const handleNavigate = () => {
+    navigate(`/resource/${id}`);
   };
   
   return (
     <section
       className={`resource ${isActive ? "resource--active" : ""}`}
-      onClick={handleClickCard}
+      onClick={handleNavigate}
       tabIndex="0"
       role="button"
       aria-pressed={isActive ? "true" : "false"}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          handleClickCard();
-        }
-      }}
+      // onKeyDown={(e) => {
+      //   if (e.key === "Enter" || e.key === " ") {
+      //     handleClickCard();
+      //   }
+      // }}
     >
       <div className="resource__heading-top">
         <div className="resource__heading-top-container">
