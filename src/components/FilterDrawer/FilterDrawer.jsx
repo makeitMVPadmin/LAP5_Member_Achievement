@@ -126,20 +126,20 @@ export default function FilterDrawer({ onFilterChange }) {
                 iconSize="45px"
                 iconColor="#0099FF"
                 border="none"
-                boxShadow="none" 
+                boxShadow="none"
                 className="submission__inputField"
                 // color={selectColors.type}
                 color="#000000"
                 marginTop="8"
                 focusBorderColor="#000000"
                 _focus={{
-                  border: "3px solid black",  
+                  border: "3px solid black",
                   boxShadow: "0px 4px 5px -2px black",
                 }}
                 sx={{
                   "& option": {
-                    color: "black",
-                    backgroundColor: "white"
+                    color: "white",
+                    backgroundColor: "white",
                   },
                   "& option:first-of-type": {
                     color: "grey",
@@ -167,7 +167,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 iconColor="#0099FF"
                 marginTop="8"
                 border="none"
-                boxShadow="none" 
+                boxShadow="none"
                 className="submission__inputField"
                 // color={selectColors.level}
                 color="#000000"
@@ -179,7 +179,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 sx={{
                   "& option": {
                     color: "black",
-                    backgroundColor: "white"
+                    backgroundColor: "white",
                   },
                   "& option:first-of-type": {
                     color: "grey",
@@ -192,7 +192,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 <option value="Advanced">Advanced</option>
                 <option value="All">All</option>
               </Select>
-             
+
               <Select
                 id="estDuration"
                 name="estDuration"
@@ -218,13 +218,12 @@ export default function FilterDrawer({ onFilterChange }) {
                 sx={{
                   "& option": {
                     color: "white",
-                    backgroundColor: "white"
+                    backgroundColor: "white",
                   },
                   "& option:first-of-type": {
                     color: "grey",
                   },
                 }}
-                
               >
                 <option value="" disabled></option>
                 <option value="3 min">3 min</option>
