@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   useDisclosure,
   Drawer,
@@ -14,7 +15,8 @@ import {
   // useToast - will use when user tested and upload successful
 } from "@chakra-ui/react";
 // import { SettingsIcon } from "@chakra-ui/icons";
-
+import SelectTags from "../SubmissionForm/SelectTags"; 
+import TopicFilter from "./TopicFilter";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import uploadIcon from "../../assets/icons/upload-folder-svgrepo-com.png";
 import { useState } from "react";
@@ -26,12 +28,17 @@ export default function FilterDrawer({ onFilterChange }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [filters, setFilters] = useState({
+    tags: [],
     discipline: "",
     type: "",
     level: "",
     estDuration: "",
   });
+
+  const [selectedTags, setSelectedTags] = useState([]);
+
   const [selectColors, setSelectColors] = useState({
+    tags: "black",
     discipline: "black",
     type: "black",
     level: "black",
@@ -61,8 +68,14 @@ export default function FilterDrawer({ onFilterChange }) {
     }
     if (typeof onFilterChange === "function") {
       event.preventDefault();
-      onFilterChange(filters);
+      const tagValues = selectedTags.map(tag => tag.value);
+      console.log("Selected Tags:", tagValues);
+      onFilterChange({
+        ...filters,
+        tags: tagValues,
+      });
       setSelectColors({
+        tags: selectedTags.length > 0 ? "grey" : "black",
         discipline: filters.discipline ? "grey" : "black",
         type: filters.type ? "grey" : "black",
         level: filters.level ? "grey" : "black",
@@ -74,18 +87,22 @@ export default function FilterDrawer({ onFilterChange }) {
 
   const handleCancel = () => {
     setFilters({
+      tags: [],
       discipline: "",
       type: "",
       level: "",
       estDuration: "",
     });
+    setSelectedTags([]); 
     setSelectColors({
+      tags: "black",
       discipline: "black",
       type: "black",
       level: "black",
       estDuration: "black",
     });
     onFilterChange({
+      tags: ["All"],
       discipline: "All",
       type: "All",
       level: "All",
@@ -126,6 +143,15 @@ export default function FilterDrawer({ onFilterChange }) {
               <h3 className="subtitle">Narrow your search results</h3>
             </DrawerHeader>
             <DrawerBody className="submission__form-container">
+           
+           {/* SelectTags */}
+            <Box mt={8}>
+                <TopicFilter onChange={handleChange}
+                  selectedOptions={selectedTags}
+                  setSelectedOptions={setSelectedTags}
+                />
+              </Box>
+
               <Select
                 id="discipline"
                 name="discipline"
@@ -158,7 +184,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 }}
               >
                 <option value="All" disabled>
-                  {name}
+                Select Discipline
                 </option>
 
                 <option value="Software Engineering">
@@ -201,7 +227,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 }}
               >
                 <option value="All" disabled>
-                  {name}
+                Select Type
                 </option>
                 <option value="Article">Article</option>
                 <option value="Blog">Blog</option>
@@ -242,7 +268,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 }}
               >
                 <option value="All" disabled>
-                  {name}
+                Select Skill Level
                 </option>
                 <option value="Beginner">Beginner</option>
                 <option value="Intermediate">Intermediate</option>
@@ -282,7 +308,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 }}
               >
                 <option value="All" disabled>
-                  {name}
+                Select Estimated Duration
                 </option>
                 <option value="3 min">3 min</option>
                 <option value="5 min">5 min</option>

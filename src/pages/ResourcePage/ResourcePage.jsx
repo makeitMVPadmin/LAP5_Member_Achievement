@@ -10,11 +10,16 @@ import { collection, getDocs } from "firebase/firestore";
 import { database } from "../../config/firebase";
 import NoMatchesFoundCard from "../../components/NoMatchesFoundCard/NoMatchesFoundCard";
 
-export default function ResourcePage({ currentUser, onBookmarkUpdate, onFilterChange }) {
+export default function ResourcePage({
+  currentUser,
+  onBookmarkUpdate,
+  onFilterChange,
+}) {
   const [resources, setResources] = useState([]);
   const [selectedResource, setSelectedResource] = useState(null);
   const [bookmarkedResources, setBookmarkedResources] = useState({});
   const [category, setCategory] = useState("All");
+  const [tags, setTags] = useState([]);
   const [type, setType] = useState("All");
   const [level, setLevel] = useState("All");
   const [estDuration, setEstDuration] = useState("All");
@@ -109,13 +114,21 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate, onFilterCh
     onBookmarkUpdate(bookmarks);
   };
 
-  const handleFilterChange = ({ discipline, type, level, estDuration }) => {
+  const handleFilterChange = ({
+    tags,
+    discipline,
+    type,
+    level,
+    estDuration,
+  }) => {
+    setTags(tags);
     setCategory(discipline === "All" || discipline === "" ? "All" : discipline);
     setType(type === "All" || type === "" ? "All" : type);
     setLevel(level === "All" || level === "" ? "All" : level);
-    setEstDuration(estDuration === "All" || estDuration === "" ? "All" : estDuration);
+    setEstDuration(
+      estDuration === "All" || estDuration === "" ? "All" : estDuration
+    );
   };
-  
 
   const handleResourceUpdate = useCallback((updatedResource) => {
     setResources((prevResources) =>
@@ -154,15 +167,22 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate, onFilterCh
     return resources.filter((resource) => {
       const currentCategory =
         category === "All" || resource.discipline === category;
-        const matchesType = type === "All" || resource.type === type;
-        const matchesLevel = level === "All" || resource.level === level;
-        const matchesEstDuration =
-          estDuration === "All" || resource.estDuration === estDuration;
+      const matchesType = type === "All" || resource.type === type;
+      const matchesLevel = level === "All" || resource.level === level;
+      const matchesEstDuration =
+        estDuration === "All" || resource.estDuration === estDuration;
       const includesSearchTerm = resource.title
         .toLowerCase()
         .includes(search.toLocaleLowerCase());
 
+      const matchesTags =
+        tags.length === 0 || 
+        resource.title
+        .toLowerCase()
+        .includes(tags);
+
       return (
+        matchesTags &&
         currentCategory &&
         matchesType &&
         matchesLevel &&
@@ -170,7 +190,7 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate, onFilterCh
         includesSearchTerm
       );
     });
-  }, [resources, category, type, level, estDuration, search]);
+  }, [resources, tags, category, type, level, estDuration, search]);
 
   return (
     <div className="resource__container">
@@ -190,10 +210,9 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate, onFilterCh
         {!isLoading && filteredResources.length > 0 ? (
           <div className="resource__container">
             <div className="resource__cards">
-          
-          <FilterDrawer onFilterChange={handleFilterChange} />
-      
-        <ResourceList
+              <FilterDrawer onFilterChange={handleFilterChange} />
+
+              <ResourceList
                 resources={filteredResources}
                 selectResource={handleSelectResource}
                 activeResourceId={selectedResource?.id}
