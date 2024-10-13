@@ -21,18 +21,21 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import "./FilterDrawer.scss";
 import filterBy from "../../assets/icons/filter-by.svg";
+
 export default function FilterDrawer({ onFilterChange }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [filters, setFilters] = useState({
+    discipline: "",
     type: "",
     level: "",
     estDuration: "",
   });
   const [selectColors, setSelectColors] = useState({
-    type: "grey",
-    level: "grey",
-    estDuration: "grey",
+    discipline: "black",
+    type: "black",
+    level: "black",
+    estDuration: "black",
   });
 
   const location = useLocation();
@@ -41,14 +44,14 @@ export default function FilterDrawer({ onFilterChange }) {
   const handleChange = (event) => {
     const { name, value } = event.target;
 
-    setFilters((filters) => ({
-      ...filters,
+    setFilters((prevFilters) => ({
+      ...prevFilters,
       [name]: value,
     }));
 
     setSelectColors((prevColors) => ({
       ...prevColors,
-      [name]: value ? "black" : "grey",
+      [name]: value ? "grey" : "black",
     }));
   };
 
@@ -60,9 +63,10 @@ export default function FilterDrawer({ onFilterChange }) {
       event.preventDefault();
       onFilterChange(filters);
       setSelectColors({
-        type: "grey",
-        level: "grey",
-        estDuration: "grey",
+        discipline: filters.discipline ? "grey" : "black",
+        type: filters.type ? "grey" : "black",
+        level: filters.level ? "grey" : "black",
+        estDuration: filters.estDuration ? "grey" : "black",
       });
       onClose();
     }
@@ -70,14 +74,22 @@ export default function FilterDrawer({ onFilterChange }) {
 
   const handleCancel = () => {
     setFilters({
+      discipline: "",
       type: "",
       level: "",
       estDuration: "",
     });
     setSelectColors({
-      type: "grey",
-      level: "grey",
-      estDuration: "grey",
+      discipline: "black",
+      type: "black",
+      level: "black",
+      estDuration: "black",
+    });
+    onFilterChange({
+      discipline: "All",
+      type: "All",
+      level: "All",
+      estDuration: "All",
     });
     onClose();
   };
@@ -115,6 +127,49 @@ export default function FilterDrawer({ onFilterChange }) {
             </DrawerHeader>
             <DrawerBody className="submission__form-container">
               <Select
+                id="discipline"
+                name="discipline"
+                placeholder="Discipline"
+                value={filters.discipline}
+                onChange={handleChange}
+                _hover={{}}
+                fontSize="1.5rem"
+                icon={<ChevronDownIcon />}
+                iconSize="45px"
+                iconColor="#0099FF"
+                border="none"
+                boxShadow="none"
+                className="submission__inputField"
+                color={selectColors.discipline}
+                marginTop="8"
+                focusBorderColor="#000000"
+                _focus={{
+                  border: "3px solid black",
+                  boxShadow: "0px 4px 5px -2px black",
+                }}
+                sx={{
+                  "& option": {
+                    color: "black",
+                    backgroundColor: "white",
+                  },
+                  "& option:first-of-type": {
+                    color: "grey",
+                  },
+                }}
+              >
+                <option value="All" disabled>
+                  {name}
+                </option>
+
+                <option value="Software Engineering">
+                  Software Engineering
+                </option>
+                <option value="UX/UI Design">UX/UI Design</option>
+                <option value="Product">Product</option>
+                <option value="Data Science">Data Science</option>
+              </Select>
+
+              <Select
                 id="type"
                 name="type"
                 placeholder="Type"
@@ -128,8 +183,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 border="none"
                 boxShadow="none"
                 className="submission__inputField"
-                // color={selectColors.type}
-                color="#000000"
+                color={selectColors.type}
                 marginTop="8"
                 focusBorderColor="#000000"
                 _focus={{
@@ -138,7 +192,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 }}
                 sx={{
                   "& option": {
-                    color: "white",
+                    color: "black",
                     backgroundColor: "white",
                   },
                   "& option:first-of-type": {
@@ -146,7 +200,9 @@ export default function FilterDrawer({ onFilterChange }) {
                   },
                 }}
               >
-                <option value="" disabled></option>
+                <option value="All" disabled>
+                  {name}
+                </option>
                 <option value="Article">Article</option>
                 <option value="Blog">Blog</option>
                 <option value="Course">Course</option>
@@ -169,8 +225,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 border="none"
                 boxShadow="none"
                 className="submission__inputField"
-                // color={selectColors.level}
-                color="#000000"
+                color={selectColors.level}
                 focusBorderColor="#000000"
                 _focus={{
                   border: "3px solid black",
@@ -186,7 +241,9 @@ export default function FilterDrawer({ onFilterChange }) {
                   },
                 }}
               >
-                <option value="" disabled></option>
+                <option value="All" disabled>
+                  {name}
+                </option>
                 <option value="Beginner">Beginner</option>
                 <option value="Intermediate">Intermediate</option>
                 <option value="Advanced">Advanced</option>
@@ -207,8 +264,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 border="none"
                 boxShadow="none"
                 className="submission__inputField"
-                // color={selectColors.estDuration}
-                color="#000000"
+                color={selectColors.estDuration}
                 marginTop="8"
                 focusBorderColor="#000000"
                 _focus={{
@@ -217,7 +273,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 }}
                 sx={{
                   "& option": {
-                    color: "white",
+                    color: "black",
                     backgroundColor: "white",
                   },
                   "& option:first-of-type": {
@@ -225,7 +281,9 @@ export default function FilterDrawer({ onFilterChange }) {
                   },
                 }}
               >
-                <option value="" disabled></option>
+                <option value="All" disabled>
+                  {name}
+                </option>
                 <option value="3 min">3 min</option>
                 <option value="5 min">5 min</option>
                 <option value="7 min">7 min</option>

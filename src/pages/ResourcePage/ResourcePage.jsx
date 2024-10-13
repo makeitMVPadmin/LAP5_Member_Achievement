@@ -15,9 +15,9 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate, onFilterCh
   const [selectedResource, setSelectedResource] = useState(null);
   const [bookmarkedResources, setBookmarkedResources] = useState({});
   const [category, setCategory] = useState("All");
-  const [type, setType] = useState("");
-  const [level, setLevel] = useState("");
-  const [estDuration, setEstDuration] = useState("");
+  const [type, setType] = useState("All");
+  const [level, setLevel] = useState("All");
+  const [estDuration, setEstDuration] = useState("All");
   const [search, setSearch] = useState("");
   const [commentCounts, setCommentCounts] = useState({});
   const [isLoading, setIsLoading] = useState(true);
@@ -109,13 +109,13 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate, onFilterCh
     onBookmarkUpdate(bookmarks);
   };
 
-  const handleFilterChange = ({ type, level, estDuration }) => {
-    setType(type === "All" || type === "" ? [] : [type]);
-    setLevel(level === "All" || level === "" ? [] : [level]);
-    setEstDuration(
-      estDuration === "All" || estDuration === "" ? [] : [estDuration]
-    );
+  const handleFilterChange = ({ discipline, type, level, estDuration }) => {
+    setCategory(discipline === "All" || discipline === "" ? "All" : discipline);
+    setType(type === "All" || type === "" ? "All" : type);
+    setLevel(level === "All" || level === "" ? "All" : level);
+    setEstDuration(estDuration === "All" || estDuration === "" ? "All" : estDuration);
   };
+  
 
   const handleResourceUpdate = useCallback((updatedResource) => {
     setResources((prevResources) =>
@@ -154,11 +154,10 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate, onFilterCh
     return resources.filter((resource) => {
       const currentCategory =
         category === "All" || resource.discipline === category;
-      const matchesType = type.length === 0 || type.includes(resource.type);
-
-      const matchesLevel = level.length === 0 || level.includes(resource.level);
-      const matchesEstDuration =
-        estDuration.length === 0 || estDuration.includes(resource.estDuration);
+        const matchesType = type === "All" || resource.type === type;
+        const matchesLevel = level === "All" || resource.level === level;
+        const matchesEstDuration =
+          estDuration === "All" || resource.estDuration === estDuration;
       const includesSearchTerm = resource.title
         .toLowerCase()
         .includes(search.toLocaleLowerCase());
