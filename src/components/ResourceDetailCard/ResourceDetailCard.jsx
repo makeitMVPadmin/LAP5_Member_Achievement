@@ -5,7 +5,12 @@ import {PointsContext} from "../../App";
 
 import useResourceStore from "../../stores/resource-store";
 
+// Styling & Icons
+import {BookmarkIcon as BookmarkChecked} from '@heroicons/react/24/solid';
+import {BookmarkIcon as BookmarkUnchecked} from '@heroicons/react/24/outline';
+import {ClockIcon} from "@heroicons/react/24/solid/index.js";
 import "./ResourceDetailCard.scss";
+
 
 // This will be considered a page now rendered through router
 const ResourceDetailCard = ({
@@ -19,9 +24,12 @@ const ResourceDetailCard = ({
 }) => {
 
   const [isRead, setIsRead] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
   const { id } = useParams();
   const { getResource, resources } = useResourceStore();
   const currentResource = getResource(id);
+  console.log("CurrentResource: ", currentResource);
+  // console.log("CurrentResource Submitter: ", currentResource?.data.submitter);
   
   useEffect(() => {
     if (currentResource) {
@@ -31,6 +39,10 @@ const ResourceDetailCard = ({
       }
     }
   }, [currentResource]);
+  
+  const handleBookmarked = () => {
+    setIsBookmarked(!isBookmarked);
+  }
 
   // const handleVoteChange = useCallback(
   //   (resourceId, upvotes, downvotes) => {
@@ -83,18 +95,11 @@ const ResourceDetailCard = ({
         <div className="resource-details__heading-top">
           <div className="resource-details__heading-top-container">
             <p className="resource-details__type">{currentResource?.data.type}</p>
-            {/*<img*/}
-            {/*  src={isBookmarked ? bookmarkedIcon : bookmarkIcon}*/}
-            {/*  onClick={() => {*/}
-            {/*    handleToggleBookmarked();*/}
-            {/*    if (!isBookmarked) {*/}
-            {/*      handleBookmarkPoints();*/}
-            {/*    }*/}
-            {/*  }}*/}
-            {/*  alt="bookmark icon"*/}
-            {/*  className="resource-details__saved-icon"*/}
-            {/*  aria-hidden="true"*/}
-            {/*/>*/}
+            <div
+              onClick={handleBookmarked}
+              className="resource-details__saved-icon">
+              {isBookmarked ? <BookmarkChecked fill="#0099ff" stroke="black" /> : <BookmarkUnchecked />}
+            </div>
           </div>
         </div>
         <div className="resource-details__heading-bottom">
@@ -103,8 +108,8 @@ const ResourceDetailCard = ({
         <p className="resource-details__level">{currentResource?.data.difficulty}</p>
         <div className="resource-details__tags-container" role="list">
           {currentResource?.data.tags?.map((tag) => (
-            <div key={tag.title} className="resource-details__tag" role="listitem">
-              {tag.title}
+            <div key={tag?.title} className="resource-details__tag" role="listitem">
+              {tag?.title}
             </div>
           ))}
         </div>
@@ -131,14 +136,10 @@ const ResourceDetailCard = ({
         
           <div className="resource-details__timer">
             <p className="resource-details__duration">
-              {currentResource?.data.duration_min}
+              {currentResource?.data.duration_min} min
             </p>
-            {/*<img*/}
-            {/*  src={timerIcon}*/}
-            {/*  alt="timer icon"*/}
-            {/*  className="resource-details__timer-icon"*/}
-            {/*  aria-hidden="true"*/}
-            {/*/>*/}
+            {/* Swapped a png image for hero icons. No need to add extra memory from heavy images */}
+            <ClockIcon className="resource-details__timer-icon" />
           </div>
         </div>
         
@@ -150,12 +151,19 @@ const ResourceDetailCard = ({
         
         <div className="resource-details__bottom-container">
           <div className="resource-details__author-container">
-            <div className="resource-details__avatar" aria-hidden="true"></div>
+            <div className="resource-details__avatar">
+              <img
+                id={currentResource?.data.submitter.name}
+                src={currentResource?.data.submitter.profile_pic}
+                alt="submitter profile picture"
+                style={{ objectFit: "cover" }}
+              />
+            </div>
             <div className="resource-details__author">
               <p className="resource-details__submission">Submitted by: </p>
-              {/*<p className="resource-details__author-name">*/}
-              {/*  {currentResource?.data.submitter.name}*/}
-              {/*</p>*/}
+              <p className="resource-details__author-name">
+                {currentResource?.data.submitter.name}
+              </p>
             </div>
           </div>
           <div className="resource-details__buttons-container">

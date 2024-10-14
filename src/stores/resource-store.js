@@ -20,6 +20,15 @@ const useResourceStore = create((set, get) => ({
 		for (const doc of resourceSnap.docs) {
 			const resourceData = doc.data();
 			
+			// submitter is a user who SUBMITTED a resource
+			let submitter = null;
+			if (resourceData.submitter) {
+				const submitterSnap = await getDoc(resourceData.submitter);
+				if (submitterSnap.exists()) {
+					submitter = submitterSnap.data();
+				}
+			}
+			
 			const tags = []; // we have to handle cases where new resources may not have any engagement
 			if (Array.isArray(resourceData.tags) && resourceData.tags.length > 0) {
 				for (const tagRef of resourceData.tags) {
@@ -36,7 +45,7 @@ const useResourceStore = create((set, get) => ({
 				}
 			}
 
-			resources.set(doc.id, { id: doc.id, data: { ...resourceData, tags, comments }})
+			resources.set(doc.id, { id: doc.id, data: { ...resourceData, submitter, tags, comments }})
 		}
 		
 		set((_state) => ({

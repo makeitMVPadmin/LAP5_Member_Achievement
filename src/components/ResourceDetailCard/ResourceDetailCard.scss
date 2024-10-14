@@ -191,6 +191,8 @@
     height: 2.75rem;
     width: 2.75rem;
     margin-right: 0.75rem;
+    display: flex;
+    overflow: hidden;
   }
 
   &__buttons-container {
