@@ -15,7 +15,7 @@ import {
   // useToast - will use when user tested and upload successful
 } from "@chakra-ui/react";
 // import { SettingsIcon } from "@chakra-ui/icons";
-import SelectTags from "../SubmissionForm/SelectTags"; 
+import SelectTags from "../SubmissionForm/SelectTags";
 import TopicFilter from "./TopicFilter";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import uploadIcon from "../../assets/icons/upload-folder-svgrepo-com.png";
@@ -68,7 +68,7 @@ export default function FilterDrawer({ onFilterChange }) {
     }
     if (typeof onFilterChange === "function") {
       event.preventDefault();
-      const tagValues = selectedTags.map(tag => tag.value);
+      const tagValues = selectedTags.map((tag) => tag.value);
       console.log("Selected Tags:", tagValues);
       onFilterChange({
         ...filters,
@@ -93,7 +93,7 @@ export default function FilterDrawer({ onFilterChange }) {
       level: "",
       estDuration: "",
     });
-    setSelectedTags([]); 
+    setSelectedTags([]);
     setSelectColors({
       tags: [],
       discipline: "black",
@@ -143,10 +143,10 @@ export default function FilterDrawer({ onFilterChange }) {
               <h3 className="subtitle">Narrow your search results</h3>
             </DrawerHeader>
             <DrawerBody className="submission__form-container">
-           
-           {/* SelectTags */}
-            <Box mt={8}>
-                <TopicFilter onChange={handleChange}
+              {/* SelectTags */}
+              <Box mt={8}>
+                <TopicFilter
+                  onChange={handleChange}
                   selectedOptions={selectedTags}
                   setSelectedOptions={setSelectedTags}
                 />
@@ -184,7 +184,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 }}
               >
                 <option value="All" disabled>
-                Select Discipline
+                  Select Discipline
                 </option>
 
                 <option value="Software Engineering">
@@ -227,7 +227,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 }}
               >
                 <option value="All" disabled>
-                Select Type
+                  Select Type
                 </option>
                 <option value="Article">Article</option>
                 <option value="Blog">Blog</option>
@@ -268,7 +268,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 }}
               >
                 <option value="All" disabled>
-                Select Skill Level
+                  Select Skill Level
                 </option>
                 <option value="Beginner">Beginner</option>
                 <option value="Intermediate">Intermediate</option>
@@ -308,7 +308,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 }}
               >
                 <option value="All" disabled>
-                Select Estimated Duration
+                  Select Estimated Duration
                 </option>
                 <option value="3 min">3 min</option>
                 <option value="5 min">5 min</option>
