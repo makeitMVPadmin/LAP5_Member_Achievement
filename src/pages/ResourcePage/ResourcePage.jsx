@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import {useCallback, useEffect, useMemo, useState} from "react";
+import {useCallback, useMemo, useState} from "react";
 
 import NavBar from "../../components/NavBar/NavBar";
 
@@ -8,6 +8,7 @@ import "./ResourcePage.scss";
 import useResourceStore from "../../stores/resource-store";
 import {Outlet} from "react-router-dom";
 import ResourceCard from "../../components/ResourceCard/ResourceCard.jsx";
+import {useGetResources} from "../../api/getResource.js";
 
 // currentUser should be global state.
 export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
@@ -20,28 +21,11 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   const [commentCounts, setCommentCounts] = useState({});
   const [isLoading, setIsLoading] = useState(true); // keep
 
-  const { resources, currentResource, loadResources } = useResourceStore();
+  const { currentResource, loadResources } = useResourceStore();
   
   // TEST SECTION
-  // console.log("all resources: ", resources);
-  const loadedResources = useMemo(() => {
-    return Array.from(resources.values())
-  }, [resources])
-  
-  // Fetching all resources and comments only once
-  useEffect(() => {
-    const getAllResourcesAndComments = async () => {
-      try {
-        // setIsLoading(true);
-        await loadResources();
-      } catch (err) {
-        console.error("Error fetching resources and comments: ", err);
-      } finally {
-        setIsLoading(!isLoading);
-      }
-    };
-    getAllResourcesAndComments();
-  }, []);
+  const resources = useGetResources();
+  console.log("all resources: ", resources);
 
   // const handleSelectResource = useCallback(
   //   (clickedId) => {
@@ -144,8 +128,8 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
           {/* Give resourceList access to the store, and pass in a filter function? */}
           <section className="resourceList" aria-label="Resource List">
             <div className="resourceList__wrapper" role="list">
-              {loadedResources?.length > 0 ? (
-                loadedResources.map((resource) => {
+              {resources.data?.length > 0 ? (
+                resources.data?.map((resource) => {
                   return (
                     <ResourceCard
                       key={resource.id}

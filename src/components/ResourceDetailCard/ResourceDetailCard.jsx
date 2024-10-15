@@ -1,7 +1,7 @@
 import {memo, useContext, useEffect, useState} from "react";
 import {Link, useParams} from "react-router-dom";
 
-import {PointsContext} from "../../App";
+import {PointsContext} from "../../PointsProvider.jsx";
 
 import useResourceStore from "../../stores/resource-store";
 
@@ -10,6 +10,7 @@ import {BookmarkIcon as BookmarkChecked} from '@heroicons/react/24/solid';
 import {BookmarkIcon as BookmarkUnchecked} from '@heroicons/react/24/outline';
 import {ClockIcon} from "@heroicons/react/24/solid/index.js";
 import "./ResourceDetailCard.scss";
+import {getDoc} from "@firebase/firestore";
 
 
 // This will be considered a page now rendered through router
@@ -31,12 +32,31 @@ const ResourceDetailCard = ({
   console.log("CurrentResource: ", currentResource);
   // console.log("CurrentResource Submitter: ", currentResource?.data.submitter);
   
+  // useEffect(() => {
+  //   if (currentResource) {
+  //     const savedReadState = localStorage.getItem(currentResource.id);
+  //     if (savedReadState) {
+  //       setIsRead(JSON.parse(savedReadState));
+  //     }
+  //   }
+  // }, [currentResource]);
+  
+  // TODO: Extract to react query
+  const [tags, setTags] = useState([]);
   useEffect(() => {
-    if (currentResource) {
-      const savedReadState = localStorage.getItem(currentResource.id);
-      if (savedReadState) {
-        setIsRead(JSON.parse(savedReadState));
+    try {
+      const getResourceTags = async () => {
+        const tags = [];
+        for (const tagRef of currentResource?.data.tags) {
+          const tagSnap = await getDoc(tagRef);
+          tags.push(tagSnap.data());
+        }
+        console.log("tags", tags)
+        setTags(tags);
       }
+      getResourceTags();
+    } catch (error) {
+      console.error(error);
     }
   }, [currentResource]);
   
@@ -107,9 +127,9 @@ const ResourceDetailCard = ({
         </div>
         <p className="resource-details__level">{currentResource?.data.difficulty}</p>
         <div className="resource-details__tags-container" role="list">
-          {currentResource?.data.tags?.map((tag) => (
-            <div key={tag?.title} className="resource-details__tag" role="listitem">
-              {tag?.title}
+          {tags.map((tag) => (
+            <div key={tag.title} className="resource-details__tag" role="listitem">
+              {tag.title}
             </div>
           ))}
         </div>

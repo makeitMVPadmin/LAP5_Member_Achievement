@@ -1,59 +1,20 @@
 import {BrowserRouter, Route, Routes} from "react-router-dom";
-import {createContext, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import Header from "./components/Header/Header.jsx";
 import Home from "./pages/HomePage/HomePage.jsx";
 import ResourcePage from "./pages/ResourcePage/ResourcePage.jsx";
-import {ChakraProvider} from "@chakra-ui/react";
 import RewardsPage from "./pages/RewardsPage/RewardsPage.jsx";
 import BookMarkedPage from "./pages/BookMarkedPage/BookMarkedPage.jsx";
 import ContributionsPage from "./pages/ContributionsPage/ContributionsPage.jsx";
 import {database} from "./config/firebase.js";
 import {doc, getDoc} from "@firebase/firestore";
 import ResourceDetailCard from "./components/ResourceDetailCard/ResourceDetailCard.jsx";
-
-export const PointsContext = createContext();
+import {usePoints} from "./PointsProvider.jsx";
 
 const App = () => {
   const [savedBookmarks, setSavedBookmarks] = useState([]);
-  const [currentUser, setCurrentUser] = useState({}); // Sample current userID
-  const [points, setPoints] = useState(() => {
-    const savedPoints = localStorage.getItem("points");
-    if (savedPoints === null) {
-      localStorage.setItem("points", 600);
-      return 600;
-    }
-    const parsedPoints = parseInt(savedPoints, 10);
-    // console.log("Saved Points:", savedPoints);
-    return !isNaN(parsedPoints) ? parsedPoints : 600;
-  });
-
-  useEffect(() => {
-    localStorage.setItem("points", points);
-  }, [points]);
-
-  const addPoints = (amount) => {
-    setPoints((prevPoints) => {
-      const newPoints = prevPoints + amount;
-      localStorage.setItem("points", newPoints);
-      return newPoints;
-    });
-  };
-
-  const deductPoints = (amount) => {
-    setPoints((prevPoints) => {
-      const newPoints = Math.max(prevPoints - amount, 0);
-      localStorage.setItem("points", newPoints);
-      // console.log("Deducting Points:", newPoints);
-      return newPoints;
-    });
-  };
-
-  const handlePointsChange = (newPoints) => {
-    localStorage.setItem("points", newPoints);
-    setPoints(newPoints);
-  };
-
-  // console.log(currentUser);
+  const [currentUser, setCurrentUser] = useState({});
+  const {points, handlePointsChange} = usePoints();
 
   useEffect(() => {
     // Fetch user data from Firestore
@@ -85,35 +46,8 @@ const App = () => {
     setSavedBookmarks(updatedBookmarks);
     localStorage.setItem("bookmarks", JSON.stringify(updatedBookmarks));
   };
-
-  // TEST
-  // const {loadResources} = useResourceStore();
-  // useEffect(() => {
-  //   const getAllResourcesAndComments = async () => {
-  //     try {
-  //       // setIsLoading(true);
-  //       await loadResources();
-  //     } catch (err) {
-  //       console.error("Error fetching resources and comments: ", err);
-  //     } finally {
-  //       // setIsLoading(!isLoading);
-  //     }
-  //   };
-  //   getAllResourcesAndComments();
-  // }, []);
   
   return (
-    <>
-      <PointsContext.Provider
-        value={{
-          points,
-          setPoints,
-          addPoints,
-          deductPoints,
-          handlePointsChange,
-        }}
-      >
-        <ChakraProvider>
           <BrowserRouter>
             <Header />
             <Routes>
@@ -163,9 +97,6 @@ const App = () => {
               />
             </Routes>
           </BrowserRouter>
-        </ChakraProvider>
-      </PointsContext.Provider>
-    </>
   );
 };
 export default App;

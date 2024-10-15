@@ -1,34 +1,15 @@
 import SelectTags from "./SelectTags";
-import { CommentModal } from "../CommentModal/CommentModal.jsx";
-import { ChevronDownIcon } from "@chakra-ui/icons";
+import {CommentModal} from "../CommentModal/CommentModal.jsx";
+import {ChevronDownIcon} from "@chakra-ui/icons";
 import UploadFile from "./UploadFile";
-import React, { useState, useRef, useContext } from "react";
+import React, {useContext, useRef, useState} from "react";
 import "./SubmissionDrawer.scss";
-import { collection, addDoc } from "firebase/firestore";
-import { storage, database } from "../../config/firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { useForm } from "react-hook-form";
-import {
-  Button,
-  useDisclosure,
-  Drawer,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  DrawerHeader,
-  DrawerBody,
-  Stack,
-  Box,
-  FormLabel,
-  Input,
-  Select,
-  Text,
-  Textarea,
-  DrawerFooter,
-  FormControl,
-  FormErrorMessage,
-} from "@chakra-ui/react";
-import { PointsContext } from "../../App.jsx";
+import {addDoc, collection} from "firebase/firestore";
+import {database, storage} from "../../config/firebase";
+import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
+import {useForm} from "react-hook-form";
+import {Box, Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerFooter, DrawerHeader, DrawerOverlay, FormControl, FormErrorMessage, FormLabel, Input, Select, Stack, Text, Textarea, useDisclosure,} from "@chakra-ui/react";
+import {PointsContext} from "../../PointsProvider.jsx";
 
 export default function SubmissionDrawer({ onFormSubmit, currentUser }) {
   // console.log(currentUser);

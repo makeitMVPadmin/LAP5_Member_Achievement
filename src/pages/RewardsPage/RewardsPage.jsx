@@ -1,24 +1,15 @@
 import NavBar from "../../components/NavBar/NavBar";
 import PointsBalance from "../../components/PointsBalance/PointsBalance";
 import RedemptionCard from "../../components/RedemptionCard/RedemptionCard";
-import RedemptionCardTest from "../../components/RedemptionCard/RedemptionCardTest";
 import "./Rewardspage.scss";
 import RedemptionOptions from "../../components/RedemptionOptions/RedemptionOptions";
-import {
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  VStack,
-  Box,
-  Circle,
-} from "@chakra-ui/react";
-import { useState } from "react";
+import {Box, Circle, Slider, SliderFilledTrack, SliderTrack, VStack,} from "@chakra-ui/react";
 import RewardOptions from "../../components/RewardOptions/RewardOptions";
-import RedemptionCardTest2 from "../../components/RedemptionCard/RedemptionCardTest2";
-import RedemptionCardTest3 from "../../components/RedemptionCard/RedemptionCardTest3";
+import {usePoints} from "../../PointsProvider.jsx";
 
-export default function RewardsPage({ points, onPointsChange }) {
+export default function RewardsPage() {
   const maxPoints = 1000;
+  const {points, onPointsChange} = usePoints();
 
   // const handleSliderChange = (value) => {
   //   setPoints(value);
