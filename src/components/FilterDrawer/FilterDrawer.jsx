@@ -95,14 +95,14 @@ export default function FilterDrawer({ onFilterChange }) {
     });
     setSelectedTags([]); 
     setSelectColors({
-      tags: "black",
+      tags: [],
       discipline: "black",
       type: "black",
       level: "black",
       estDuration: "black",
     });
     onFilterChange({
-      tags: ["All"],
+      tags: [],
       discipline: "All",
       type: "All",
       level: "All",
