@@ -1,24 +1,26 @@
 // Deps
-import {memo, useContext, useState} from "react";
-import {Link, useParams} from "react-router-dom";
+import {memo, useContext} from "react";
+import {Link, Navigate, useLocation, useParams} from "react-router-dom";
 
 // React Context global state
 import {PointsContext} from "../../PointsProvider.jsx";
 
 // Lib & Helpers
 import {useGetResource} from "../../api/index.js";
+import {useToggleBookmarkMutation} from "../../api/toggleBookmark.js";
+import {useToggleReadMutation} from "../../api/toggleRead.js";
 
 // Styling & Icons
 import {BookmarkIcon as BookmarkChecked} from '@heroicons/react/24/solid';
 import {BookmarkIcon as BookmarkUnchecked} from '@heroicons/react/24/outline';
 import {ClockIcon} from "@heroicons/react/24/solid/index.js";
 import "./ResourceDetailCard.scss";
-import {useToggleBookmarkMutation} from "../../api/toggleBookmark.js";
+
 
 // This will be considered a page now rendered through router
 const ResourceDetailCard = ({ currentUserId }) => {
   const { resourceId } = useParams();
-  const [isRead, setIsRead] = useState(false);
+  const location = useLocation();
 
   // Check if the currentResource is loading or throwing an error
   const { data: currentResourceData, isLoading, isError, error: getResourceError } = useGetResource(resourceId, currentUserId);
@@ -30,50 +32,66 @@ const ResourceDetailCard = ({ currentUserId }) => {
       resourceId,
     });
   }
+  
+  const readMutation = useToggleReadMutation(currentUserId, resourceId);
+  const handleRead = () => {
+    readMutation.mutate({
+      userId: currentUserId,
+      resourceId,
+    });
+  }
 
   const { addPoints } = useContext(PointsContext);
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error: {getResourceError.message}</div>;
-  
-  // Now we can extract our data object if the above resolved
-  const tags = currentResourceData.tags;
-  console.log("CurrentResource: ", currentResourceData);
+
+  // I don't feel like typing someSuperLongName.prop every time so let's pull them out
+  const type = currentResourceData?.type;
+  const title = currentResourceData?.title;
+  const difficulty = currentResourceData?.difficulty;
+  const tags = currentResourceData?.tags;
+  const description = currentResourceData?.description;
+  const url = currentResourceData?.url;
+  const isBookmarked = currentResourceData?.isBookmarked;
+  const duration_min = currentResourceData?.duration_min;
+  const isRead = currentResourceData?.isRead;
 
   // TODO: Ignore the below... Needs tlc
-  const handleUpvotePoints = () => {
-    addPoints(2);
-  };
+  // const handleUpvotePoints = () => {
+  //   addPoints(2);
+  // };
 
-  const handleMarkAsReadPoints = () => {
-    addPoints(10);
-  };
+  // const handleMarkAsReadPoints = () => {
+  //   addPoints(10);
+  // };
 
-  const handleBookmarkPoints = () => {
-    addPoints(20);
-  };
+  // const handleBookmarkPoints = () => {
+  //   addPoints(20);
+  // };
   // TODO: End of Ignore
-
-
-
+  
+  if (location.pathname.includes("bookmarked") && !currentResourceData.isBookmarked) {
+    return <Navigate to="/bookmarked" />;
+  }
 
   return (
     <>
       <section className="resource-details">
         <div className="resource-details__heading-top">
           <div className="resource-details__heading-top-container">
-            <p className="resource-details__type">{currentResourceData?.type}</p>
+            <p className="resource-details__type">{type}</p>
             <div
               onClick={handleBookmarked}
               className="resource-details__saved-icon">
-              {currentResourceData.isBookmarked ? <BookmarkChecked fill="#0099ff" stroke="black" /> : <BookmarkUnchecked />}
+              {isBookmarked ? <BookmarkChecked fill="#0099ff" stroke="black" /> : <BookmarkUnchecked />}
             </div>
           </div>
         </div>
         <div className="resource-details__heading-bottom">
-          <h1 className="resource-details__title">{currentResourceData?.title}</h1>
+          <h1 className="resource-details__title">{title}</h1>
         </div>
-        <p className="resource-details__level">{currentResourceData?.difficulty}</p>
+        <p className="resource-details__level">{difficulty}</p>
         <div className="resource-details__tags-container" role="list">
           {tags && tags.length > 0 ? (
             tags.map((tag) => (
@@ -108,7 +126,7 @@ const ResourceDetailCard = ({ currentUserId }) => {
         
           <div className="resource-details__timer">
             <p className="resource-details__duration">
-              {currentResourceData?.duration_min} min
+              {duration_min} min
             </p>
             {/* Swapped a png image for hero icons. No need to add extra memory from heavy images */}
             <ClockIcon className="resource-details__timer-icon" />
@@ -117,7 +135,7 @@ const ResourceDetailCard = ({ currentUserId }) => {
         
         <div className="resource-details__about">
           <p className="resource-details__preview">
-            {currentResourceData?.description}
+            {description}
           </p>
         </div>
         
@@ -140,7 +158,7 @@ const ResourceDetailCard = ({ currentUserId }) => {
           </div>
           <div className="resource-details__buttons-container">
             <Link
-              to={currentResourceData?.url}
+              to={url}
               key=""
               target="_blank"
               rel="noopener noreferrer"
@@ -153,21 +171,16 @@ const ResourceDetailCard = ({ currentUserId }) => {
                 Go to Resource
               </button>
             </Link>
-            {/*<button*/}
-            {/*  className={`resource-details__button ${*/}
-            {/*    isRead ? "resource-details__button--read" : ""*/}
-            {/*  }`}*/}
-            {/*  onClick={() => {*/}
-            {/*    handleToggleRead();*/}
-            {/*    if (!isRead) {*/}
-            {/*      handleMarkAsReadPoints();*/}
-            {/*    }*/}
-            {/*  }}*/}
-            {/*  aria-pressed={isRead}*/}
-            {/*  aria-label={isRead ? "Read!" : "Mark as Read"}*/}
-            {/*>*/}
-            {/*  {isRead ? "Read!" : "Mark as Read"}*/}
-            {/*</button>*/}
+            <button
+              className={`resource-details__button ${
+                isRead ? "resource-details__button--read" : ""
+              }`}
+              onClick={handleRead}
+              aria-pressed={isRead}
+              aria-label={isRead ? "Read!" : "Mark as Read"}
+            >
+              {isRead ? "Read!" : "Mark as Read"}
+            </button>
           </div>
         </div>
       </section>

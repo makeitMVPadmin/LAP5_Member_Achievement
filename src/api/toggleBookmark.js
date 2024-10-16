@@ -8,10 +8,16 @@ export const useToggleBookmarkMutation = () => {
 
 	return useMutation({
 		mutationFn: (variables) => toggleBookmark(variables.userId, variables.resourceId),
-		onMutate: async ({ resourceId }) => {
+		onMutate: async ({ resourceId, userId }) => {
 			await queryClient.cancelQueries({ queryKey: ['resources', resourceId] })
+
+			const bookmarks = queryClient.getQueryData(['bookmarks', userId]);
+			const updatedBookmarks = bookmarks.filter((bookmark) => bookmark.id !== resourceId);
+			queryClient.setQueryData(['bookmarks', userId], updatedBookmarks);
+			
 			const resource = queryClient.getQueryData(['resources', resourceId]);
 			queryClient.setQueryData(['resources', resourceId], { ...resource, isBookmarked: !resource.isBookmarked });
+			
 			return { resource }
 		},
 		onError: (err) => {

@@ -2,6 +2,11 @@
 import {database as db} from "../config/firebase.js";
 import {useQuery} from "@tanstack/react-query";
 
+export const useGetResources = () => useQuery({
+	queryKey: ['resources'],
+	queryFn: getResources
+});
+
 const getResources = async () => {
 	const resourceSnap = await getDocs(collection(db, "rf_Resources"));
 
@@ -16,5 +21,3 @@ const getResources = async () => {
 	}
 	return resources;
 }
-
-export const useGetResources = () => useQuery({queryKey: ['resources'], queryFn: getResources})

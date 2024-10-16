@@ -1,92 +1,64 @@
-import PropTypes from "prop-types";
-import {useCallback, useState} from "react";
+// Deps
+import {useState} from "react";
+import {Outlet} from "react-router-dom";
 
+// Lib & Helpers
+import {useGetResources} from "../../api/index.js";
+
+// Components & Styling
 import NavBar from "../../components/NavBar/NavBar";
-
+import ResourceCard from "../../components/ResourceCard/ResourceCard.jsx";
 import "./ResourcePage.scss";
 
-import useResourceStore from "../../stores/resource-store";
-import {Outlet} from "react-router-dom";
-import ResourceCard from "../../components/ResourceCard/ResourceCard.jsx";
-import {useGetResources} from "../../api/getResources.js";
-
 // currentUser should be global state.
-export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
-  // const [resources, setResources] = useState([]);
-  const [bookmarkedResources, setBookmarkedResources] = useState({});
-  const [category, setCategory] = useState("All");
-  const [commentCounts, setCommentCounts] = useState({});
+export default function ResourcePage({ currentUser }) {
   const [isLoading, setIsLoading] = useState(true); // keep
 
-  const { currentResource } = useResourceStore();
-  
-  // TEST SECTION
+  // START: Test Section
   const resources = useGetResources();
   console.log("all resources: ", resources);
+  // END: Test Section
 
-  const handleToggleBookmarked = () => {
-    if (!currentResource) return;
+  // const handleFilterChange = ({ type, level, estDuration }) => {
+  //   setType(type === "All" || type === "" ? [] : [type]);
+  //   setLevel(level === "All" || level === "" ? [] : [level]);
+  //   setEstDuration(
+  //     estDuration === "All" || estDuration === "" ? [] : [estDuration]
+  //   );
+  // };
 
-    const newBookmarkedState = !bookmarkedResources[currentResource.id];
-    setBookmarkedResources((prev) => ({
-      ...prev,
-      [currentResource.id]: newBookmarkedState,
-    }));
-
-    let bookmarks = JSON.parse(localStorage.getItem("bookmarks")) || [];
-
-    if (newBookmarkedState) {
-      bookmarks.push(currentResource);
-    } else {
-      bookmarks = bookmarks.filter(
-        (bookmark) => bookmark.id !== currentResource.id
-      );
-    }
-
-    localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
-    onBookmarkUpdate(bookmarks);
-  };
-
-  const handleFilterChange = ({ type, level, estDuration }) => {
-    setType(type === "All" || type === "" ? [] : [type]);
-    setLevel(level === "All" || level === "" ? [] : [level]);
-    setEstDuration(
-      estDuration === "All" || estDuration === "" ? [] : [estDuration]
-    );
-  };
-
-  const handleCommentAdded = useCallback((resourceId, newComment) => {
-    setResources((prevResources) =>
-      prevResources.map((resource) =>
-        resource.id === resourceId
-          ? {
-              ...resource,
-              comments: [...(resource.comments || []), newComment],
-              commentsCount: (resource.commentsCount || 0) + 1,
-            }
-          : resource
-      )
-    );
-
-    if (currentResource && currentResource.id === resourceId) {
-      setSelectedResource((prevSelected) => ({
-        ...prevSelected,
-        comments: [...(prevSelected.comments || []), newComment],
-        commentsCount: (prevSelected.commentsCount || 0) + 1,
-      }));
-    }
-  }, []);
+  // const handleCommentAdded = useCallback((resourceId, newComment) => {
+  //   setResources((prevResources) =>
+  //     prevResources.map((resource) =>
+  //       resource.id === resourceId
+  //         ? {
+  //             ...resource,
+  //             comments: [...(resource.comments || []), newComment],
+  //             commentsCount: (resource.commentsCount || 0) + 1,
+  //           }
+  //         : resource
+  //     )
+  //   );
+  //
+  //   if (currentResource && currentResource.id === resourceId) {
+  //     setSelectedResource((prevSelected) => ({
+  //       ...prevSelected,
+  //       comments: [...(prevSelected.comments || []), newComment],
+  //       commentsCount: (prevSelected.commentsCount || 0) + 1,
+  //     }));
+  //   }
+  // }, []);
 
   return (
     <div className="resource__container">
       <div className="resource__navbar-container">
         {/* Move to App.jsx to reduce redundancy */}
         <NavBar
-          onCategoryChange={setCategory}
+          // onCategoryChange={setCategory}
           onFormSubmit={(newResource) =>
             setResources([...resources, newResource])
           }
-          onFilterChange={handleFilterChange}
+          // onFilterChange={handleFilterChange}
           currentUser={currentUser}
         />
       </div>
@@ -103,6 +75,7 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
                       key={resource.id}
                       id={resource.id}
                       resource={resource.data}
+                      url={`/resource/${resource.id}`}
                     />
                   );
                 })
@@ -120,8 +93,3 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
     </div>
   );
 }
-
-ResourcePage.propTypes = {
-  currentUser: PropTypes.object.isRequired,
-  onBookmarkUpdate: PropTypes.func.isRequired,
-};

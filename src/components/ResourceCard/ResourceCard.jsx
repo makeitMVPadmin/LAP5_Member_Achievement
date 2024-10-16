@@ -5,13 +5,10 @@ import upvoteImg from "../../assets/images/upvote.png";
 import commentsImg from "../../assets/images/comments.png";
 import {useNavigate, useParams} from "react-router-dom";
 
-export default function ResourceCard({
-  id,
-  resource,
-}) {
+export default function ResourceCard({ id, resource, url }) {
   const navigate = useNavigate();
   const handleNavigate = () => {
-    navigate(`/resource/${id}`);
+    navigate(url);
   };
   const { id: resourceId } = useParams()
   
@@ -24,11 +21,6 @@ export default function ResourceCard({
       tabIndex="0"
       role="button"
       aria-pressed={isActive ? "true" : "false"}
-      // onKeyDown={(e) => {
-      //   if (e.key === "Enter" || e.key === " ") {
-      //     handleClickCard();
-      //   }
-      // }}
     >
       <div className="resource__heading-top">
         <div className="resource__heading-top-container">

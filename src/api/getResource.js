@@ -31,8 +31,12 @@ const getResource = async (resourceId, userId) => {
 	}
 	resourceData.isBookmarked = isBookmarked;
 
-	console.log("isBookmarked", isBookmarked);
-	
+	let isRead = false;
+	if (userData.read_resources.includes(resourceId)) {
+		isRead = true;
+	}
+	resourceData.isRead = isRead;
+
 	const tagRefs = resourceData.tags;
 	if (!Array.isArray(tagRefs) || tagRefs.length <= 0) {
 		return resourceData;
