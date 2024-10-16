@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   useDisclosure,
   Drawer,
@@ -13,25 +14,35 @@ import {
   Icon,
   // useToast - will use when user tested and upload successful
 } from "@chakra-ui/react";
-import { SettingsIcon } from "@chakra-ui/icons";
+// import { SettingsIcon } from "@chakra-ui/icons";
+import SelectTags from "../SubmissionForm/SelectTags";
+import TopicFilter from "./TopicFilter";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import uploadIcon from "../../assets/icons/upload-folder-svgrepo-com.png";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import "./FilterDrawer.scss";
+import filterBy from "../../assets/icons/filter-by.svg";
 
 export default function FilterDrawer({ onFilterChange }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [filters, setFilters] = useState({
+    tags: [],
+    discipline: "",
     type: "",
     level: "",
     estDuration: "",
   });
+
+  const [selectedTags, setSelectedTags] = useState([]);
+
   const [selectColors, setSelectColors] = useState({
-    type: 'grey',
-    level: 'grey',
-    estDuration: 'grey'
+    tags: "black",
+    discipline: "black",
+    type: "black",
+    level: "black",
+    estDuration: "black",
   });
 
   const location = useLocation();
@@ -40,14 +51,14 @@ export default function FilterDrawer({ onFilterChange }) {
   const handleChange = (event) => {
     const { name, value } = event.target;
 
-    setFilters((filters) => ({
-      ...filters,
+    setFilters((prevFilters) => ({
+      ...prevFilters,
       [name]: value,
     }));
 
     setSelectColors((prevColors) => ({
       ...prevColors,
-      [name]: value ? 'black' : 'grey'
+      [name]: value ? "grey" : "black",
     }));
   };
 
@@ -57,11 +68,18 @@ export default function FilterDrawer({ onFilterChange }) {
     }
     if (typeof onFilterChange === "function") {
       event.preventDefault();
-      onFilterChange(filters);
+      const tagValues = selectedTags.map((tag) => tag.value);
+      console.log("Selected Tags:", tagValues);
+      onFilterChange({
+        ...filters,
+        tags: tagValues,
+      });
       setSelectColors({
-        type: 'grey',
-        level: 'grey',
-        estDuration: 'grey'
+        tags: selectedTags.length > 0 ? "grey" : "black",
+        discipline: filters.discipline ? "grey" : "black",
+        type: filters.type ? "grey" : "black",
+        level: filters.level ? "grey" : "black",
+        estDuration: filters.estDuration ? "grey" : "black",
       });
       onClose();
     }
@@ -69,14 +87,26 @@ export default function FilterDrawer({ onFilterChange }) {
 
   const handleCancel = () => {
     setFilters({
+      tags: [],
+      discipline: "",
       type: "",
       level: "",
       estDuration: "",
     });
+    setSelectedTags([]);
     setSelectColors({
-      type: 'grey',
-      level: 'grey',
-      estDuration: 'grey'
+      tags: [],
+      discipline: "black",
+      type: "black",
+      level: "black",
+      estDuration: "black",
+    });
+    onFilterChange({
+      tags: [],
+      discipline: "All",
+      type: "All",
+      level: "All",
+      estDuration: "All",
     });
     onClose();
   };
@@ -84,9 +114,11 @@ export default function FilterDrawer({ onFilterChange }) {
   return (
     <>
       <button className="filter__button" onClick={onOpen}>
-        <SettingsIcon boxSize="1.15rem" className="filter__icon" />
-        {/* <Icon as={SettingsIcon} className="filter__icon" /> */}
-        <p className="filter__button-name">Filters</p>
+        {/* <SettingsIcon boxSize="1.15rem" className="filter__icon" /> */}
+        {/* <Icon as={SettingsIcon} className="filter__icon" />
+         */}
+        <img src={filterBy} alt="filter icon" className="filter__icon" />
+        <p className="filter__button-name">Filter by</p>
       </button>
       <div>
         <Drawer
@@ -106,44 +138,96 @@ export default function FilterDrawer({ onFilterChange }) {
               sx={{ color: "#0099FF", fontSize: "20px", fontWeight: "bolder" }}
             />
             <DrawerHeader>
-              <h1 className="submission__header-title">Filter Resources</h1>
+              <h1 className="submission__header-title">Advanced</h1>
+              <h1 className="submission__header-title">Filters</h1>
+              <h3 className="subtitle">Narrow your search results</h3>
             </DrawerHeader>
             <DrawerBody className="submission__form-container">
-              <FormLabel
-                htmlFor="type"
-                marginTop="10px"
-                fontSize="20px"
-                fontWeight="bold"
-                pt={2}
-                mb={3}
-              >
-                Type
-              </FormLabel>
+              {/* SelectTags */}
+              <Box mt={8}>
+                <TopicFilter
+                  onChange={handleChange}
+                  selectedOptions={selectedTags}
+                  setSelectedOptions={setSelectedTags}
+                />
+              </Box>
+
               <Select
-                id="type"
-                name="type"
-                value={filters.type}
+                id="discipline"
+                name="discipline"
+                placeholder="Discipline"
+                value={filters.discipline}
                 onChange={handleChange}
                 _hover={{}}
-                fontSize="20px"
+                fontSize="1.5rem"
                 icon={<ChevronDownIcon />}
                 iconSize="45px"
                 iconColor="#0099FF"
-                border="3px solid black"
+                border="none"
+                boxShadow="none"
                 className="submission__inputField"
-                color={selectColors.type}
-                focusBorderColor="#0099ff"
+                color={selectColors.discipline}
+                marginTop="8"
+                focusBorderColor="#000000"
+                _focus={{
+                  border: "3px solid black",
+                  boxShadow: "0px 4px 5px -2px black",
+                }}
                 sx={{
-                  '& option': {
-                    color: 'black',
+                  "& option": {
+                    color: "black",
+                    backgroundColor: "white",
                   },
-                  '& option:first-of-type': {
-                    color: 'grey',
+                  "& option:first-of-type": {
+                    color: "grey",
                   },
                 }}
               >
-                <option value="" disabled>
-                  Select
+                <option value="All" disabled>
+                  Select Discipline
+                </option>
+
+                <option value="Software Engineering">
+                  Software Engineering
+                </option>
+                <option value="UX/UI Design">UX/UI Design</option>
+                <option value="Product">Product</option>
+                <option value="Data Science">Data Science</option>
+              </Select>
+
+              <Select
+                id="type"
+                name="type"
+                placeholder="Type"
+                value={filters.type}
+                onChange={handleChange}
+                _hover={{}}
+                fontSize="1.5rem"
+                icon={<ChevronDownIcon />}
+                iconSize="45px"
+                iconColor="#0099FF"
+                border="none"
+                boxShadow="none"
+                className="submission__inputField"
+                color={selectColors.type}
+                marginTop="8"
+                focusBorderColor="#000000"
+                _focus={{
+                  border: "3px solid black",
+                  boxShadow: "0px 4px 5px -2px black",
+                }}
+                sx={{
+                  "& option": {
+                    color: "black",
+                    backgroundColor: "white",
+                  },
+                  "& option:first-of-type": {
+                    color: "grey",
+                  },
+                }}
+              >
+                <option value="All" disabled>
+                  Select Type
                 </option>
                 <option value="Article">Article</option>
                 <option value="Blog">Blog</option>
@@ -151,82 +235,80 @@ export default function FilterDrawer({ onFilterChange }) {
                 <option value="Video">Video</option>
                 <option value="All">All</option>
               </Select>
-              <FormLabel
-                htmlFor="level"
-                fontSize="20px"
-                fontWeight="bold"
-                marginTop="10px"
-                pt={2}
-                mb={3}
-              >
-                Skill
-              </FormLabel>
+
               <Select
                 id="level"
                 name="level"
+                placeholder="Skill Level"
                 value={filters.level}
                 onChange={handleChange}
                 _hover={{}}
-                fontSize="20px"
+                fontSize="1.5rem"
                 icon={<ChevronDownIcon />}
                 iconSize="45px"
                 iconColor="#0099FF"
-                border="3px solid black"
+                marginTop="8"
+                border="none"
+                boxShadow="none"
                 className="submission__inputField"
                 color={selectColors.level}
-                focusBorderColor="#0099ff"
+                focusBorderColor="#000000"
+                _focus={{
+                  border: "3px solid black",
+                  boxShadow: "0px 4px 5px -2px black",
+                }}
                 sx={{
-                  '& option': {
-                    color: 'black',
+                  "& option": {
+                    color: "black",
+                    backgroundColor: "white",
                   },
-                  '& option:first-of-type': {
-                    color: 'grey',
+                  "& option:first-of-type": {
+                    color: "grey",
                   },
                 }}
               >
-                <option value="" disabled>
-                  Select
+                <option value="All" disabled>
+                  Select Skill Level
                 </option>
                 <option value="Beginner">Beginner</option>
                 <option value="Intermediate">Intermediate</option>
                 <option value="Advanced">Advanced</option>
                 <option value="All">All</option>
               </Select>
-              <FormLabel
-                htmlFor="estDuration"
-                fontSize="20px"
-                fontWeight="bold"
-                marginTop="10px"
-                pt={2}
-                mb={3}
-              >
-                Duration
-              </FormLabel>
+
               <Select
                 id="estDuration"
                 name="estDuration"
+                placeholder="Estimated Duration"
                 value={filters.estDuration}
                 onChange={handleChange}
                 _hover={{}}
                 icon={<ChevronDownIcon />}
-                fontSize="20px"
+                fontSize="1.5rem"
                 iconSize="45px"
                 iconColor="#0099FF"
-                border="3px solid black"
+                border="none"
+                boxShadow="none"
                 className="submission__inputField"
                 color={selectColors.estDuration}
-                focusBorderColor="#0099ff"
+                marginTop="8"
+                focusBorderColor="#000000"
+                _focus={{
+                  border: "3px solid black",
+                  boxShadow: "0px 4px 5px -2px black",
+                }}
                 sx={{
-                  '& option': {
-                    color: 'black',
+                  "& option": {
+                    color: "black",
+                    backgroundColor: "white",
                   },
-                  '& option:first-of-type': {
-                    color: 'grey',
+                  "& option:first-of-type": {
+                    color: "grey",
                   },
                 }}
               >
-                <option value="" disabled>
-                  Select
+                <option value="All" disabled>
+                  Select Estimated Duration
                 </option>
                 <option value="3 min">3 min</option>
                 <option value="5 min">5 min</option>
@@ -256,7 +338,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 onClick={handleCancel}
                 className="submission__form-button"
               >
-                Cancel
+                Clear
               </Button>
               <Button
                 bg="#0099FF"
@@ -273,7 +355,7 @@ export default function FilterDrawer({ onFilterChange }) {
                 type="submit"
                 onClick={handleFilterChange}
               >
-                Confirm
+                Search
               </Button>
             </DrawerFooter>
           </DrawerContent>

@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import NavBar from "../../components/NavBar/NavBar";
 import SearchBar from "../../components/SearchBar/SearchBar";
+import FilterDrawer from "../../components/FilterDrawer/FilterDrawer";
 import ResourceDetailCard from "../../components/ResourceDetailCard/ResourceDetailCard";
 import ResourceList from "../../components/ResourceList/ResourceList";
 import "./ResourcePage.scss";
@@ -9,14 +10,19 @@ import { collection, getDocs } from "firebase/firestore";
 import { database } from "../../config/firebase";
 import NoMatchesFoundCard from "../../components/NoMatchesFoundCard/NoMatchesFoundCard";
 
-export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
+export default function ResourcePage({
+  currentUser,
+  onBookmarkUpdate,
+  onFilterChange,
+}) {
   const [resources, setResources] = useState([]);
   const [selectedResource, setSelectedResource] = useState(null);
   const [bookmarkedResources, setBookmarkedResources] = useState({});
   const [category, setCategory] = useState("All");
-  const [type, setType] = useState("");
-  const [level, setLevel] = useState("");
-  const [estDuration, setEstDuration] = useState("");
+  const [tags, setTags] = useState([]);
+  const [type, setType] = useState("All");
+  const [level, setLevel] = useState("All");
+  const [estDuration, setEstDuration] = useState("All");
   const [search, setSearch] = useState("");
   const [commentCounts, setCommentCounts] = useState({});
   const [isLoading, setIsLoading] = useState(true);
@@ -108,11 +114,19 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
     onBookmarkUpdate(bookmarks);
   };
 
-  const handleFilterChange = ({ type, level, estDuration }) => {
-    setType(type === "All" || type === "" ? [] : [type]);
-    setLevel(level === "All" || level === "" ? [] : [level]);
+  const handleFilterChange = ({
+    tags,
+    discipline,
+    type,
+    level,
+    estDuration,
+  }) => {
+    setTags(tags);
+    setCategory(discipline === "All" || discipline === "" ? "All" : discipline);
+    setType(type === "All" || type === "" ? "All" : type);
+    setLevel(level === "All" || level === "" ? "All" : level);
     setEstDuration(
-      estDuration === "All" || estDuration === "" ? [] : [estDuration]
+      estDuration === "All" || estDuration === "" ? "All" : estDuration
     );
   };
 
@@ -153,16 +167,22 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
     return resources.filter((resource) => {
       const currentCategory =
         category === "All" || resource.discipline === category;
-      const matchesType = type.length === 0 || type.includes(resource.type);
-
-      const matchesLevel = level.length === 0 || level.includes(resource.level);
+      const matchesType = type === "All" || resource.type === type;
+      const matchesLevel = level === "All" || resource.level === level;
       const matchesEstDuration =
-        estDuration.length === 0 || estDuration.includes(resource.estDuration);
+        estDuration === "All" || resource.estDuration === estDuration;
       const includesSearchTerm = resource.title
         .toLowerCase()
         .includes(search.toLocaleLowerCase());
 
+      const matchesTags =
+        tags.length === 0 || 
+        resource.title
+        .toLowerCase()
+        .includes(tags);
+
       return (
+        matchesTags &&
         currentCategory &&
         matchesType &&
         matchesLevel &&
@@ -170,7 +190,7 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
         includesSearchTerm
       );
     });
-  }, [resources, category, type, level, estDuration, search]);
+  }, [resources, tags, category, type, level, estDuration, search]);
 
   return (
     <div className="resource__container">
@@ -180,7 +200,7 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
           onFormSubmit={(newResource) =>
             setResources([...resources, newResource])
           }
-          onFilterChange={handleFilterChange}
+          // onFilterChange={handleFilterChange}
           currentUser={currentUser}
         />
       </div>
@@ -190,6 +210,8 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
         {!isLoading && filteredResources.length > 0 ? (
           <div className="resource__container">
             <div className="resource__cards">
+              <FilterDrawer onFilterChange={handleFilterChange} />
+
               <ResourceList
                 resources={filteredResources}
                 selectResource={handleSelectResource}

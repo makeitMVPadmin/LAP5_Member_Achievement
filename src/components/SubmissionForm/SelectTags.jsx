@@ -5,7 +5,6 @@ import React, { forwardRef } from "react";
 import Select, { components } from "react-select";
 import { useForm } from "react-hook-form";
 
-
 // const animatedComponents = makeAnimated();
 const CustomDropdownIndicator = (props) => {
   return (

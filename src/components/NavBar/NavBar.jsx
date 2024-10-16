@@ -204,9 +204,9 @@ export default function NavBar({
             <p className="nav__library-subitem" onClick={handleSortDuration}>Duration</p>
           </li>
         </ul> */}
-        <div className="nav__item">
+        {/* <div className="nav__item">
           <FilterDrawer onFilterChange={onFilterChange} />
-        </div>
+        </div> */}
       </div>
 
       <div className="nav__container-bottom">
