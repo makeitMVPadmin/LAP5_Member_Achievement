@@ -1,98 +1,46 @@
-import {memo, useContext, useEffect, useState} from "react";
+// Deps
+import {memo, useContext, useState} from "react";
 import {Link, useParams} from "react-router-dom";
 
+// React Context global state
 import {PointsContext} from "../../PointsProvider.jsx";
 
-import useResourceStore from "../../stores/resource-store";
+// Lib & Helpers
+import {useGetResource} from "../../api/index.js";
 
 // Styling & Icons
 import {BookmarkIcon as BookmarkChecked} from '@heroicons/react/24/solid';
 import {BookmarkIcon as BookmarkUnchecked} from '@heroicons/react/24/outline';
 import {ClockIcon} from "@heroicons/react/24/solid/index.js";
 import "./ResourceDetailCard.scss";
-import {getDoc} from "@firebase/firestore";
-
+import {useToggleBookmarkMutation} from "../../api/toggleBookmark.js";
 
 // This will be considered a page now rendered through router
-const ResourceDetailCard = ({
-  // selectedResource,
-  // handleToggleBookmarked,
-  // savedBookmarks,
-  // isBookmarked,
-  // comments,
-  // currentUser,
-  // onCommentAdded,
-}) => {
-
+const ResourceDetailCard = ({ currentUserId }) => {
+  const { resourceId } = useParams();
   const [isRead, setIsRead] = useState(false);
-  const [isBookmarked, setIsBookmarked] = useState(false);
-  const { id } = useParams();
-  const { getResource, resources } = useResourceStore();
-  const currentResource = getResource(id);
-  console.log("CurrentResource: ", currentResource);
-  // console.log("CurrentResource Submitter: ", currentResource?.data.submitter);
-  
-  // useEffect(() => {
-  //   if (currentResource) {
-  //     const savedReadState = localStorage.getItem(currentResource.id);
-  //     if (savedReadState) {
-  //       setIsRead(JSON.parse(savedReadState));
-  //     }
-  //   }
-  // }, [currentResource]);
-  
-  // TODO: Extract to react query
-  const [tags, setTags] = useState([]);
-  useEffect(() => {
-    try {
-      const getResourceTags = async () => {
-        const tags = [];
-        for (const tagRef of currentResource?.data.tags) {
-          const tagSnap = await getDoc(tagRef);
-          tags.push(tagSnap.data());
-        }
-        console.log("tags", tags)
-        setTags(tags);
-      }
-      getResourceTags();
-    } catch (error) {
-      console.error(error);
-    }
-  }, [currentResource]);
-  
+
+  // Check if the currentResource is loading or throwing an error
+  const { data: currentResourceData, isLoading, isError, error: getResourceError } = useGetResource(resourceId, currentUserId);
+
+  const mutation = useToggleBookmarkMutation(currentUserId, resourceId);
   const handleBookmarked = () => {
-    setIsBookmarked(!isBookmarked);
+    mutation.mutate({
+      userId: currentUserId,
+      resourceId,
+    });
   }
-
-  // const handleVoteChange = useCallback(
-  //   (resourceId, upvotes, downvotes) => {
-  //     setLocalResource(prev => {
-  //       if (prev.upvote === upvotes && prev.downvote === downvotes) {
-  //         return prev;
-  //       }
-  //       return { ...prev, upvote: upvotes, downvote: downvotes };
-  //     });
-
-  //     if (onResourceUpdate) {
-  //       onResourceUpdate({
-  //         ...currentResource,
-  //         id: resourceId,
-  //         upvote: upvotes,
-  //         downvote: downvotes,
-  //       });
-  //     }
-  //   },
-  //   [currentResource, onResourceUpdate]
-  // );
-
-  const handleToggleRead = () => {
-    const newReadState = !isRead;
-    setIsRead(newReadState);
-    localStorage.setItem(selectedResource.id, JSON.stringify(newReadState));
-  };
 
   const { addPoints } = useContext(PointsContext);
 
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error: {getResourceError.message}</div>;
+  
+  // Now we can extract our data object if the above resolved
+  const tags = currentResourceData.tags;
+  console.log("CurrentResource: ", currentResourceData);
+
+  // TODO: Ignore the below... Needs tlc
   const handleUpvotePoints = () => {
     addPoints(2);
   };
@@ -104,34 +52,38 @@ const ResourceDetailCard = ({
   const handleBookmarkPoints = () => {
     addPoints(20);
   };
-  
+  // TODO: End of Ignore
 
-  // return (
-  //   <div>{id}</div>
-  // )
+
+
+
   return (
     <>
       <section className="resource-details">
         <div className="resource-details__heading-top">
           <div className="resource-details__heading-top-container">
-            <p className="resource-details__type">{currentResource?.data.type}</p>
+            <p className="resource-details__type">{currentResourceData?.type}</p>
             <div
               onClick={handleBookmarked}
               className="resource-details__saved-icon">
-              {isBookmarked ? <BookmarkChecked fill="#0099ff" stroke="black" /> : <BookmarkUnchecked />}
+              {currentResourceData.isBookmarked ? <BookmarkChecked fill="#0099ff" stroke="black" /> : <BookmarkUnchecked />}
             </div>
           </div>
         </div>
         <div className="resource-details__heading-bottom">
-          <h1 className="resource-details__title">{currentResource?.data.title}</h1>
+          <h1 className="resource-details__title">{currentResourceData?.title}</h1>
         </div>
-        <p className="resource-details__level">{currentResource?.data.difficulty}</p>
+        <p className="resource-details__level">{currentResourceData?.difficulty}</p>
         <div className="resource-details__tags-container" role="list">
-          {tags.map((tag) => (
-            <div key={tag.title} className="resource-details__tag" role="listitem">
-              {tag.title}
-            </div>
-          ))}
+          {tags && tags.length > 0 ? (
+            tags.map((tag) => (
+              <div key={tag.title} className="resource-details__tag" role="listitem">
+                {tag.title}
+              </div>
+            ))
+          ) : (
+            <div>No Tags</div>
+          )}
         </div>
         
         {/*UPVOTING STUFFS*/}
@@ -156,7 +108,7 @@ const ResourceDetailCard = ({
         
           <div className="resource-details__timer">
             <p className="resource-details__duration">
-              {currentResource?.data.duration_min} min
+              {currentResourceData?.duration_min} min
             </p>
             {/* Swapped a png image for hero icons. No need to add extra memory from heavy images */}
             <ClockIcon className="resource-details__timer-icon" />
@@ -165,7 +117,7 @@ const ResourceDetailCard = ({
         
         <div className="resource-details__about">
           <p className="resource-details__preview">
-            {currentResource?.data.description}
+            {currentResourceData?.description}
           </p>
         </div>
         
@@ -173,8 +125,8 @@ const ResourceDetailCard = ({
           <div className="resource-details__author-container">
             <div className="resource-details__avatar">
               <img
-                id={currentResource?.data.submitter.name}
-                src={currentResource?.data.submitter.profile_pic}
+                id={currentResourceData?.submitter.name}
+                src={currentResourceData?.submitter.profile_pic}
                 alt="submitter profile picture"
                 style={{ objectFit: "cover" }}
               />
@@ -182,13 +134,13 @@ const ResourceDetailCard = ({
             <div className="resource-details__author">
               <p className="resource-details__submission">Submitted by: </p>
               <p className="resource-details__author-name">
-                {currentResource?.data.submitter.name}
+                {currentResourceData?.submitter.name}
               </p>
             </div>
           </div>
           <div className="resource-details__buttons-container">
             <Link
-              to={currentResource?.url}
+              to={currentResourceData?.url}
               key=""
               target="_blank"
               rel="noopener noreferrer"

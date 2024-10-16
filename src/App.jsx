@@ -21,11 +21,11 @@ const App = () => {
     const fetchUserData = async () => {
       try {
         // Assuming you have a way to get the user ID, replace `userId` with actual user ID.
-        const userId = "lsIRi5Uu72sATQ7JLIu1"; // Replace with actual user ID logic
-        const userDoc = doc(database, "Users", userId);
+        const userId = "FkqIKqqKWQj7hB3MfdBq"; // Replace with actual user ID logic
+        const userDoc = doc(database, "rf_Users", userId);
         const userSnapshot = await getDoc(userDoc);
         if (userSnapshot.exists()) {
-          setCurrentUser(userSnapshot.data());
+          setCurrentUser({ id: userDoc.id, ...userSnapshot.data() });
         } else {
           // console.log("No such user!");
         }
@@ -62,8 +62,8 @@ const App = () => {
                 }
               >
                 <Route
-                  path=":id"
-                  element={<ResourceDetailCard />}
+                  path=":resourceId"
+                  element={<ResourceDetailCard currentUserId={currentUser.id} />}
                 />
               </Route>
               

@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import {useCallback, useMemo, useState} from "react";
+import {useCallback, useState} from "react";
 
 import NavBar from "../../components/NavBar/NavBar";
 
@@ -8,38 +8,21 @@ import "./ResourcePage.scss";
 import useResourceStore from "../../stores/resource-store";
 import {Outlet} from "react-router-dom";
 import ResourceCard from "../../components/ResourceCard/ResourceCard.jsx";
-import {useGetResources} from "../../api/getResource.js";
+import {useGetResources} from "../../api/getResources.js";
 
 // currentUser should be global state.
 export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   // const [resources, setResources] = useState([]);
   const [bookmarkedResources, setBookmarkedResources] = useState({});
   const [category, setCategory] = useState("All");
-  // const [type, setType] = useState("");
-  // const [level, setLevel] = useState("");
-  // const [estDuration, setEstDuration] = useState("");
   const [commentCounts, setCommentCounts] = useState({});
   const [isLoading, setIsLoading] = useState(true); // keep
 
-  const { currentResource, loadResources } = useResourceStore();
+  const { currentResource } = useResourceStore();
   
   // TEST SECTION
   const resources = useGetResources();
   console.log("all resources: ", resources);
-
-  // const handleSelectResource = useCallback(
-  //   (clickedId) => {
-  //     const foundResource = resources.find(
-  //       (resource) => resource.id === clickedId
-  //     );
-  //     if (foundResource) {
-  //       setCurrentResource(clickedId);
-  //     } else {
-  //       console.error("Resource not found for id:", clickedId);
-  //     }
-  //   },
-  //   [resources]
-  // );
 
   const handleToggleBookmarked = () => {
     if (!currentResource) return;
@@ -94,21 +77,6 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
     }
   }, []);
 
-  // Filter resources based on the category, type, skill, and duration
-  const filteredResources = useMemo(() => {
-    // return resources?.filter((resource) => {
-    //   const currentCategory =
-    //     category === "All" || resource.discipline === category;
-    //   const matchesType = type.length === 0 || type.includes(resource.type);
-    //   const matchesLevel = level.length === 0 || level.includes(resource.level);
-    //   const matchesEstDuration =
-    //     estDuration.length === 0 || estDuration.includes(resource.estDuration);
-    //   return (
-    //     currentCategory && matchesType && matchesLevel && matchesEstDuration
-    //   );
-    // });
-  }, [resources, category]);
-
   return (
     <div className="resource__container">
       <div className="resource__navbar-container">
@@ -135,7 +103,6 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
                       key={resource.id}
                       id={resource.id}
                       resource={resource.data}
-                      // selectResource={selectResource}
                     />
                   );
                 })
@@ -144,24 +111,10 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
               )}
             </div>
           </section>
-          {/*<ResourceList*/}
-          {/*  resources={loadedResources}*/}
-          {/*  // selectResource={handleSelectResource}*/}
-          {/*  // activeResourceId={currentResource?.id}*/}
-          {/*  commentCounts={commentCounts}*/}
-          {/*/>*/}
         </div>
         <div className="resource-details__container">
-          <Outlet/>
-          {/*// TODO:*/}
-          {/*// <ResourceDetailCard*/}
-          {/*//   handleToggleBookmarked={handleToggleBookmarked}*/}
-          {/*//   savedBookmarks={Object.values(bookmarkedResources).some(Boolean)}*/}
-          {/*//   isBookmarked={bookmarkedResources[currentResource.id] || false}*/}
-          {/*//   // comments={currentResource.comments}*/}
-          {/*//   currentUser={currentUser}*/}
-          {/*//   onCommentAdded={handleCommentAdded}*/}
-          {/*// />*/}
+          {/* This is a slot for the details card that shows up on the right in the Resource Library */}
+          <Outlet/> 
         </div>
       </>
     </div>
