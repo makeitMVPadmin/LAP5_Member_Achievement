@@ -49,17 +49,13 @@ const getResource = async (resourceId, userId) => {
 
 
 const getTags = async (tagRefs) => {
-	const tags = [];
-
-	for (const tagRef of tagRefs) {
+	return await Promise.all(tagRefs.map(async (tagRef) => {
 		const tagSnap = await getDoc(tagRef);
-		if (!tagSnap.exists()) {
-			console.log("No tag(s) found.");
-			return [];
-		}
-
-		tags.push(tagSnap.data());
-	}
-
-	return tags;
+		return tagSnap.data();
+	}));
+	
+		// if (!tagSnap.exists()) {
+		// 	console.log("No tag(s) found.");
+		// 	return [];
+		// }
 }

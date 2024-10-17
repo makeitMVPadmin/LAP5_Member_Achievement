@@ -7,7 +7,7 @@ export const useGetBookmarks = (userId) => useQuery({
 	queryFn: () => getBookmarks(userId),
 });
 
-const getBookmarks = async (userId) => {
+export const getBookmarks = async (userId) => {
 	const userRef = doc(db, "rf_Users", userId);
 	const userSnap = await getDoc(userRef);
 	if (!userSnap.exists()) {
