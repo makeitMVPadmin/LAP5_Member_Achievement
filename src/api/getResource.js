@@ -41,6 +41,8 @@ const getResource = async (resourceId, userId) => {
 	if (!Array.isArray(tagRefs) || tagRefs.length <= 0) {
 		return resourceData;
 	}
+	
+	// TODO: Fetch me my comments 🍵
 
 	const tags = await getTags(tagRefs);
 

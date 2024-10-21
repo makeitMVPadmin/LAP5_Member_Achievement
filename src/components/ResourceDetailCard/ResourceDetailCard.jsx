@@ -56,6 +56,7 @@ const ResourceDetailCard = ({ currentUserId }) => {
   const isBookmarked = currentResourceData?.isBookmarked;
   const duration_min = currentResourceData?.duration_min;
   const isRead = currentResourceData?.isRead;
+  // TODO: Add comments
 
   // TODO: Ignore the below... Needs tlc
   // const handleUpvotePoints = () => {
@@ -184,6 +185,7 @@ const ResourceDetailCard = ({ currentUserId }) => {
           </div>
         </div>
       </section>
+      {/* TODO: For Zahfir */}
       {/*<div className="resource-details__comments">*/}
       {/*  {currentResource?.data.comments && (*/}
       {/*    <Comments*/}
