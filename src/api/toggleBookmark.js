@@ -1,7 +1,6 @@
 ﻿import {useMutation, useQueryClient} from "@tanstack/react-query";
-import {doc, getDoc} from "@firebase/firestore";
+import {doc, getDoc, updateDoc} from "@firebase/firestore";
 import {database as db} from "../config/firebase.js";
-import {updateDoc} from "firebase/firestore";
 import {getBookmarks} from "./getBookmarks.js";
 
 export const useToggleBookmarkMutation = () => {
@@ -18,7 +17,6 @@ export const useToggleBookmarkMutation = () => {
 		onMutate: async ({ resourceId, userId }) => {
 			await queryClient.cancelQueries({ queryKey: ['resources', resourceId] })
 
-			
 			const resource = queryClient.getQueryData(['resources', resourceId]);
 			queryClient.setQueryData(['resources', resourceId], { ...resource, isBookmarked: !resource.isBookmarked });
 			

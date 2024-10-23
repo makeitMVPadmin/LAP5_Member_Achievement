@@ -37,6 +37,12 @@ const getResource = async (resourceId, userId) => {
 	}
 	resourceData.isRead = isRead;
 
+	let isUpvoted = false;
+	if (resourceData.upvotes?.includes(userId)) {
+		isUpvoted = true;
+	}
+	resourceData.isUpvoted = isUpvoted;
+
 	const tagRefs = resourceData.tags;
 	if (!Array.isArray(tagRefs) || tagRefs.length <= 0) {
 		return resourceData;

@@ -13,12 +13,12 @@ export const getBookmarks = async (userId) => {
 	if (!userSnap.exists()) {
 		throw new Error("User not found")
 	}
-	
 
 	const userData = userSnap.data();
 	const resourceIds = userData.bm_resources;
 	console.log("bm_resources", resourceIds);
 	// fetch resource data based on user bookmarks ids
+
 	const bookmarks = [];
 	for (const resourceId of resourceIds) {
 		const resourceRef = doc(db, "rf_Resources", resourceId);
@@ -28,5 +28,6 @@ export const getBookmarks = async (userId) => {
 		}
 		bookmarks.push({ id: resourceSnap.id, data: resourceSnap.data()});
 	}
+
 	return bookmarks;
 }

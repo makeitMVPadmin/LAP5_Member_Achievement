@@ -37,7 +37,7 @@ export default function ResourceCard({ id, resource, url }) {
               src={upvoteImg}
               alt="upvote icon"
             />
-            <p className="resource__upvotes-total">{resource?.upvote_count}</p>
+            <p className="resource__upvotes-total">{resource?.upvotes_count}</p>
           </div>
           <div className="resource__icons">
             <img

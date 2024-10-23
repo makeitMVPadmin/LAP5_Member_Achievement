@@ -8,14 +8,13 @@ import {PointsContext} from "../../PointsProvider.jsx";
 // Lib & Helpers
 import {useGetResource} from "../../api/index.js";
 import {useToggleBookmarkMutation} from "../../api/toggleBookmark.js";
+import {useToggleUpvoteMutation} from "../../api/toggleUpvote.js";
 import {useToggleReadMutation} from "../../api/toggleRead.js";
 
 // Styling & Icons
-import {BookmarkIcon as BookmarkChecked} from '@heroicons/react/24/solid';
-import {BookmarkIcon as BookmarkUnchecked} from '@heroicons/react/24/outline';
-import {ClockIcon} from "@heroicons/react/24/solid/index.js";
+import {BookmarkIcon as BookmarkSolid, ClockIcon, HandThumbUpIcon as LikedSolid} from '@heroicons/react/24/solid';
+import {BookmarkIcon as BookmarkOutline, HandThumbUpIcon as LikedOutline} from '@heroicons/react/24/outline';
 import "./ResourceDetailCard.scss";
-
 
 // This will be considered a page now rendered through router
 const ResourceDetailCard = ({ currentUserId }) => {
@@ -25,7 +24,7 @@ const ResourceDetailCard = ({ currentUserId }) => {
   // Check if the currentResource is loading or throwing an error
   const { data: currentResourceData, isLoading, isError, error: getResourceError } = useGetResource(resourceId, currentUserId);
 
-  const mutation = useToggleBookmarkMutation(currentUserId, resourceId);
+  const mutation = useToggleBookmarkMutation();
   const handleBookmarked = () => {
     mutation.mutate({
       userId: currentUserId,
@@ -33,12 +32,20 @@ const ResourceDetailCard = ({ currentUserId }) => {
     });
   }
   
-  const readMutation = useToggleReadMutation(currentUserId, resourceId);
+  const readMutation = useToggleReadMutation();
   const handleRead = () => {
     readMutation.mutate({
       userId: currentUserId,
       resourceId,
     });
+  }
+
+  const upvoteMutation = useToggleUpvoteMutation();
+  const handleUpvote = () => {
+    upvoteMutation.mutate({
+      userId: currentUserId,
+      resourceId,
+    })
   }
 
   const { addPoints } = useContext(PointsContext);
@@ -56,6 +63,8 @@ const ResourceDetailCard = ({ currentUserId }) => {
   const isBookmarked = currentResourceData?.isBookmarked;
   const duration_min = currentResourceData?.duration_min;
   const isRead = currentResourceData?.isRead;
+  const isUpvoted = currentResourceData?.isUpvoted;
+  const upvotes_count = currentResourceData?.upvotes_count
   // TODO: Add comments
 
   // TODO: Ignore the below... Needs tlc
@@ -85,7 +94,7 @@ const ResourceDetailCard = ({ currentUserId }) => {
             <div
               onClick={handleBookmarked}
               className="resource-details__saved-icon">
-              {isBookmarked ? <BookmarkChecked fill="#0099ff" stroke="black" /> : <BookmarkUnchecked />}
+              {isBookmarked ? <BookmarkSolid fill="#0099ff" /> : <BookmarkOutline />}
             </div>
           </div>
         </div>
@@ -107,23 +116,12 @@ const ResourceDetailCard = ({ currentUserId }) => {
         
         {/*UPVOTING STUFFS*/}
         <div className="resource-details__rating-timer-container">
-        {/*  <div className="resource-details__rating-star-container">*/}
-        {/*    <div className="resource-details__stars">*/}
-        {/*      <Upvoting*/}
-        {/*        onClick={handleUpvotePoints}*/}
-        {/*        addPoints={addPoints}*/}
-        {/*        resource={currentResource?.id}*/}
-        {/*        currentUser={currentUser}*/}
-        {/*        initialUpvotes={currentResource?.data.upvote_count}*/}
-        {/*        initialDownvotes={currentResource?.data.downvote_count}*/}
-        {/*        onVoteChange={(upvotes, downvotes) => {*/}
-        {/*          updateResource(currentResource?.id, {*/}
-        {/*            upvotes, downvotes*/}
-        {/*          })*/}
-        {/*        }}*/}
-        {/*      />*/}
-        {/*    </div>*/}
-        {/*  </div>*/}
+          <div className="resource-details__rating-star-container">
+            <div onClick={handleUpvote} className="resource-details__stars">
+              <span>{isUpvoted ? <LikedSolid fill="#0099ff" width={24} /> : <LikedOutline width={24} />}</span>
+              <span>{upvotes_count ?? 0}</span>
+            </div>
+          </div>
         
           <div className="resource-details__timer">
             <p className="resource-details__duration">

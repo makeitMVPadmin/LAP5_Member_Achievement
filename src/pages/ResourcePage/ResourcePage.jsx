@@ -1,5 +1,4 @@
 // Deps
-import {useState} from "react";
 import {Outlet} from "react-router-dom";
 
 // Lib & Helpers
@@ -12,10 +11,10 @@ import "./ResourcePage.scss";
 
 // currentUser should be global state.
 export default function ResourcePage({ currentUser }) {
-  const [isLoading, setIsLoading] = useState(true); // keep
-
+  // const [isLoading, setIsLoading] = useState(true); // keep
+  console.log(currentUser);
   // START: Test Section
-  const resources = useGetResources();
+  const resources = useGetResources(currentUser.id);
   console.log("all resources: ", resources);
   // END: Test Section
 
