@@ -1,52 +1,67 @@
 // Deps
-import {memo, useContext} from "react";
-import {Link, Navigate, useLocation, useParams} from "react-router-dom";
+import { memo, useContext } from "react";
+import { Link, Navigate, useLocation, useParams } from "react-router-dom";
 
 // React Context global state
-import {PointsContext} from "../../PointsProvider.jsx";
+import { PointsContext } from "../../PointsProvider.jsx";
 
 // Lib & Helpers
-import {useGetResource} from "../../api/index.js";
-import {useToggleBookmarkMutation} from "../../api/toggleBookmark.js";
-import {useToggleUpvoteMutation} from "../../api/toggleUpvote.js";
-import {useToggleReadMutation} from "../../api/toggleRead.js";
+import { useGetResource } from "../../api/index.js";
+import { useToggleBookmarkMutation } from "../../api/toggleBookmark.js";
+import { useToggleUpvoteMutation } from "../../api/toggleUpvote.js";
+import { useToggleReadMutation } from "../../api/toggleRead.js";
 
 // Styling & Icons
-import {BookmarkIcon as BookmarkSolid, ClockIcon, HandThumbUpIcon as LikedSolid} from '@heroicons/react/24/solid';
-import {BookmarkIcon as BookmarkOutline, HandThumbUpIcon as LikedOutline} from '@heroicons/react/24/outline';
+import {
+  BookmarkIcon as BookmarkSolid,
+  ClockIcon,
+  HandThumbUpIcon as LikedSolid,
+} from "@heroicons/react/24/solid";
+import {
+  BookmarkIcon as BookmarkOutline,
+  HandThumbUpIcon as LikedOutline,
+} from "@heroicons/react/24/outline";
 import "./ResourceDetailCard.scss";
 
+// Components
+import { Comments } from "../Comments/Comments.jsx";
+
 // This will be considered a page now rendered through router
-const ResourceDetailCard = ({ currentUserId }) => {
+const ResourceDetailCard = ({ currentUser }) => {
   const { resourceId } = useParams();
   const location = useLocation();
 
   // Check if the currentResource is loading or throwing an error
-  const { data: currentResourceData, isLoading, isError, error: getResourceError } = useGetResource(resourceId, currentUserId);
+  const {
+    data: currentResourceData,
+    isLoading,
+    isError,
+    error: getResourceError,
+  } = useGetResource(resourceId, currentUser.id);
 
   const mutation = useToggleBookmarkMutation();
   const handleBookmarked = () => {
     mutation.mutate({
-      userId: currentUserId,
+      userId: currentUser.id,
       resourceId,
     });
-  }
-  
+  };
+
   const readMutation = useToggleReadMutation();
   const handleRead = () => {
     readMutation.mutate({
-      userId: currentUserId,
+      userId: currentUser.id,
       resourceId,
     });
-  }
+  };
 
   const upvoteMutation = useToggleUpvoteMutation();
   const handleUpvote = () => {
     upvoteMutation.mutate({
-      userId: currentUserId,
+      userId: currentUser.id,
       resourceId,
-    })
-  }
+    });
+  };
 
   const { addPoints } = useContext(PointsContext);
 
@@ -64,8 +79,10 @@ const ResourceDetailCard = ({ currentUserId }) => {
   const duration_min = currentResourceData?.duration_min;
   const isRead = currentResourceData?.isRead;
   const isUpvoted = currentResourceData?.isUpvoted;
-  const upvotes_count = currentResourceData?.upvotes_count
+  const upvotes_count = currentResourceData?.upvotes_count;
   // TODO: Add comments
+  const comments = currentResourceData?.comments;
+  console.log("comments received in resource detail card", comments);
 
   // TODO: Ignore the below... Needs tlc
   // const handleUpvotePoints = () => {
@@ -80,8 +97,11 @@ const ResourceDetailCard = ({ currentUserId }) => {
   //   addPoints(20);
   // };
   // TODO: End of Ignore
-  
-  if (location.pathname.includes("bookmarked") && !currentResourceData.isBookmarked) {
+
+  if (
+    location.pathname.includes("bookmarked") &&
+    !currentResourceData.isBookmarked
+  ) {
     return <Navigate to="/bookmarked" />;
   }
 
@@ -93,8 +113,13 @@ const ResourceDetailCard = ({ currentUserId }) => {
             <p className="resource-details__type">{type}</p>
             <div
               onClick={handleBookmarked}
-              className="resource-details__saved-icon">
-              {isBookmarked ? <BookmarkSolid fill="#0099ff" /> : <BookmarkOutline />}
+              className="resource-details__saved-icon"
+            >
+              {isBookmarked ? (
+                <BookmarkSolid fill="#0099ff" />
+              ) : (
+                <BookmarkOutline />
+              )}
             </div>
           </div>
         </div>
@@ -105,7 +130,11 @@ const ResourceDetailCard = ({ currentUserId }) => {
         <div className="resource-details__tags-container" role="list">
           {tags && tags.length > 0 ? (
             tags.map((tag) => (
-              <div key={tag.title} className="resource-details__tag" role="listitem">
+              <div
+                key={tag.title}
+                className="resource-details__tag"
+                role="listitem"
+              >
                 {tag.title}
               </div>
             ))
@@ -113,31 +142,33 @@ const ResourceDetailCard = ({ currentUserId }) => {
             <div>No Tags</div>
           )}
         </div>
-        
+
         {/*UPVOTING STUFFS*/}
         <div className="resource-details__rating-timer-container">
           <div className="resource-details__rating-star-container">
             <div onClick={handleUpvote} className="resource-details__stars">
-              <span>{isUpvoted ? <LikedSolid fill="#0099ff" width={24} /> : <LikedOutline width={24} />}</span>
+              <span>
+                {isUpvoted ? (
+                  <LikedSolid fill="#0099ff" width={24} />
+                ) : (
+                  <LikedOutline width={24} />
+                )}
+              </span>
               <span>{upvotes_count ?? 0}</span>
             </div>
           </div>
-        
+
           <div className="resource-details__timer">
-            <p className="resource-details__duration">
-              {duration_min} min
-            </p>
+            <p className="resource-details__duration">{duration_min} min</p>
             {/* Swapped a png image for hero icons. No need to add extra memory from heavy images */}
             <ClockIcon className="resource-details__timer-icon" />
           </div>
         </div>
-        
+
         <div className="resource-details__about">
-          <p className="resource-details__preview">
-            {description}
-          </p>
+          <p className="resource-details__preview">{description}</p>
         </div>
-        
+
         <div className="resource-details__bottom-container">
           <div className="resource-details__author-container">
             <div className="resource-details__avatar">
@@ -184,20 +215,20 @@ const ResourceDetailCard = ({ currentUserId }) => {
         </div>
       </section>
       {/* TODO: For Zahfir */}
-      {/*<div className="resource-details__comments">*/}
-      {/*  {currentResource?.data.comments && (*/}
-      {/*    <Comments*/}
-      {/*      comments={currentResource?.data.comments}*/}
-      {/*      // currentUser={currentUser}*/}
-      {/*      resourceId={currentResource?.id}*/}
-      {/*      onCommentAdded={(resourceId, newComment) => {*/}
-      {/*        if (onCommentAdded) {*/}
-      {/*          onCommentAdded(resourceId, newComment);*/}
-      {/*        }*/}
-      {/*      }}*/}
-      {/*    />*/}
-      {/*  )}*/}
-      {/*</div>*/}
+      <div className="resource-details__comments">
+        {comments && (
+          <Comments
+            comments={comments}
+            currentUser={currentUser}
+            resourceId={resourceId}
+            onCommentAdded={(resourceId, newComment) => {
+              if (onCommentAdded) {
+                onCommentAdded(resourceId, newComment);
+              }
+            }}
+          />
+        )}
+      </div>
     </>
   );
 };

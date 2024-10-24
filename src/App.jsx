@@ -1,13 +1,13 @@
 // Deps
-import {BrowserRouter, Route, Routes} from "react-router-dom";
-import {useEffect, useState} from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 // Lib & Helpers
-import {database} from "./config/firebase.js";
-import {doc, getDoc} from "@firebase/firestore";
+import { database } from "./config/firebase.js";
+import { doc, getDoc } from "@firebase/firestore";
 
 // Providers
-import {usePoints} from "./PointsProvider.jsx";
+import { usePoints } from "./PointsProvider.jsx";
 
 // Components
 import Header from "./components/Header/Header.jsx";
@@ -20,7 +20,7 @@ import ResourceDetailCard from "./components/ResourceDetailCard/ResourceDetailCa
 
 const App = () => {
   const [currentUser, setCurrentUser] = useState({});
-  const {points, handlePointsChange} = usePoints();
+  const { points, handlePointsChange } = usePoints();
 
   useEffect(() => {
     // Fetch user data from Firestore
@@ -42,45 +42,47 @@ const App = () => {
 
     fetchUserData();
   }, []);
-  
+
   return (
-          <BrowserRouter>
-            <Header />
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route
-                path="/resource"
-                element={<ResourcePage currentUser={currentUser} />}
-              >
-                <Route path=":resourceId" element={<ResourceDetailCard currentUserId={currentUser.id} />} />
-              </Route>
-              <Route
-                path="/bookmarked"
-                element={
-                  <BookMarkedPage currentUser={currentUser} />}
-              >
-                <Route path=":resourceId" element={<ResourceDetailCard currentUserId={currentUser.id} />} />
-              </Route>
-              <Route
-                path="/rewards"
-                element={
-                  <RewardsPage
-                    points={points}
-                    onPointsChange={handlePointsChange}
-                  />
-                }
-              />
-              <Route
-                path="/contributions"
-                element={
-                  <ContributionsPage
-                    // onBookmarkUpdate={handleBookmarkUpdate}
-                    currentUser={currentUser}
-                  />
-                }
-              />
-            </Routes>
-          </BrowserRouter>
+    <BrowserRouter>
+      <Header />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route
+          path="/resource"
+          element={<ResourcePage currentUser={currentUser} />}
+        >
+          <Route
+            path=":resourceId"
+            element={<ResourceDetailCard currentUser={currentUser} />}
+          />
+        </Route>
+        <Route
+          path="/bookmarked"
+          element={<BookMarkedPage currentUser={currentUser} />}
+        >
+          <Route
+            path=":resourceId"
+            element={<ResourceDetailCard currentUser={currentUser} />}
+          />
+        </Route>
+        <Route
+          path="/rewards"
+          element={
+            <RewardsPage points={points} onPointsChange={handlePointsChange} />
+          }
+        />
+        <Route
+          path="/contributions"
+          element={
+            <ContributionsPage
+              // onBookmarkUpdate={handleBookmarkUpdate}
+              currentUser={currentUser}
+            />
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   );
 };
 export default App;

@@ -4,97 +4,48 @@
 
 import React, { useState, useEffect } from "react";
 import "./CommentVotes.scss";
-import { database } from "../../config/firebase";
-import {
-  doc,
-  updateDoc,
-  arrayUnion,
-  arrayRemove,
-  getDoc,
-} from "firebase/firestore";
-import ThumbIcon from "../../assets/icons/thumbsUpComments.svg";
-import ThumbIconActive from "../../assets/icons/thumbsUpCommentsActive.svg";
+import { useToggleCommentUpvoteMutation } from "../../api/toggleCommentUpvote";
+import { HandThumbUpIcon as LikedSolid } from "@heroicons/react/24/solid";
+import { HandThumbUpIcon as LikedOutline } from "@heroicons/react/24/outline";
 
-function CommentVotes({ commentId, currentUser }) {
-  // console.log("CommentVotes received props:", { commentId, currentUser });
-  const [upvotes, setUpvotes] = useState(0);
-  const [voteStatus, setVoteStatus] = useState(null);
+function CommentVotes({ comment, currentUser }) {
+  console.log("CommentVotes received props:", { comment, currentUser });
+  const [upvoteCount, setUpvoteCount] = useState(comment.upvote_count || 0);
+  const [upvoters, setUpvoters] = useState(comment.upvotes || []);
+  const [isUpvoted, setIsUpvoted] = useState(
+    comment.upvotes?.includes(currentUser.id) || false
+  );
   const [isValidComment, setIsValidComment] = useState(true);
 
-  // console.log("CommentVotes render. commentId:", commentId, "currentUser:", currentUser);
-
   useEffect(() => {
-    // console.log("CommentVotes useEffect. commentId:", commentId);
-
-    if (!commentId) {
-      console.error("commentId is undefined or null");
+    if (!comment) {
+      console.error("comment is undefined or null");
       setIsValidComment(false);
+    }
+  }, [comment, currentUser]);
+
+  const upvoteMutation = useToggleCommentUpvoteMutation();
+  const handleUpvote = () => {
+    console.log("handleUpvote clicked", { comment, currentUser });
+    if (!comment || !currentUser || !currentUser.id) {
+      console.error("Invalid comment or currentUser");
       return;
     }
 
-    const fetchCommentData = async () => {
-      const commentRef = doc(database, "Comments", commentId);
-      try {
-        const commentDoc = await getDoc(commentRef);
-        if (commentDoc.exists()) {
-          const commentData = commentDoc.data();
-          if (Array.isArray(commentData.likedByUser)) {
-            const hasLiked = commentData.likedByUser.includes(currentUser.id);
-            setVoteStatus(hasLiked ? "upvoted" : null);
-            setUpvotes(commentData.likes || 0);
-          } else {
-            console.error(
-              "likedByUser is not an array:",
-              commentData.likedByUser
-            );
-          }
-        } else {
-          console.error("No such document!");
-          setIsValidComment(false);
-        }
-      } catch (error) {
-        console.error("Error fetching comment data:", error);
-        setIsValidComment(false);
+    upvoteMutation.mutate(
+      {
+        userId: currentUser.id,
+        commentId: comment.id,
+      },
+      {
+        onSuccess: (updatedComment) => {
+          console.log("Upvote mutation successful", updatedComment);
+          setUpvoteCount(updatedComment.upvote_count);
+          setUpvoters(updatedComment.upvotes);
+          setIsUpvoted(updatedComment.upvotes.includes(currentUser.id));
+        },
       }
-    };
-
-    fetchCommentData();
-  }, [commentId, currentUser]);
-
-  const handleUpvote = async () => {
-    if (!commentId || !currentUser || !currentUser.id) {
-      console.error("Invalid commentId or currentUser");
-      return;
-    }
-    const commentRef = doc(database, "Comments", commentId);
-    const userId = currentUser.id;
-
-    try {
-      const docSnap = await getDoc(commentRef);
-
-      if (!docSnap.exists()) {
-        console.error("Comment document does not exist");
-        return;
-      }
-
-      if (voteStatus === "upvoted") {
-        await updateDoc(commentRef, {
-          likedByUser: arrayRemove(userId),
-          likes: upvotes - 1,
-        });
-        setUpvotes((prevUpvotes) => prevUpvotes - 1);
-        setVoteStatus(null);
-      } else {
-        await updateDoc(commentRef, {
-          likedByUser: arrayUnion(userId),
-          likes: upvotes + 1,
-        });
-        setUpvotes((prevUpvotes) => prevUpvotes + 1);
-        setVoteStatus("upvoted");
-      }
-    } catch (error) {
-      console.error("Error updating upvote: ", error);
-    }
+    );
   };
 
   if (!isValidComment) {
@@ -104,15 +55,16 @@ function CommentVotes({ commentId, currentUser }) {
   return (
     <section className="voting">
       <div className="voting__container">
-        <img
-          src={voteStatus === "upvoted" ? ThumbIconActive : ThumbIcon}
-          alt="Thumb up"
-          className={`voting__thumb voting__thumb--up ${
-            voteStatus === "upvoted" ? "voting__thumb--active" : ""
-          }`}
-          onClick={handleUpvote}
-        />
-        {upvotes}
+        <div onClick={handleUpvote} className="">
+          <span>
+            {isUpvoted ? (
+              <LikedSolid fill="#0099ff" width={24} />
+            ) : (
+              <LikedOutline width={24} />
+            )}
+          </span>
+        </div>
+        {upvoteCount}
       </div>
     </section>
   );

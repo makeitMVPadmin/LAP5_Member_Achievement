@@ -14,8 +14,12 @@ import {
   query,
   where,
   getDocs,
+  updateDoc,
+  getDoc,
+  doc,
 } from "firebase/firestore";
-import { PointsContext } from "../../App";
+import { PointsContext } from "../../PointsProvider.jsx";
+import { addCommentToResource } from "../../api/getResource.js";
 
 export const Comments = ({
   comments,
@@ -23,7 +27,7 @@ export const Comments = ({
   resourceId,
   onCommentAdded,
 }) => {
-  // console.log("Received comments in Comments component:", comments);
+  console.log("Received comments in Comments component:", comments);
   const [postedComments, setPostedComments] = useState([]);
   const [comment, setComment] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -38,22 +42,27 @@ export const Comments = ({
     setComment(e.target.value);
   };
 
+  // // TODO: Use new collection rf_ResourceComment
   const submitComment = async (e) => {
+    console.log("entered submitComment");
     e.preventDefault();
     if (comment.trim() && currentUser) {
       const newComment = {
         content: comment,
         createdAt: Timestamp.now(),
-        likedByUser: [],
-        likes: 0,
-        name: currentUser.name || "Anonymous",
-        resourceId: resourceId || "",
-        userId: currentUser.id || "",
+        upvote_count: 0,
+        resource: resourceId || "",
+        user: currentUser.id || "",
       };
       try {
-        const commentsRef = collection(database, "Comments");
-        const docRef = await addDoc(commentsRef, newComment);
-        const commentWithId = { ...newComment, id: docRef.id };
+        // Add comment to ResourceComment collection
+        const commentsCollection = collection(database, "rf_ResourceComment");
+        const commentRef = await addDoc(commentsCollection, newComment);
+
+        const commentWithId = { ...newComment, id: commentRef.id };
+        console.log("Comment added:", commentRef);
+        await addCommentToResource(resourceId, commentRef.id);
+
         setPostedComments((prevComments) => [commentWithId, ...prevComments]);
         setComment("");
         setShowModal(true);
@@ -82,7 +91,7 @@ export const Comments = ({
           postedComments
             .sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate())
             .map((postedComment) => {
-              // console.log("Rendering comment:", postedComment);
+              console.log("Rendering comment:", postedComment);
               return (
                 <div key={postedComment.id} className="commentDivs">
                   <img
@@ -104,7 +113,7 @@ export const Comments = ({
                         aria-label="thumbs up Comment button"
                       >
                         <CommentVotes
-                          commentId={postedComment.id}
+                          comment={postedComment}
                           currentUser={currentUser}
                         />
                       </div>
