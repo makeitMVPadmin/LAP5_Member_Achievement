@@ -8,6 +8,8 @@ import "./ResourcePage.scss";
 import { collection, getDocs } from "firebase/firestore";
 import { database } from "../../config/firebase";
 import NoMatchesFoundCard from "../../components/NoMatchesFoundCard/NoMatchesFoundCard";
+import FilterChips from "../../components/FilterChips/FilterChips.jsx";
+import { tallyPopularTopics } from "../../util/helpers.js";
 
 export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   const [resources, setResources] = useState([]);
@@ -18,6 +20,7 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
   const [level, setLevel] = useState("");
   const [estDuration, setEstDuration] = useState("");
   const [search, setSearch] = useState("");
+  const [selectedChip, setSelectedChip] = useState("");
   const [commentCounts, setCommentCounts] = useState({});
   const [isLoading, setIsLoading] = useState(true);
 
@@ -38,10 +41,13 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
           const resourceComments = commentsSnapshot.docs
             .filter((commentDoc) => commentDoc.data().resourceId === doc.id)
             .map((commentDoc) => ({ id: commentDoc.id, ...commentDoc.data() }));
+          const tags = []
+          tags.push(resourceData.tag1, resourceData.tag2, resourceData.tag3, resourceData.tag4)
           return {
             ...resourceData,
             comments: resourceComments,
             commentsCount: resourceComments.length,
+            tags: tags,
           };
         });
 
@@ -71,6 +77,11 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
     getAllResourcesAndComments();
   }, []);
 
+// derived from resources state
+  const topFiveTags = tallyPopularTopics (resources).filter((tag)=>{
+    return tag.includes(selectedChip)
+  })
+  
   const handleSelectResource = useCallback(
     (clickedId) => {
       const foundResource = resources.find(
@@ -161,16 +172,19 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
       const includesSearchTerm = resource.title
         .toLowerCase()
         .includes(search.toLocaleLowerCase());
+    const includesSelectedChip = selectedChip === "" || resource.tags.includes(selectedChip) 
 
       return (
         currentCategory &&
         matchesType &&
         matchesLevel &&
         matchesEstDuration &&
-        includesSearchTerm
+        includesSearchTerm &&
+        includesSelectedChip
       );
     });
-  }, [resources, category, type, level, estDuration, search]);
+  }, [resources, category, type, level, estDuration, search, selectedChip]);
+
 
   return (
     <div className="resource__container">
@@ -186,6 +200,7 @@ export default function ResourcePage({ currentUser, onBookmarkUpdate }) {
       </div>
       <div className="search__bar">
         <SearchBar searchTerm={search} onSearch={setSearch} />
+        <FilterChips popularTopics={topFiveTags} onChipClick={setSelectedChip}/>
         {isLoading && <p>Loading...</p>}
         {!isLoading && filteredResources.length > 0 ? (
           <div className="resource__container">

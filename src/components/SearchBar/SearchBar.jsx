@@ -7,7 +7,7 @@ const SearchBar = ({searchTerm,onSearch}) => {
 		onSearch(e.target.value);
 	};
 	return (
-		<InputGroup>
+		<InputGroup ml={3}>
 			<InputLeftElement pointerEvents="none">
 				<SearchIcon color="gray.300" />
 			</InputLeftElement>
