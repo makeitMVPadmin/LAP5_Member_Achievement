@@ -1,31 +1,27 @@
-﻿import {doc, getDoc} from "@firebase/firestore";
+﻿import {useQuery} from '@tanstack/react-query';
+import {doc, getDoc} from "@firebase/firestore";
 import {database as db} from "../config/firebase.js";
-import {useQuery} from "@tanstack/react-query";
 
-export const useGetResource = (resourceId, userId) => useQuery({
+
+export const useGetResourceQuery = (resourceId, userId, tags) => useQuery({
 	queryKey: ['resources', resourceId],
-	queryFn: () => getResource(resourceId, userId),
+	queryFn: () => getResource(resourceId, userId, tags),
 });
 
-const getResource = async (resourceId, userId) => {
-	const resourceRef = doc(db, "rf_Resources", resourceId);
-	const resourceSnap = await getDoc(resourceRef);
+export const getResource =  async (resourceId, userId, tags) => {
+	const resourceSnap = await getDoc(doc(db, "rf_Resources", resourceId));
 	if (!resourceSnap.exists()) {
 		return;
 	}
+	const resourceData = resourceSnap.data();
 
-	const userRef = doc(db, "rf_Users", userId);
-	const userSnap = await getDoc(userRef);
+	let isBookmarked = false;
+	const userSnap = await getDoc(doc(db, "rf_Users", userId));
 	if (!userSnap.exists()) {
 		return;
 	}
 
-	const resourceData = resourceSnap.data();
-	const userData = userSnap.data();
-
-	console.log("my bookmarks", userData.bm_resources, resourceId);
-
-	let isBookmarked = false;
+	const userData = userSnap.data()
 	if (userData.bm_resources.includes(resourceId)) {
 		isBookmarked = true;
 	}
@@ -43,27 +39,16 @@ const getResource = async (resourceId, userId) => {
 	}
 	resourceData.isUpvoted = isUpvoted;
 
-	const tagRefs = resourceData.tags;
-	if (!Array.isArray(tagRefs) || tagRefs.length <= 0) {
-		return resourceData;
+	const resourceTags = [];
+	for (const tag of tags) {
+		for (const resourceTag of resourceData.tags) {
+			if (tag.id === resourceTag) {
+				resourceTags.push(tag)
+			}
+		}
 	}
-	
+
 	// TODO: Fetch me my comments 🍵
 
-	const tags = await getTags(tagRefs);
-
-	return { ...resourceData, tags };
-}
-
-
-const getTags = async (tagRefs) => {
-	return await Promise.all(tagRefs.map(async (tagRef) => {
-		const tagSnap = await getDoc(tagRef);
-		return tagSnap.data();
-	}));
-	
-		// if (!tagSnap.exists()) {
-		// 	console.log("No tag(s) found.");
-		// 	return [];
-		// }
+	return { ...resourceData, tags: resourceTags };
 }

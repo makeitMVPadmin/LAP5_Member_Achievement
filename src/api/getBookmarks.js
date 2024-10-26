@@ -16,7 +16,6 @@ export const getBookmarks = async (userId) => {
 
 	const userData = userSnap.data();
 	const resourceIds = userData.bm_resources;
-	console.log("bm_resources", resourceIds);
 	// fetch resource data based on user bookmarks ids
 
 	const bookmarks = [];
@@ -26,7 +25,9 @@ export const getBookmarks = async (userId) => {
 		if (!resourceSnap.exists()) {
 			throw new Error("Resource not found");
 		}
-		bookmarks.push({ id: resourceSnap.id, data: resourceSnap.data()});
+
+		const resourceData = resourceSnap.data();
+		bookmarks.push({ id: resourceSnap.id, ...resourceData });
 	}
 
 	return bookmarks;

@@ -19,15 +19,6 @@ export const useToggleUpvoteMutation = () => {
 				isUpvoted: !resource.isUpvoted
 			});
 
-			// we are targeting the list now, not the detail card
-			const resources = queryClient.getQueryData(['resources']);
-			const idx = resources.findIndex(resource => resource.id === resourceId);
-			resources[idx].data = updateResource(userId, resources[idx].data);
-
-			console.log(resources);
-
-			queryClient.setQueryData(['resources'], resources)
-
 			return { resource }
 		},
 		onError: (err) => {

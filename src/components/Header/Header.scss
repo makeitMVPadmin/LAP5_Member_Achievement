@@ -7,11 +7,10 @@ $font-stack-gilroy-bl: "PoppinsBold", serif;
 .header {
   align-items: center;
   display: flex;
-  height: 8vh;
+  max-height: 60px;
   justify-content: space-between;
   background: #fff;
   padding: 0 0.75rem;
-  margin-top: 0.75rem;
 
   @include desktop {
     height: 11vh;

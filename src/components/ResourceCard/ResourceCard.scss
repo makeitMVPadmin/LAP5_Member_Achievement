@@ -4,7 +4,6 @@
 @use "../../styles/partials/global" as *;
 
 .resource {
-  margin: 0.75rem 0.75rem 0.75rem 0;
   padding: 0.5rem;
   @include border;
   // height: 8rem;

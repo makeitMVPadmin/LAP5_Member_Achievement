@@ -17,10 +17,15 @@ import RewardsPage from "./pages/RewardsPage/RewardsPage.jsx";
 import BookMarkedPage from "./pages/BookMarkedPage/BookMarkedPage.jsx";
 import ContributionsPage from "./pages/ContributionsPage/ContributionsPage.jsx";
 import ResourceDetailCard from "./components/ResourceDetailCard/ResourceDetailCard.jsx";
+import {useGetTagsQuery} from "./api/getTags.js";
 
 const App = () => {
   const [currentUser, setCurrentUser] = useState({});
   const {points, handlePointsChange} = usePoints();
+  const [filterTags, setFilterTags] = useState([]);
+  
+  // preloading tags here
+  const { data: tags } = useGetTagsQuery();
 
   useEffect(() => {
     // Fetch user data from Firestore
@@ -33,14 +38,14 @@ const App = () => {
         if (userSnapshot.exists()) {
           setCurrentUser({ id: userDoc.id, ...userSnapshot.data() });
         } else {
-          // console.log("No such user!");
+          console.log("No such user!");
         }
       } catch (error) {
         console.error("Error fetching user data: ", error);
       }
     };
 
-    fetchUserData();
+   void fetchUserData();
   }, []);
   
   return (
@@ -50,16 +55,16 @@ const App = () => {
               <Route path="/" element={<Home />} />
               <Route
                 path="/resource"
-                element={<ResourcePage currentUser={currentUser} />}
+                element={<ResourcePage currentUser={currentUser} tags={tags} />}
               >
-                <Route path=":resourceId" element={<ResourceDetailCard currentUserId={currentUser.id} />} />
+                <Route path=":resourceId" element={<ResourceDetailCard currentUser={currentUser} tags={tags ?? []} />} />
               </Route>
               <Route
                 path="/bookmarked"
                 element={
                   <BookMarkedPage currentUser={currentUser} />}
               >
-                <Route path=":resourceId" element={<ResourceDetailCard currentUserId={currentUser.id} />} />
+                <Route path=":resourceId" element={<ResourceDetailCard currentUser={currentUser} tags={tags ?? []} />} />
               </Route>
               <Route
                 path="/rewards"

@@ -6,7 +6,6 @@ import {Link, Navigate, useLocation, useParams} from "react-router-dom";
 import {PointsContext} from "../../PointsProvider.jsx";
 
 // Lib & Helpers
-import {useGetResource} from "../../api/index.js";
 import {useToggleBookmarkMutation} from "../../api/toggleBookmark.js";
 import {useToggleUpvoteMutation} from "../../api/toggleUpvote.js";
 import {useToggleReadMutation} from "../../api/toggleRead.js";
@@ -15,191 +14,183 @@ import {useToggleReadMutation} from "../../api/toggleRead.js";
 import {BookmarkIcon as BookmarkSolid, ClockIcon, HandThumbUpIcon as LikedSolid} from '@heroicons/react/24/solid';
 import {BookmarkIcon as BookmarkOutline, HandThumbUpIcon as LikedOutline} from '@heroicons/react/24/outline';
 import "./ResourceDetailCard.scss";
+import {useGetResourceQuery} from "../../api/index.js";
 
 // This will be considered a page now rendered through router
-const ResourceDetailCard = ({ currentUserId }) => {
-  const { resourceId } = useParams();
-  const location = useLocation();
+const ResourceDetailCard = ({currentUser, tags}) => {
+	const {resourceId} = useParams();
+	const location = useLocation();
 
-  // Check if the currentResource is loading or throwing an error
-  const { data: currentResourceData, isLoading, isError, error: getResourceError } = useGetResource(resourceId, currentUserId);
-
-  const mutation = useToggleBookmarkMutation();
-  const handleBookmarked = () => {
-    mutation.mutate({
-      userId: currentUserId,
-      resourceId,
-    });
-  }
-  
-  const readMutation = useToggleReadMutation();
-  const handleRead = () => {
-    readMutation.mutate({
-      userId: currentUserId,
-      resourceId,
-    });
-  }
-
-  const upvoteMutation = useToggleUpvoteMutation();
-  const handleUpvote = () => {
-    upvoteMutation.mutate({
-      userId: currentUserId,
-      resourceId,
-    })
-  }
-
-  const { addPoints } = useContext(PointsContext);
-
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error: {getResourceError.message}</div>;
-
-  // I don't feel like typing someSuperLongName.prop every time so let's pull them out
-  const type = currentResourceData?.type;
-  const title = currentResourceData?.title;
-  const difficulty = currentResourceData?.difficulty;
-  const tags = currentResourceData?.tags;
-  const description = currentResourceData?.description;
-  const url = currentResourceData?.url;
-  const isBookmarked = currentResourceData?.isBookmarked;
-  const duration_min = currentResourceData?.duration_min;
-  const isRead = currentResourceData?.isRead;
-  const isUpvoted = currentResourceData?.isUpvoted;
-  const upvotes_count = currentResourceData?.upvotes_count
-  // TODO: Add comments
-
-  // TODO: Ignore the below... Needs tlc
-  // const handleUpvotePoints = () => {
-  //   addPoints(2);
-  // };
-
-  // const handleMarkAsReadPoints = () => {
-  //   addPoints(10);
-  // };
-
-  // const handleBookmarkPoints = () => {
-  //   addPoints(20);
-  // };
-  // TODO: End of Ignore
-  
-  if (location.pathname.includes("bookmarked") && !currentResourceData.isBookmarked) {
-    return <Navigate to="/bookmarked" />;
-  }
-
-  return (
-    <>
-      <section className="resource-details">
-        <div className="resource-details__heading-top">
-          <div className="resource-details__heading-top-container">
-            <p className="resource-details__type">{type}</p>
-            <div
-              onClick={handleBookmarked}
-              className="resource-details__saved-icon">
-              {isBookmarked ? <BookmarkSolid fill="#0099ff" /> : <BookmarkOutline />}
-            </div>
-          </div>
-        </div>
-        <div className="resource-details__heading-bottom">
-          <h1 className="resource-details__title">{title}</h1>
-        </div>
-        <p className="resource-details__level">{difficulty}</p>
-        <div className="resource-details__tags-container" role="list">
-          {tags && tags.length > 0 ? (
-            tags.map((tag) => (
-              <div key={tag.title} className="resource-details__tag" role="listitem">
-                {tag.title}
-              </div>
-            ))
-          ) : (
-            <div>No Tags</div>
-          )}
-        </div>
-        
-        {/*UPVOTING STUFFS*/}
-        <div className="resource-details__rating-timer-container">
-          <div className="resource-details__rating-star-container">
-            <div onClick={handleUpvote} className="resource-details__stars">
-              <span>{isUpvoted ? <LikedSolid fill="#0099ff" width={24} /> : <LikedOutline width={24} />}</span>
-              <span>{upvotes_count ?? 0}</span>
-            </div>
-          </div>
-        
-          <div className="resource-details__timer">
-            <p className="resource-details__duration">
-              {duration_min} min
-            </p>
-            {/* Swapped a png image for hero icons. No need to add extra memory from heavy images */}
-            <ClockIcon className="resource-details__timer-icon" />
-          </div>
-        </div>
-        
-        <div className="resource-details__about">
-          <p className="resource-details__preview">
-            {description}
-          </p>
-        </div>
-        
-        <div className="resource-details__bottom-container">
-          <div className="resource-details__author-container">
-            <div className="resource-details__avatar">
-              <img
-                id={currentResourceData?.submitter.name}
-                src={currentResourceData?.submitter.profile_pic}
-                alt="submitter profile picture"
-                style={{ objectFit: "cover" }}
-              />
-            </div>
-            <div className="resource-details__author">
-              <p className="resource-details__submission">Submitted by: </p>
-              <p className="resource-details__author-name">
-                {currentResourceData?.submitter.name}
-              </p>
-            </div>
-          </div>
-          <div className="resource-details__buttons-container">
-            <Link
-              to={url}
-              key=""
-              target="_blank"
-              rel="noopener noreferrer"
-              className="resource-details__link"
-            >
-              <button
-                className="resource-details__resource-button"
-                aria-label="Go to Resource"
-              >
-                Go to Resource
-              </button>
-            </Link>
-            <button
-              className={`resource-details__button ${
-                isRead ? "resource-details__button--read" : ""
-              }`}
-              onClick={handleRead}
-              aria-pressed={isRead}
-              aria-label={isRead ? "Read!" : "Mark as Read"}
-            >
-              {isRead ? "Read!" : "Mark as Read"}
-            </button>
-          </div>
-        </div>
-      </section>
-      {/* TODO: For Zahfir */}
-      {/*<div className="resource-details__comments">*/}
-      {/*  {currentResource?.data.comments && (*/}
-      {/*    <Comments*/}
-      {/*      comments={currentResource?.data.comments}*/}
-      {/*      // currentUser={currentUser}*/}
-      {/*      resourceId={currentResource?.id}*/}
-      {/*      onCommentAdded={(resourceId, newComment) => {*/}
-      {/*        if (onCommentAdded) {*/}
-      {/*          onCommentAdded(resourceId, newComment);*/}
-      {/*        }*/}
-      {/*      }}*/}
-      {/*    />*/}
-      {/*  )}*/}
-      {/*</div>*/}
-    </>
+	const { data: currentResourceData, isLoading } = useGetResourceQuery(
+	  resourceId,
+	  currentUser.id,
+	  tags
   );
+
+	const mutation = useToggleBookmarkMutation();
+	const handleBookmarked = () => {
+		mutation.mutate({
+			userId: currentUser.id, resourceId,
+		});
+	}
+
+	const readMutation = useToggleReadMutation();
+	const handleRead = () => {
+		readMutation.mutate({
+			userId: currentUser.id, resourceId,
+		});
+	}
+
+	const upvoteMutation = useToggleUpvoteMutation();
+	const handleUpvote = () => {
+		upvoteMutation.mutate({
+			userId: currentUser.id, resourceId,
+		})
+	}
+
+	const {addPoints} = useContext(PointsContext);
+
+	if (isLoading) {
+	  return <div>Loading...</div>;
+	}
+
+	// I don't feel like typing someSuperLongName.prop every time so let's pull them out
+	const type = currentResourceData?.type;
+	const title = currentResourceData?.title;
+	const difficulty = currentResourceData?.difficulty;
+	const resourceTags = currentResourceData?.tags;
+	const description = currentResourceData?.description;
+	const url = currentResourceData?.url;
+	const isBookmarked = currentResourceData?.isBookmarked;
+	const duration_min = currentResourceData?.duration_min;
+	const isRead = currentResourceData?.isRead;
+	const isUpvoted = currentResourceData?.isUpvoted;
+	const upvotes_count = currentResourceData?.upvotes_count
+	// TODO: Add comments
+
+	// TODO: Ignore the below... Needs tlc
+	// const handleUpvotePoints = () => {
+	//   addPoints(2);
+	// };
+
+	// const handleMarkAsReadPoints = () => {
+	//   addPoints(10);
+	// };
+
+	// const handleBookmarkPoints = () => {
+	//   addPoints(20);
+	// };
+	// TODO: End of Ignore
+
+	if (location.pathname.includes("bookmarked") && !currentResourceData.isBookmarked) {
+		return <Navigate to="/bookmarked"/>;
+	}
+
+	return (<>
+			<section className="resource-details">
+				<div className="resource-details__heading-top">
+					<div className="resource-details__heading-top-container">
+						<p className="resource-details__type">{type}</p>
+						<div
+							onClick={handleBookmarked}
+							className="resource-details__saved-icon">
+							{isBookmarked ? <BookmarkSolid fill="#0099ff"/> : <BookmarkOutline/>}
+						</div>
+					</div>
+				</div>
+				<div className="resource-details__heading-bottom">
+					<h1 className="resource-details__title">{title}</h1>
+				</div>
+				<p className="resource-details__level">{difficulty}</p>
+				<div className="resource-details__tags-container" role="list">
+					{resourceTags && resourceTags.length > 0 ? (resourceTags.map((tag) => (<div key={tag.title} className="resource-details__tag" role="listitem">
+								{tag.title}
+							</div>))) : (<div>No Tags</div>)}
+				</div>
+
+				{/*UPVOTING STUFFS*/}
+				<div className="resource-details__rating-timer-container">
+					<div className="resource-details__rating-star-container">
+						<div onClick={handleUpvote} className="resource-details__stars">
+							<span>{isUpvoted ? <LikedSolid fill="#0099ff" width={24}/> : <LikedOutline width={24}/>}</span>
+							<span>{upvotes_count ?? 0}</span>
+						</div>
+					</div>
+
+					<div className="resource-details__timer">
+						<p className="resource-details__duration">
+							{duration_min} min
+						</p>
+						{/* Swapped a png image for hero icons. No need to add extra memory from heavy images */}
+						<ClockIcon className="resource-details__timer-icon"/>
+					</div>
+				</div>
+
+				<div className="resource-details__about">
+					<p className="resource-details__preview">
+						{description}
+					</p>
+				</div>
+
+				<div className="resource-details__bottom-container">
+					<div className="resource-details__author-container">
+						<div className="resource-details__avatar">
+							<img
+								id={currentResourceData?.submitter.name}
+								src={currentResourceData?.submitter.profile_pic}
+								alt="submitter profile picture"
+								style={{objectFit: "cover"}}
+							/>
+						</div>
+						<div className="resource-details__author">
+							<p className="resource-details__submission">Submitted by: </p>
+							<p className="resource-details__author-name">
+								{currentResourceData?.submitter.name}
+							</p>
+						</div>
+					</div>
+					<div className="resource-details__buttons-container">
+						<Link
+							to={url}
+							key=""
+							target="_blank"
+							rel="noopener noreferrer"
+							className="resource-details__link"
+						>
+							<button
+								className="resource-details__resource-button"
+								aria-label="Go to Resource"
+							>
+								Go to Resource
+							</button>
+						</Link>
+						<button
+							className={`resource-details__button ${isRead ? "resource-details__button--read" : ""}`}
+							onClick={handleRead}
+							aria-pressed={isRead}
+							aria-label={isRead ? "Read!" : "Mark as Read"}
+						>
+							{isRead ? "Read!" : "Mark as Read"}
+						</button>
+					</div>
+				</div>
+			</section>
+			{/* TODO: For Zahfir */}
+			{/*<div className="resource-details__comments">*/}
+			{/*  {currentResource?.data.comments && (*/}
+			{/*    <Comments*/}
+			{/*      comments={currentResource?.data.comments}*/}
+			{/*      // currentUser={currentUser}*/}
+			{/*      resourceId={currentResource?.id}*/}
+			{/*      onCommentAdded={(resourceId, newComment) => {*/}
+			{/*        if (onCommentAdded) {*/}
+			{/*          onCommentAdded(resourceId, newComment);*/}
+			{/*        }*/}
+			{/*      }}*/}
+			{/*    />*/}
+			{/*  )}*/}
+			{/*</div>*/}
+		</>);
 };
 
 export default memo(ResourceDetailCard);

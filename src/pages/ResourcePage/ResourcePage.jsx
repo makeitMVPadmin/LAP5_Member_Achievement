@@ -1,94 +1,76 @@
 // Deps
-import {Outlet} from "react-router-dom";
-
 // Lib & Helpers
-import {useGetResources} from "../../api/index.js";
-
 // Components & Styling
-import NavBar from "../../components/NavBar/NavBar";
-import ResourceCard from "../../components/ResourceCard/ResourceCard.jsx";
 import "./ResourcePage.scss";
+import NavBar from "../../components/NavBar/NavBar.jsx";
+import {Outlet} from "react-router-dom";
+import ResourceCard from "../../components/ResourceCard/ResourceCard.jsx";
+import {useGetResourcesQuery} from "../../api/index.js";
+import {useGetPopularTagsQuery} from "../../helpers/getTopTags.js";
+import FilterChips from "../../components/FilterChips/FilterChips.jsx";
+import SearchBar from "../../components/SearchBar/SearchBar.jsx";
+import {useState} from "react";
+import {Box, Flex} from "@chakra-ui/react";
 
-// currentUser should be global state.
-export default function ResourcePage({ currentUser }) {
-  // const [isLoading, setIsLoading] = useState(true); // keep
-  console.log(currentUser);
-  // START: Test Section
-  const resources = useGetResources(currentUser.id);
-  console.log("all resources: ", resources);
-  // END: Test Section
+// currentUser should be global state. That's okay when dealing with session stuffs
+export default function ResourcePage({ currentUser, tags }) {
+  const [search, setSearch] = useState("");
+  const [selectedChip, setSelectedChip] = useState("");
 
-  // const handleFilterChange = ({ type, level, estDuration }) => {
-  //   setType(type === "All" || type === "" ? [] : [type]);
-  //   setLevel(level === "All" || level === "" ? [] : [level]);
-  //   setEstDuration(
-  //     estDuration === "All" || estDuration === "" ? [] : [estDuration]
-  //   );
-  // };
-
-  // const handleCommentAdded = useCallback((resourceId, newComment) => {
-  //   setResources((prevResources) =>
-  //     prevResources.map((resource) =>
-  //       resource.id === resourceId
-  //         ? {
-  //             ...resource,
-  //             comments: [...(resource.comments || []), newComment],
-  //             commentsCount: (resource.commentsCount || 0) + 1,
-  //           }
-  //         : resource
-  //     )
-  //   );
-  //
-  //   if (currentResource && currentResource.id === resourceId) {
-  //     setSelectedResource((prevSelected) => ({
-  //       ...prevSelected,
-  //       comments: [...(prevSelected.comments || []), newComment],
-  //       commentsCount: (prevSelected.commentsCount || 0) + 1,
-  //     }));
-  //   }
-  // }, []);
+  // we need the selected chip
+  // const includesSelectedChip = selectedChip === "" || resource.tags.includes(selectedChip)
+  
+  const { data: resources } = useGetResourcesQuery(currentUser.id);
+  const { data: topFiveTags } = useGetPopularTagsQuery(resources ?? [], tags);
 
   return (
-    <div className="resource__container">
-      <div className="resource__navbar-container">
+    <Flex gap={4} px={2} overflowY="hidden">
+      <Flex direction="column" minW={240} position="fixed" height="calc(100vh - 70px)">
         {/* Move to App.jsx to reduce redundancy */}
         <NavBar
           // onCategoryChange={setCategory}
-          onFormSubmit={(newResource) =>
-            setResources([...resources, newResource])
-          }
+          // onFormSubmit={(newResource) =>
+          //   setResources([...resources, newResource])
+          // }
           // onFilterChange={handleFilterChange}
           currentUser={currentUser}
         />
-      </div>
-      {/* This fragment remains, all else goes. */}
-      <>
-        <div className="resource__cards">
-          {/* Give resourceList access to the store, and pass in a filter function? */}
-          <section className="resourceList" aria-label="Resource List">
-            <div className="resourceList__wrapper" role="list">
-              {resources.data?.length > 0 ? (
-                resources.data?.map((resource) => {
-                  return (
-                    <ResourceCard
-                      key={resource.id}
-                      id={resource.id}
-                      resource={resource.data}
-                      url={`/resource/${resource.id}`}
-                    />
-                  );
-                })
-              ) : (
-                <p>No resources available for this category.</p>
-              )}
-            </div>
-          </section>
-        </div>
-        <div className="resource-details__container">
-          {/* This is a slot for the details card that shows up on the right in the Resource Library */}
-          <Outlet/> 
-        </div>
-      </>
-    </div>
+      </Flex>
+
+      <Box flexGrow={1} pl={260} height="calc(100vh - 70px)">
+        <Flex pb={2} direction="column" gap={1}>
+          <SearchBar searchTerm={search} onSearch={setSearch}/>
+          <FilterChips popularTags={topFiveTags}/>
+        </Flex>
+
+        <Flex gap={2}>
+          <Box className="resource__cards" maxW={300} minW={300}>
+            {/* Give resourceList access to the store, and pass in a filter function? */}
+            <section className="resourceList" aria-label="Resource List">
+              <Flex direction="column" gap={2} role="list" pb={30}>
+                {resources?.length > 0 ? (
+                  resources?.map((resource) => {
+                    return (
+                      <ResourceCard
+                        key={resource.id}
+                        id={resource.id}
+                        resource={resource}
+                        url={`/resource/${resource.id}`}
+                      />
+                    );
+                  })
+                ) : (
+                  <p>No resources available for this category.</p>
+                )}
+              </Flex>
+            </section>
+          </Box>
+          <Box width="100%">
+            {/* This is a slot for the details card that shows up on the right in the Resource Library */}
+            <Outlet />
+          </Box>
+        </Flex>
+      </Box>
+    </Flex>
   );
 }

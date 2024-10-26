@@ -3,7 +3,7 @@ import {database as db} from "../config/firebase.js";
 import {useQuery} from "@tanstack/react-query";
 import {getBookmarks} from "./getBookmarks.js";
 
-export const useGetResources = (userId) => useQuery({
+export const useGetResourcesQuery = (userId) => useQuery({
 	queryKey: ['resources'],
 	queryFn: () => getResources(userId)
 });
@@ -12,7 +12,7 @@ const getResources = async (userId) => {
 	const resourceSnap = await getDocs(collection(db, "rf_Resources"));
 
 	if (resourceSnap.empty) {
-		return;
+		return [];
 	}
 
 	// Prefetch me bookmarks but don't load until we have userId
@@ -23,7 +23,7 @@ const getResources = async (userId) => {
 	const resources = [];
 	for (const doc of resourceSnap.docs) {
 		const resourceData = doc.data();
-		resources.push({ id: doc.id, data: resourceData })
+		resources.push({ id: doc.id, ...resourceData })
 	}
 	return resources;
 }

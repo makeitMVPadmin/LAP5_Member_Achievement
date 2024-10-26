@@ -6,10 +6,11 @@
 .resource {
   &__container {
     display: flex;
+    gap: 1rem;
+    padding: 0 0.5rem;
   }
 
   &__cards {
-    margin-right: 0.75rem;
     width: 48%;
     // background-color: purple;
     height: 88vh;
@@ -29,17 +30,12 @@
     width: 90%;
     height: 100%;
     max-height: 100vh;
-    // margin-left: 0px;
-    margin: 0 0.75rem 0.75rem 0;
-
-    // background-color: orange;
     @include desktop {
       width: 25rem;
     }
   }
 
   &__navbar-container {
-    width: 19rem;
     display: flex;
     flex-direction: column;
 
